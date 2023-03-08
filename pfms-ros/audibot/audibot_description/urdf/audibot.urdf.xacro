@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<robot name="audibot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="half_front_track_width" value="0.819" />
+  <xacro:property name="half_rear_track_width" value="0.8" />
+  <xacro:property name="half_wheelbase" value="1.326" />
+
+  <xacro:property name="wheel_radius" value="0.36" />
+  <xacro:property name="wheel_thickness" value="0.25" />
+  <xacro:property name="wheel_mass" value="40.0" />
+
+  <xacro:property name="body_mass" value="1620.0" />
+  <xacro:property name="body_width" value="${2*half_rear_track_width}" />
+  <xacro:property name="body_depth" value="${2*half_wheelbase + 0.8}" />
+  <xacro:property name="body_length" value="0.6" />
+
+  <xacro:arg name="pub_tf" default="true" />
+  <xacro:arg name="robot_name" default="" />
+
+  <gazebo>
+    <!-- Simulated vehicle interface -->
+    <plugin name="audibot_interface_plugin" filename="libaudibot_interface_plugin.so" >
+      <robotName>$(arg robot_name)</robotName>
+      <pubTf>$(arg pub_tf)</pubTf>
+      <tfFreq>100.0</tfFreq>
+    </plugin>
+
+    <!-- Publish current joint angles -->
+    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+        <jointName>
+            steer_fl_joint, steer_fr_joint, wheel_fl_joint, wheel_fr_joint, wheel_rl_joint, wheel_rr_joint
+        </jointName>
+        <updateRate>100</updateRate>
+    </plugin>
+  </gazebo>
+
+  <xacro:macro name="rear_wheel" params="name x y z flip" >
+    <link name="wheel_${name}" >
+      <visual>
+        <origin xyz="0 0 0" rpy="1.57079632679 ${flip * 3.1415926535} 0" />
+        <geometry>
+          <mesh filename="package://audibot_description/meshes/wheel.dae" scale="1 1 1" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_thickness}" />
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${wheel_mass}"/>
+        <inertia ixx="${wheel_mass/12*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0" ixz="0" iyy="${wheel_mass/12*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0" izz="${wheel_mass/2 * wheel_radius*wheel_radius}"/>
+      </inertial>
+
+    </link>
+    <joint name="wheel_${name}_joint" type="continuous" >
+      <parent link="base_link" />
+      <child link="wheel_${name}" />
+      <origin xyz="${x} ${y} ${z}" rpy="-1.57079632679 0 0" />
+      <axis xyz="0 0 1" />
+      <limit effort="-1.0" velocity="-1.0" />
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="front_wheel" params="name x y z flip" >
+    <link name="wheel_${name}" >
+      <visual>
+        <origin xyz="0 0 0" rpy="1.57079632679 ${flip * pi} 0" />
+        <geometry>
+          <mesh filename="package://audibot_description/meshes/wheel.dae" scale="1 1 1" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_thickness}" />
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${wheel_mass}"/>
+        <inertia ixx="${wheel_mass/12*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0" ixz="0" iyy="${wheel_mass/12*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0" izz="${wheel_mass/2 * wheel_radius*wheel_radius}"/>
+      </inertial>
+    </link>
+
+    <link name="steer_${name}" >
+      <inertial>
+        <origin xyz="-0.013054 -0.0295 0" rpy="0 0 0"/>
+        <mass value="20.0"/>
+        <inertia ixx="2" ixy="0" ixz="0" iyy="2" iyz="0" izz="2"/>
+      </inertial>
+    </link>
+
+    <joint name="steer_${name}_joint" type="revolute" >
+      <parent link="base_link" />
+      <child link="steer_${name}" />
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
+      <axis xyz="0 0 1" />
+      <limit upper="0.6" lower="-0.6" effort="-1.0" velocity="-1.0" />
+    </joint>
+
+    <joint name="wheel_${name}_joint" type="continuous" >
+      <parent link="steer_${name}" />
+      <child link="wheel_${name}" />
+      <origin xyz="0 0 0" rpy="-1.57079632679 0 0" />
+      <axis xyz="0 0 1" />
+      <limit effort="-1.0" velocity="-1.0" />
+    </joint>
+  </xacro:macro>
+
+  <link name="base_footprint">
+  </link>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.035 0 0.025" rpy="0 0 0" />
+      <geometry>
+        <xacro:if value="$(arg blue)" >
+          <mesh filename="package://audibot_description/meshes/blue_body.dae" scale="1 1 1" />
+        </xacro:if>
+        <xacro:unless value="$(arg blue)" >
+          <mesh filename="package://audibot_description/meshes/orange_body.dae" scale="1 1 1" />
+        </xacro:unless>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.035 0 0.025" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://audibot_description/meshes/body_collision.stl" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${body_mass}"/>
+      <inertia ixx="${body_mass/12 * (body_width*body_width + body_length*body_length)}" ixy="0" ixz="0" iyy="${body_mass/12 * (body_length*body_length + body_depth*body_depth)}" iyz="0" izz="${body_mass/12 * (body_width*body_width + body_depth*body_depth)}"/>
+    </inertial>
+  </link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="${half_wheelbase} 0 ${wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+
+    <!-- Sensor links and fixed joints -->
+    <link name="front_laser_link">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
+             <box size="0.1 0.1 0.1"/>
+          </geometry>
+          <material name="blue"/>
+        </visual>
+
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+      </inertial>
+    </link>
+
+    <joint name="front_laser_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="front_laser_link"/>
+      <origin xyz="${body_depth -1.05} 0 0.2" rpy="0 0 0"/>
+    </joint>
+
+
+    <link name="front_sonar_link">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
+             <box size="0.1 0.1 0.1"/>
+          </geometry>
+          <material name="blue"/>
+        </visual>
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+      </inertial>
+    </link>
+    <joint name="front_sonar_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="front_sonar_link"/>
+      <origin xyz="${body_depth -1.05} 0 0.5" rpy="0 0 0"/>
+    </joint>
+
+
+  <xacro:rear_wheel name="rl" x="${-half_wheelbase}" y="${half_rear_track_width}" z="0" flip="1" />
+  <xacro:rear_wheel name="rr" x="${-half_wheelbase}" y="${-half_rear_track_width}" z="0" flip="0" />
+  <xacro:front_wheel name="fl" x="${half_wheelbase}" y="${half_front_track_width}" z="0" flip="1" />
+  <xacro:front_wheel name="fr" x="${half_wheelbase}" y="${-half_front_track_width}" z="0" flip="0" />
+
+  <xacro:property name="wheel_friction" value="1.75" />
+
+  <gazebo reference="base_link" >
+    <mu1>0.5</mu1>
+    <mu2>0.5</mu2>
+  </gazebo>
+
+  <gazebo reference="wheel_fl" >
+    <mu1>${wheel_friction}</mu1>
+    <mu2>${wheel_friction}</mu2>
+  </gazebo>
+
+  <gazebo reference="wheel_fr" >
+    <mu1>${wheel_friction}</mu1>
+    <mu2>${wheel_friction}</mu2>
+  </gazebo>
+
+  <gazebo reference="wheel_rl" >
+    <mu1>${wheel_friction}</mu1>
+    <mu2>${wheel_friction}</mu2>
+  </gazebo>
+
+  <gazebo reference="wheel_rr" >
+    <mu1>${wheel_friction}</mu1>
+    <mu2>${wheel_friction}</mu2>
+  </gazebo>
+
+
+    <gazebo reference="front_laser_link">
+      <sensor name='front_laser_sensor' type='ray'>
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>30</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>640</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.5707</min_angle>
+              <max_angle>1.5707</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.10</min>
+            <max>30.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise parameters based on published spec for Hokuyo laser
+                 achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                 stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                 reading. -->
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+            <topicName>/orange/laser/scan</topicName>
+            <frameName>/orange/front_laser_link</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="front_sonar_link">
+      <sensor name='front_sonar_sensor' type='ray'>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>1</samples>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>5</max>
+            <resolution>0.2</resolution>
+          </range>
+        </ray>
+        <plugin name='front_sonar_sensor' filename='libgazebo_ros_range.so'>
+          <topicName>/orange/sonar/range</topicName>
+          <frameName>orange/front_sonar_link</frameName>
+          <fov>0.2</fov>
+        </plugin>
+        <always_on>false</always_on>
+        <update_rate>5</update_rate>
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+
+</robot>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>gazebo_tf</name>
+  <version>0.1.2</version>
+  <description>The pfms_connector package makes a bridge between ROS and shared memory</description>
+
+  <maintainer email="Alen.Alempijevic@uts.edu.au">Alen Alempijevic</maintainer>
+  <license>BSD</license>
+  <url type="website">http://wiki.ros.org/beginner_tutorials</url>
+  <author email="Alen.Alempijevic@uts.edu.au">Alen Alempijevic</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>tf</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>gazebo_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>tf</run_depend>
+
+</package>

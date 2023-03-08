@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+        <sky>
+            <sunset>20</sunset>
+        </sky>
+    </scene>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+      <model name="wall">
+        <pose>0 0 2.25 0 0 0</pose>
+        <include>
+          <!--static>true</static-->
+          <uri>model://closed_green_wall</uri>
+        </include>
+      </model>
+    <!-- Focus camera bit behind platforms -->
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>26.1679 -10.733 33.53 0.000000 0.973796 2.860191</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

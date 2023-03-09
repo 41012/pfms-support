@@ -18,7 +18,7 @@ git clone git@github.com:41012/pfms-support.git
 
 Proceed to install the pipes library, which has been supplied to allow using the physics simulator, at present bypassing the ROS framework for students.
 
-Please select the pipes package for the version of ROS you have
+Please select the pipes package for the version of ROS you have (there is an additional package for arm64 processors as well)
 
 ```bash
 cd pfms-support

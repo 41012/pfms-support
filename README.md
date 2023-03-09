@@ -7,11 +7,10 @@ Assignment 1 - Setup
 
 **ASSUMPTION**: you have cloned this repository under your ~/git folder.
 
-UPDATED: 
-
-
+UPDATED: 09 MARCH 19:41
 
 ```
+cd ~/git
 git clone git@github.com:41012/pfms-support.git
 ```
 
@@ -22,6 +21,7 @@ Proceed to install the pipes library, which has been supplied to allow using the
 Please select the pipes package for the version of ROS you have
 
 ```bash
+cd pfms-support
 cd packages
 sudo dpkg -i pipes-2.2.0-noetic-Linux.deb
 ```

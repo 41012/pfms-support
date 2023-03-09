@@ -83,7 +83,7 @@ dpkg -l | grep pipes
 
 To update a library make sure `git pul` from `~/git/pfms-support`
 
-To update **pipes** library execute below (where you need to specify the correct package name, ie `pipes-2.2.0-noetic.Linux.deb`
+To update **pipes** library execute below (where you need to specify the correct package name, ie `pipes-2.2.0-noetic.Linux.deb` instead of `pipes-latest-Linux.deb` in the below.
 
 ```bash
 cd ~/git/pfms-support/packages

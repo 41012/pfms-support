@@ -16,8 +16,7 @@ catkin_package()
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Include the headers and library directory needed
-include_directories(/opt/pfms/include)
-link_directories(/opt/pfms/lib)
+find_package(pipes)
 
 message ( STATUS "Include Dirs ${catkin_INCLUDE_DIRS}" )
 message ( STATUS "Include Libs ${catkin_LIBRARIES}" )

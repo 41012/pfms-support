@@ -18,7 +18,7 @@ git clone git@github.com:41012/pfms-support.git
 
 Proceed to install the pipes library, which has been supplied to allow using the physics simulator, at present bypassing the ROS framework for students.
 
-Please select the pipes package for the version of ROS you have
+Please select the pipes package for the version of ROS you have (there is an additional package for arm64 processors as well)
 
 ```bash
 cd pfms-support
@@ -83,7 +83,7 @@ dpkg -l | grep pipes
 
 To update a library make sure `git pul` from `~/git/pfms-support`
 
-To update **pipes** library execute below (where you need to specify the correct package name, ie `pipes-2.2.0-noetic.Linux.deb`
+To update **pipes** library execute below (where you need to specify the correct package name, ie `pipes-2.2.0-noetic.Linux.deb` instead of `pipes-latest-Linux.deb` in the below.
 
 ```bash
 cd ~/git/pfms-support/packages

@@ -42,7 +42,7 @@
           <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
            <box size="0.1 0.1 0.1"/>
         </geometry>
-        <material name="red"/>
+        <!--material name="red"/-->
       </visual>
 
       <inertial>
@@ -59,7 +59,7 @@
             <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
              <box size="0.1 0.1 0.1"/>
           </geometry>
-          <material name="blue"/>
+          <!--material name="blue"/-->
         </visual>
       <inertial>
         <mass value="1e-5"/>
@@ -127,9 +127,9 @@
           </noise>
         </imu>
       </sensor>
-   </gazebo>
+  </gazebo>
 
-<gazebo>
+  <gazebo>
     <!-- front camera -->
     <sensor name="front_camera" type="camera">
       <camera>
@@ -269,6 +269,7 @@
         <plugin name='ros_sonar' filename='libplugin_ros_sonar.so'>
             <topicName>/drone/sonar/range</topicName>
             <frameName>drone/front_sonar_link</frameName>
+            <radiation>ultrasound</radiation>
         </plugin>
         <sonar>
           <min>0.3</min>

@@ -154,7 +154,7 @@
             <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
              <box size="0.1 0.1 0.1"/>
           </geometry>
-          <material name="blue"/>
+          <!--material name="blue"/-->
         </visual>
 
       <inertial>
@@ -177,7 +177,7 @@
             <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
              <box size="0.1 0.1 0.1"/>
           </geometry>
-          <material name="blue"/>
+          <!--material name="blue"/-->
         </visual>
       <inertial>
         <mass value="1"/>
@@ -286,6 +286,7 @@
           <topicName>/orange/sonar/range</topicName>
           <frameName>orange/front_sonar_link</frameName>
           <fov>0.2</fov>
+          <radiation>ultrasound</radiation>
         </plugin>
         <always_on>false</always_on>
         <update_rate>5</update_rate>

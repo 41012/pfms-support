@@ -72,24 +72,24 @@ dpkg -l | grep pipes
 
 ## Current versions
 
-| package        | version |
-| -------------- | ------- |
-| audibot_gazebo | 0.2.1   |
-| gazebo_tf      | 0.1.2   |
-| sjtu_drone     | 0.0.0   |
-| pipes          | 2.2.0   |
+| package        | version  X.Y.Z |
+| -------------- | -------------- |
+| audibot_gazebo | 0.2.1          |
+| gazebo_tf      | 0.1.2          |
+| sjtu_drone     | 0.0.0          |
+| pipes          | 2.2.0          |
 
 ### Upgrades
 
-To update a library make sure `git pul` from `~/git/pfms-support`
+To update any of the libraries make sure `git pul` from `~/git/pfms-support`
 
-To update **pipes** library execute below (where you need to specify the correct package name, ie `pipes-2.2.0-noetic.Linux.deb` instead of `pipes-latest-Linux.deb` in the below.
+To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table,  your `ROSVERSION` (`melodic` and `noetic`) and your system (`Linux` or `arm64`).
 
 ```bash
 cd ~/git/pfms-support/packages
-sudo dpkg -i pipes-latest-Linux.deb
+sudo dpkg -i pipes-X.Y.Z-ROSVESRION-SYSTEM.deb
 ```
-To update all other libraries recompile your catkin workspace
+To update **all other packages** recompile your catkin workspace
 
 ```bash
 cd ~/catkin_ws

@@ -3,18 +3,20 @@
 Assignment 1 - Setup
 =========================
 
-**PRE-REQUISITE:** you have installed ROS and created a workspace as per instructions on canvas in week 00. 
+**PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00. 
 
-**ASSUMPTION**: you have cloned this repository under your ~/git folder.
+**UPDATED: 09 MARCH 19:41**
 
-UPDATED: 09 MARCH 19:41
+[TOC]
 
-```
+## Installation
+
+If not done already:
+
+```bash
 cd ~/git
 git clone git@github.com:41012/pfms-support.git
 ```
-
-## Installation
 
 Proceed to install the pipes library, which has been supplied to allow using the physics simulator, at present bypassing the ROS framework for students.
 
@@ -41,7 +43,9 @@ catkin_make
 
 You should now have all the required software. 
 
-You can launch the simulator for the audi and drone
+## Running Simulator
+
+You can launch the simulator for the audi , drone or both. You will need to launch the simulator if your running any code that sends commands or receives data from the simulator. 
 
 ```
 roslaunch gazebo_tf multi.launch
@@ -50,7 +54,9 @@ roslaunch gazebo_tf multi.launch
 
 The terminal where you have executed this command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
 
-You can run other commands in another terminal. There is also a gui for the quadcopter that you need to run from another terminal () (just for sanity checking), hit `Z` first to enable control.
+Instead of `multi.lauch` you can run `ugv.launch` for the car or `uav.launch` for the drone.
+
+You can run other commands in another terminal.  For instance there is also a gui for the quadcopter that you need to run from another terminal (just for sanity checking), hit `Z` first to enable control.
 
 ```bash
 rosrun sjtu_drone drone_keyboard
@@ -70,7 +76,7 @@ rosversion sjtu_drone
 dpkg -l | grep pipes
 ```
 
-## Current versions
+### Current versions
 
 | package        | version  X.Y.Z |
 | -------------- | -------------- |

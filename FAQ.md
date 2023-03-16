@@ -43,16 +43,24 @@ Check your ~/.bashrc file to see if your workspace had been configured correctly
 tail ~/.bashrc
 ```
 
-The last few lines should look something like
+The last few should look something exactly like this (you should have only two lines  `sources )
 
 ```bash
 source /opt/ros/noetic/setup.bash
 source /home/student/catkin_ws/devel/setup.bash
 ```
 
-If your missing the `/opt/ros/` section execute `echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc`
+If they are not use nano editor. Open the file via`nano ~/.bashrc`  then remove the lines so the only thing you have is the `source /opt/ros/noetic/setup.bash ` part. Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and use CTRL+K to remove who lines or backspace. Save via CTRL+X and Y (follow prompts).
 
-If your missing the `/home/....` section (this is specific to your computer and your username then execute) `echo "source ${HOME}/catkin_ws/devel/setup.bash" >> ~/.bashrc`
+Now rebuild the package, by also deleting previous `build` and `devel` folders.
+
+```bash
+cd ~/catkin_ws
+rm -rf build devel
+catkin_make
+```
+
+Then execute `echo "source ${HOME}/catkin_ws/devel/setup.bash" >> ~/.bashrc`
 
 Just sanity check again
 
@@ -60,11 +68,16 @@ Just sanity check again
 tail ~/.bashrc
 ```
 
-If it all looks good then execute `source ~/.bashrc`. This should not report errors (about unknown locations). if it does you need to remove those line that source the files. You can do so by using `nano` which is a editor
+If it all looks good then execute `source ~/.bashrc`. This should not report errors (about unknown locations). if
+
+## RVIZ only shows gray screen instead of robot
+
+If your RVIZ is not showing anything, it is blank as per image below. The fix is to add the command into your `~/.bashrc`. 
 
 ```bash
-nano ~/.bashrc
+export LIBGL_ALWAYS_SOFTWARE=true
 ```
 
-Edit the file (used arrows/backspace to remove lines and then save CTRL+X and Y (follow prompts), execute `source ~/.bashrc` to check if the changes are OK.
+<img src="./images/rviz_gray.png" style="zoom:70%;" />
 
+Use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the command. Save via CTRL+X and Y (follow prompts).

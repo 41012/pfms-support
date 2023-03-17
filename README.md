@@ -25,7 +25,7 @@ Please select the pipes package for the version of ROS you have (there is an add
 ```bash
 cd pfms-support
 cd packages
-sudo dpkg -i pipes-2.2.0-noetic-Linux.deb
+sudo dpkg -i pipes-2.3.0-noetic-Linux.deb
 ```
 
 Then link the `a1_ros` folder to your `catkin_ws/src`
@@ -83,7 +83,7 @@ dpkg -l | grep pipes
 | audibot_gazebo | 0.2.1          |
 | gazebo_tf      | 0.1.2          |
 | sjtu_drone     | 0.0.0          |
-| pipes          | 2.2.0          |
+| pipes          | 2.3.0          |
 
 ### Upgrades
 

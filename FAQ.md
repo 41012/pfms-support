@@ -3,8 +3,6 @@
 FAQ
 =========================
 
-[TOC]
-
 ## [multi.launch] is neither a launch file in package [gazebo_tf] nor is [gazebo_tf] a launch file name
 
 The error indicates ROS is unable to find the package that contains this file, which is tied to the simulation.
@@ -81,3 +79,12 @@ export LIBGL_ALWAYS_SOFTWARE=true
 <img src="./images/rviz_gray.png" style="zoom:70%;" />
 
 Use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the command. Save via CTRL+X and Y (follow prompts).
+
+
+## Error while loading shared libraryies: libpipes.so: cannot open shared object file
+
+This error occurs when trying to execute (run) `./command_ugv` and is not related to the building process, pipes indeed exists on your system, it is related to he runtim environment (when you try to run the executable).
+
+You can execute this in the terminal window prior to `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib` running `command_ugv`. 
+
+If this fixes the issue to make this permanant use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the export command. Save via CTRL+X and Y (follow prompts).

@@ -95,10 +95,18 @@ To update **pipes** library execute below (where you need to specify the correct
 cd ~/git/pfms-support/packages
 sudo dpkg -i pipes-X.Y.Z-ROSVESRION-SYSTEM.deb
 ```
+
+If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.
+
+```
+rm CMakeCache.txt
+cmake ..
+make
+```
+
 To update **all other packages** recompile your catkin workspace
 
 ```bash
 cd ~/catkin_ws
 catkin_make
 ```
-

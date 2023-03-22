@@ -7,7 +7,7 @@ Assignment 1 - Setup
 
 **UPDATED: 09 MARCH 19:41**
 
-[TOC]
+If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
 ## Installation
 

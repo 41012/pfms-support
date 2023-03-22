@@ -48,9 +48,9 @@ source /opt/ros/noetic/setup.bash
 source /home/student/catkin_ws/devel/setup.bash
 ```
 
-If they are not use nano editor. Open the file via`nano ~/.bashrc`  then remove the lines so the only thing you have is the `source /opt/ros/noetic/setup.bash ` part. Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and use CTRL+K to remove who lines or backspace. Save via CTRL+X and Y (follow prompts).
+If they are not use nano editor. Open the file via`nano ~/.bashrc`  then remove the lines so the only thing you have is the `source /opt/ros/noetic/setup.bash ` part. Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and use CTRL+K to remove whole lines at once, or use backspace to delete a character at a time. Save the file via CTRL+X and Y (follow prompts).
 
-Now rebuild the package, by also deleting previous `build` and `devel` folders.
+Now rebuild the package, best done by also deleting previous `build` and `devel` folders.
 
 ```bash
 cd ~/catkin_ws
@@ -66,7 +66,7 @@ Just sanity check again
 tail ~/.bashrc
 ```
 
-If it all looks good then execute `source ~/.bashrc`. This should not report errors (about unknown locations). if
+If it all looks good then execute `source ~/.bashrc`. This should not report errors (about unknown locations). 
 
 ## RVIZ only shows gray screen instead of robot
 

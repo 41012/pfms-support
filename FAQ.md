@@ -83,8 +83,8 @@ Use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/bac
 
 ## Error while loading shared libraryies: libpipes.so: cannot open shared object file
 
-This error occurs when trying to execute (run) `./command_ugv` and is not related to the building process, pipes indeed exists on your system, it is related to he runtim environment (when you try to run the executable).
+This error occurs when trying to execute (run) `./command_ugv` and is not related to the building process, pipes indeed exists on your system, it is related to the runtime environment (when you try to run the executable).
 
-You can execute this in the terminal window prior to `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib` running `command_ugv`. 
+Try executing `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib` in the terminal window prior to running `./command_ugv`. 
 
-If this fixes the issue to make this permanant use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the export command. Save via CTRL+X and Y (follow prompts).
+If this fixes the issue, to make this permanant use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the export command. Save via CTRL+X and Y (follow prompts).

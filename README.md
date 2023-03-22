@@ -28,7 +28,7 @@ cd packages
 sudo dpkg -i pipes-2.3.0-noetic-Linux.deb
 ```
 
-Then link the `a1_ros` folder to your `catkin_ws/src`
+Then link the `pfms_ros` folder to your `catkin_ws/src`
 
 ```bash
 cd ~/catkin_ws/src

@@ -93,7 +93,7 @@ To update **pipes** library execute below (where you need to specify the correct
 
 ```bash
 cd ~/git/pfms-support/packages
-sudo dpkg -i pipes-X.Y.Z-ROSVESRION-SYSTEM.deb
+sudo dpkg -i pipes-X.Y.Z-ROSVERSION-SYSTEM.deb
 ```
 
 If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.

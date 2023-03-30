@@ -24,14 +24,11 @@ ln -s ~/git/pfms_support/pfms_ros
 ```
 2) You have not compiled the packages
 
-You need to execute `catkin_make` within the `catkin_ws` folder as per instructions. When catkin_make is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. You can also build individual packages so can try
+You need to execute `catkin_make` within the `catkin_ws` folder as per instructions. When catkin_make is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. 
 
-```bash
-cd ~/catkin_ws
-catkin_make --pkg gazebo_tf
-```
+If `catkin_make` only produces few lines an error check if you have actually customised Linux for PfMS, in particular section on [install ROS and all other required packages](https://canvas.uts.edu.au/courses/26214/pages/customising-linux-install-for-pfms?wrap=1) and read next section below about ~/.bashrc
 
-This will only compile gazebo_tf. If this produces only few lines an error check if you have actually customised Linux for PfMS, in particular section on [install ROS and all other required packages](https://canvas.uts.edu.au/courses/26214/pages/customising-linux-install-for-pfms?wrap=1) and read next section below about ~/.bashrc
+If `catkin_make` causes your computer to freeze, it might be becasuse by default it tries to use 4 cores to compile, you can try `catkin_make -j1` which only uses one core.
 
 3. You have not sourced your workspace
 

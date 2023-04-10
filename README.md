@@ -1,6 +1,6 @@
 
 
-Assignment 1 - Setup
+PFMS Support - Setup
 =========================
 
 **PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00. 

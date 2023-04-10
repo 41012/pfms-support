@@ -89,7 +89,7 @@ dpkg -l | grep pipes
 
 To update any of the libraries make sure `git pull` from `~/git/pfms-support`
 
-To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table,  your `ROSVERSION` (`melodic` and `noetic`) and your system (`Linux` or `arm64`).
+To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table,  your `ROSVERSION` (`melodic` and `noetic`) and your system (`Linux` or `arm64`). So, for instance, if your after version 2.1.0, on noetic and Linux the file would be `pipes-2.1.0-noetic-Linux.deb`.
 
 ```bash
 cd ~/git/pfms-support/packages

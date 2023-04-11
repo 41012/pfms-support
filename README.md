@@ -5,7 +5,7 @@ PFMS Support - Setup
 
 **PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00. 
 
-**UPDATED: 09 MARCH 19:41**
+**UPDATED: 11 APRIL 13:55**
 
 If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
@@ -83,7 +83,7 @@ dpkg -l | grep pipes
 | audibot_gazebo | 0.2.1          |
 | gazebo_tf      | 0.1.2          |
 | sjtu_drone     | 0.0.0          |
-| pipes          | 2.4.0          |
+| pipes          | 2.5.0          |
 
 ### Upgrades
 

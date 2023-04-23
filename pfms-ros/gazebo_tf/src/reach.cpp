@@ -122,7 +122,7 @@ void OdoCallback(const nav_msgs::Odometry::ConstPtr& msg)
                if (reach){
                    ros::Time endTime = ros::Time::now();
                    double dt = endTime.toSec() - startTime_.toSec();
-                   ROS_INFO_STREAM("GOALS REACHED : " <<  dt );
+                   ROS_INFO_STREAM("All goals reached in " <<  dt <<"[s]" );
                    minDist_=dt;
               }
               goalSet_=false;

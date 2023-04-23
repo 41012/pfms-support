@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+
+ <include file="$(find audibot_gazebo)/launch/audibot_named_robot.launch" >
+   <arg name="robot_name" value="orange" />
+   <arg name="start_x" value="0" />
+   <arg name="start_y" value="2" />
+   <arg name="start_z" value="0" />
+   <arg name="start_yaw" value="0" />
+   <arg name="pub_tf" value="true" />
+   <arg name="tf_freq" value="100.0" />
+   <arg name="blue" value="false" />
+ </include>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="false"/>
+    <arg name="headless" value="true"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <node pkg="rviz" type="rviz" name="single_vehicle_viz" args="-d $(find gazebo_tf)/rviz/ugv.rviz" />
+
+  <node pkg="gazebo_tf" type="gazebo_connect" name="gazebo_connect" />
+  <!--node pkg="gazebo_tf" type="reach" name="reach" /-->
+
+</launch>

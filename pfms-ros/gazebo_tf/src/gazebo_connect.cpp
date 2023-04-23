@@ -54,6 +54,11 @@ public:
             return;
         }
 
+        if(isnan(steering)){
+            ROS_DEBUG_STREAM("Steering angle is nan");
+            return;
+        }
+
         double radius = 2.65/(tan(steering/17.3));
 
         int marker_counter=0;

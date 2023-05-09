@@ -129,7 +129,7 @@
       </sensor>
   </gazebo>
 
-  <gazebo>
+  <gazebo reference="base_link">
     <!-- front camera -->
     <sensor name="front_camera" type="camera">
       <camera>

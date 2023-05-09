@@ -188,7 +188,7 @@ public:
            odom.header.frame_id="world";
            odom.pose.pose=pose;
            odom.twist.twist=twist;
-           ROS_INFO_STREAM_THROTTLE(10.0,"QUAD x,y,yaw,vx,vy:" <<
+           ROS_INFO_STREAM_THROTTLE(60.0,"QUAD x,y,yaw,vx,vy:" <<
                                     msg->pose[i].position.x << " " <<
                                     msg->pose[i].position.y << " " <<
                                     tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
@@ -207,7 +207,7 @@ public:
              odom.header.frame_id="world";
              odom.pose.pose=pose;
              odom.twist.twist=twist;
-             ROS_INFO_STREAM_THROTTLE(10.0,"AUDI x,y,yaw,vx,vy:" <<
+             ROS_INFO_STREAM_THROTTLE(60.0,"AUDI x,y,yaw,vx,vy:" <<
                                     msg->pose[i].position.x << " " <<
                                     msg->pose[i].position.y << " " <<
                                     tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
@@ -226,7 +226,7 @@ public:
              odom.header.frame_id="world";
              odom.pose.pose=pose;
              odom.twist.twist=twist;
-             ROS_INFO_STREAM_THROTTLE(10.0,"AUDI x,y,yaw,vx,vy:" <<
+             ROS_INFO_STREAM_THROTTLE(60.0,"AUDI x,y,yaw,vx,vy:" <<
                                     msg->pose[i].position.x << " " <<
                                     msg->pose[i].position.y << " " <<
                                     tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<

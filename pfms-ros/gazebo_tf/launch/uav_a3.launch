@@ -23,7 +23,7 @@
 
     <group ns="$(arg drone_name)" >
     <param name="robot_description" command="cat '$(find sjtu_drone)/urdf/sjtu_drone.urdf'" />
-    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model sjtu_drone -x 0 -y 0 -z 0"
+    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model sjtu_drone -x 8 -y 8 -z 0"
      respawn="false" output="screen" />
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="state_publisher">
       <param name="publish_frequency" type="double" value="$(arg tf_freq)" />
@@ -35,10 +35,6 @@
     <node pkg="rviz" type="rviz" name="uav_viz" args="-d $(find gazebo_tf)/rviz/uav_a3.rviz" />
 
     <node pkg="gazebo_tf" type="gazebo_connect" name="gazebo_connect" />
-    <!--node pkg="gazebo_tf" type="uav_odo" name="uav_odo" respawn="true" /-->
-    <!--node pkg="gazebo_tf" type="uav_comms" name="uav_comms" />
-    <node pkg="gazebo_tf" type="uav_odo" name="uav_odo" respawn="true" />
-    <node pkg="gazebo_tf" type="goals" name="goals" /-->
 
     <node name="robot_0_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 1.5707 0 drone/front_sonar_link drone/front_sonar_link_fix 100"/>
 

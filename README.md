@@ -25,7 +25,7 @@ Please select the pipes package for the version of ROS you have (there is an add
 ```bash
 cd pfms-support
 cd packages
-sudo dpkg -i pipes-2.4.0-noetic-Linux.deb
+sudo dpkg -i pipes-2.5.0-noetic-Linux.deb
 ```
 
 Then link the `pfms_ros` folder to your `catkin_ws/src`

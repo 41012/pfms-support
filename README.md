@@ -5,7 +5,7 @@ PFMS Support - Setup
 
 **PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00. 
 
-**UPDATED: 11 APRIL 13:55**
+**UPDATED: Refer the history here in main branch**
 
 If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 

@@ -154,13 +154,13 @@
         </include>
       </model>
       <model name="blue_cone_7">
-        <pose>-76.895096 -35.146961 0 0 0 0</pose>
+        <pose>-76.34 -36.52 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
       </model>
       <model name="blue_cone_8">
-        <pose>-77.559837 -24.742823 0 0 0 0</pose>
+        <pose>-75.94 -24.55 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
@@ -244,7 +244,7 @@
         </include>
       </model>
       <model name="blue_cone_22">
-        <pose>24.622831 46.130177 0 0 0 0</pose>
+        <pose>23.51 46.25 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
@@ -298,7 +298,7 @@
         </include>
       </model>
       <model name="blue_cone_31">
-        <pose>69.747604 -2.4451318 0 0 0 0</pose>
+        <pose>67.48 0.45 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
@@ -369,8 +369,50 @@
           <uri>model:///construction_cone</uri>
         </include>
       </model>
+      <model name="blue_cone_43">
+        <pose>71.65 -5.25 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>
+      <model name="blue_cone_44">
+        <pose>69.88 -55.68 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>
+      <model name="blue_cone_45">
+        <pose>-76.34 -33.20 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>      
+      <model name="blue_cone_46">
+        <pose>-76.54 -28.13 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>  
+      <model name="blue_cone_47">
+        <pose>-13.89 42.35 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>            
+      <model name="blue_cone_48">
+        <pose>23.51 42.96 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model> 
+      <model name="blue_cone_49">
+        <pose>23.56 40.64 0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>       
       <model name="yellow_cone_0">
-        <pose>-13.653171 -52.691891 0 0 0 0</pose>
+        <pose>-29.82 -12.30 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
@@ -400,7 +442,7 @@
         </include>
       </model>
       <model name="yellow_cone_5">
-        <pose>43.569714 -52.794247 0 0 0 0</pose>
+        <pose>41.53 -53.34 0 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
@@ -652,11 +694,17 @@
         </include>
       </model>
       <model name="yellow_cone_47">
-        <pose>-13.633113 -52.691349 0 0 0 0</pose>
+        <pose>-11.989 -52.911 0 0 0</pose>
         <include>
           <uri>model:///construction_cone</uri>
         </include>
       </model>
+      <model name="yellow_cone_48">
+        <pose>19.86 26.831 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>      
 
     <!-- Focus camera bit behind platforms -->
     <gui fullscreen='0'>

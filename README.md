@@ -5,7 +5,7 @@ PFMS Support - Setup
 
 **PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00. 
 
-**UPDATED: 11 APRIL 13:55**
+**UPDATED: Refer the history here in main branch**
 
 If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
@@ -25,7 +25,7 @@ Please select the pipes package for the version of ROS you have (there is an add
 ```bash
 cd pfms-support
 cd packages
-sudo dpkg -i pipes-2.4.0-noetic-Linux.deb
+sudo dpkg -i pipes-2.5.0-noetic-Linux.deb
 ```
 
 Then link the `pfms_ros` folder to your `catkin_ws/src`

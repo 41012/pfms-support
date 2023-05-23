@@ -18,7 +18,7 @@ class Reach
 {
 public:
 Reach(ros::NodeHandle nh) :
-    nh_(nh), goalSet_(false),goalReached_(false)
+    nh_(nh), goalSet_(false),goalReached_(false), dTravelled_(0), dStart_(0)
 {
 
     ros::NodeHandle pnh("~"); // Create private node handle
@@ -56,6 +56,7 @@ bool setGoal(gazebo_tf::SetGoals::Request  &req,
   }
   mx_.unlock();
   startTime_ = ros::Time::now();
+  dStart_ = dTravelled_;
 
   return true;
 }
@@ -87,6 +88,13 @@ bool checkGoals(gazebo_tf::GetMinDistToGoal::Request  &req,
 void OdoCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
 
+    if(odoPrev_.header.seq>0){
+        double d = pow (pow(msg->pose.pose.position.x-odoPrev_.pose.pose.position.x,2) +
+                          pow(msg->pose.pose.position.y-odoPrev_.pose.pose.position.y,2),0.5);
+        std::atomic<double> dAtomic(d); // complications because we have one variable that is atomic (dTravelled)
+        dTravelled_= dTravelled_ + dAtomic;
+    }
+    odoPrev_=*msg;
 
     if(goalSet_){
         mx_.lock();
@@ -95,8 +103,8 @@ void OdoCallback(const nav_msgs::Odometry::ConstPtr& msg)
             double dy = goals_.at(goalIdx_).y - msg->pose.pose.position.y ;
             mx_.unlock();
             double d=std::pow( std::pow(dx,2) + std::pow(dy,2),0.5);
-
-            ROS_INFO_STREAM_THROTTLE(5,"Goal:" << goalIdx_ << " dist:"<< d);
+            double dNow = dTravelled_;
+            ROS_INFO_STREAM_THROTTLE(5,"Goal [id,d]=[" << goalIdx_ << ","<< d << "]  odo:" << dNow-dStart_ ) ;
             if(d<1.0){
                 ROS_INFO_STREAM("Reached Goal:" << goalIdx_ << " dist:"<< d);
                 goalReached_.at(goalIdx_)=true;
@@ -124,6 +132,8 @@ void OdoCallback(const nav_msgs::Odometry::ConstPtr& msg)
                    double dt = endTime.toSec() - startTime_.toSec();
                    ROS_INFO_STREAM("All goals reached in " <<  dt <<"[s]" );
                    minDist_=dt;
+                   double dEnd = dTravelled_;
+                   ROS_INFO_STREAM("Distance Travelled : " << dEnd-dStart_ );
               }
               goalSet_=false;
           }
@@ -145,6 +155,9 @@ private:
     ros::ServiceServer serviceCheckGoal_;
     double minDist_;
     ros::Time startTime_;
+    double dStart_;
+    std::atomic<double> dTravelled_;
+    nav_msgs::Odometry odoPrev_;
 };
 
 

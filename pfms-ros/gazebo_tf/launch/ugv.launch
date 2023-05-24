@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
+ <arg name="gui" default="false" />
+
  <include file="$(find audibot_gazebo)/launch/audibot_named_robot.launch" >
    <arg name="robot_name" value="orange" />
    <arg name="start_x" value="0" />
@@ -15,8 +17,8 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch" >
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="false"/>
-    <arg name="headless" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <!--arg name="headless" value="true"/-->
     <arg name="debug" value="false"/>
   </include>
 

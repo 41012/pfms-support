@@ -49,7 +49,7 @@ public:
     void publishMarkers(const std_msgs::Float64::ConstPtr& msg){
         double steering=msg->data;
 
-        if(fabs(steering)<0.01){
+        if(fabs(steering)<0.03){
             ROS_DEBUG_STREAM("Straight line steering");
             return;
         }
@@ -113,7 +113,7 @@ public:
 
         double dr = (2*radius*M_PI)/0.5;
         double dtheta = 0.5/fabs(radius);
-        ROS_INFO_STREAM("dr:" << dr << " dtheta:" << dtheta );
+        //ROS_INFO_STREAM("dr:" << dr << " dtheta:" << dtheta );
 
         for (double ang = 0; ang < (2*M_PI); ang +=dtheta){
 

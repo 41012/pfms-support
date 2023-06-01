@@ -38,3 +38,8 @@ target_link_libraries(reach ${catkin_LIBRARIES} )
 ## This enforces generating messages before building these executables
 add_dependencies(odo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(reach ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+catkin_install_python(PROGRAMS
+  scripts/cleanup
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

@@ -25,25 +25,53 @@
       <distribution>
         <type>grid</type>
         <rows>2</rows>
-        <cols>4</cols>
+        <cols>3</cols>
         <step>10 10 0</step>
       </distribution>
     </population>
-    <population name="desperate_masses">
-      <model name="survivor">
-        <include>
-          <!--static>true</static-->
-          <uri>model://person_standing</uri>
-        </include>
-      </model>
-      <pose>0 0 0 0 0 0</pose>
-      <distribution>
-        <type>grid</type>
-        <rows>2</rows>
-        <cols>4</cols>
-        <step>10 10 0</step>
-      </distribution>
-    </population>
+    <model name="survivor1">
+      <pose>-9 5 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+    <model name="survivor2">
+      <pose>-2.5 6 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+    <model name="survivor3">
+      <pose>-2 -7 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+    <model name="survivor4">
+      <pose>2 -3 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+    <model name="survivor5">
+      <pose>7.5 -7 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+    <model name="survivor6">
+      <pose>7.5 7 0 0 0 0</pose>
+      <include>
+        <!--static>true</static-->
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
+
 
     <!-- Focus camera bit behind platforms -->
     <gui fullscreen='0'>

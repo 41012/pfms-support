@@ -254,8 +254,8 @@
           </noise>
         </ray>
         <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-            <topicName>/orange/laser/scan</topicName>
-            <frameName>/orange/front_laser_link</frameName>
+            <topicName>/$(arg robot_name)/laser/scan</topicName>
+            <frameName>/$(arg robot_name)/front_laser_link</frameName>
         </plugin>
       </sensor>
     </gazebo>
@@ -283,8 +283,8 @@
           </range>
         </ray>
         <plugin name='front_sonar_sensor' filename='libgazebo_ros_range.so'>
-          <topicName>/orange/sonar/range</topicName>
-          <frameName>orange/front_sonar_link</frameName>
+          <topicName>/$(arg robot_name)/sonar/range</topicName>
+          <frameName>/$(arg robot_name)/front_sonar_link</frameName>
           <fov>0.2</fov>
           <radiation>ultrasound</radiation>
         </plugin>
@@ -319,7 +319,7 @@
         <update_rate>30</update_rate>
         <visualize>true</visualize>
         <plugin name='front_camera' filename='libplugin_ros_cam.so'>
-          <imageTopicName>/orange/front_camera/image_raw</imageTopicName>
+          <imageTopicName>/$(arg robot_name)/front_camera/image_raw</imageTopicName>
         </plugin>
       </sensor>
     </gazebo>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="tf_freq" default="100.0" />
+
+    <arg name="drone_name1" default="drone" />
+    <arg name="drone_name2" default="drone2" />
+    <arg name="pub_tf" value="true" />
+    <arg name="gui" default="false" />
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+      <arg name="paused" value="false"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="gui" value="$(arg gui)"/>
+      <arg name="debug" value="false"/>
+      <arg name="world_name" value="$(find sjtu_drone)/worlds/tower_search_and_rescue.world"/>
+    </include>
+
+
+    <group ns="$(arg drone_name1)" >
+        <param name="robot_description" command="cat '$(find sjtu_drone)/urdf/sjtu_drone.urdf'" />
+        <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model sjtu_drone -x 8 -y 8 -z 0"
+        respawn="false" output="screen" />
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="state_publisher">
+        <param name="publish_frequency" type="double" value="$(arg tf_freq)" />
+        <param name="tf_prefix" value="$(arg drone_name1)" />
+        </node>
+    </group>
+
+    <group ns="$(arg drone_name2)" >
+        <param name="robot_description" command="cat '$(find sjtu_drone)/urdf/sjtu_drone2.urdf'" />
+        <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model sjtu_drone2 -x 0 -y 8 -z 0"
+        respawn="false" output="screen" />
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="state_publisher">
+        <param name="publish_frequency" type="double" value="$(arg tf_freq)" />
+        <param name="tf_prefix" value="$(arg drone_name2)" />
+        </node>
+    </group>
+
+    <node pkg="rviz" type="rviz" name="uav_viz" args="-d $(find gazebo_tf)/rviz/two_quads.rviz" />
+
+    <node pkg="gazebo_tf" type="gazebo_connect" name="gazebo_connect" />
+
+    <node name="robot_0_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 1.5707 0 drone/front_sonar_link drone/front_sonar_link_fix 100"/>
+    <node name="robot_1_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 1.5707 0 drone2/front_sonar_link drone2/front_sonar_link_fix 100"/>
+
+</launch>

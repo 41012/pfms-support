@@ -211,6 +211,26 @@ public:
           //sendTfBroadcast(pose,"base_link" );
           sendTfBroadcast(pose,"drone/base_link" );
         }
+        else if ((msg->name[i]).compare("sjtu_drone2::base_link") == 0) 
+        {
+          geometry_msgs::Pose pose(msg->pose[i]);
+          geometry_msgs::Twist twist(msg->twist[i]);
+          nav_msgs::Odometry odom;
+          odom.header.seq=seq_++;
+          odom.header.stamp = ros::Time::now();
+          odom.header.frame_id="world";
+          odom.pose.pose=pose;
+          odom.twist.twist=twist;
+          ROS_INFO_STREAM_THROTTLE(60.0,"QUAD x,y,yaw,vx,vy:" <<
+                                  msg->pose[i].position.x << " " <<
+                                  msg->pose[i].position.y << " " <<
+                                  tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
+                                  msg->twist[i].linear.x << " "  <<
+                                  msg->twist[i].linear.y );
+          uav_odom_pub.publish(odom);
+          //sendTfBroadcast(pose,"base_link" );
+          sendTfBroadcast(pose,"drone2/base_link" );
+        }        
         else if ((msg->name[i]).compare("audibot::base_footprint") == 0) {
             geometry_msgs::Pose pose(msg->pose[i]);
             geometry_msgs::Twist twist(msg->twist[i]);

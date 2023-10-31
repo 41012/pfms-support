@@ -25,8 +25,8 @@ endif()
 
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${OGRE_LIBRARY_DIRS})
-include_directories(${OpenCV_INCLUDE_DIR} 
-                    ${Boost_INCLUDE_DIR}
+include_directories(${OpenCV_INCLUDE_DIR}
+#                    ${Boost_INCLUDE_DIRS}
                     ${catkin_INCLUDE_DIRS}
                     ${GAZEBO_INCLUDE_DIRS}
                     ${OGRE_INCLUDE_DIRS}

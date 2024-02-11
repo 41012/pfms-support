@@ -38,13 +38,9 @@ ament_target_dependencies(gazebo_connect rclcpp gazebo_msgs nav_msgs tf2 tf2_geo
 add_executable(reach src/reach.cpp)
 ament_target_dependencies(reach rclcpp std_srvs geometry_msgs nav_msgs)
 
-add_executable(tf_transform_republisher src/tf_transform_republisher.cpp)
-ament_target_dependencies(tf_transform_republisher rclcpp geometry_msgs tf2 tf2_ros)
-
 install(TARGETS
   gazebo_connect
   reach
-  tf_transform_republisher
   DESTINATION lib/${PROJECT_NAME}
 )
 

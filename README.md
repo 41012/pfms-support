@@ -25,16 +25,17 @@ sudo dpkg -i pipes_3.0.0-humble-amd64.deb
 sudo ldconfig
 ```
 
-If not done already, link the `pfms_ros` folder to your `ros_ws/src`
+If not done already, link the `pfms_ros` folder to your `ros2_ws/src`
 
 ```bash
-cd ~/ros_ws/src
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
 ln -s ~/git/pfms-support/pfms-ros 
 ```
 Now we can make the package.
 
 ```bash
-cd ~/ros_ws
+cd ~/ros2_ws
 colcon build --symlink-install
 ```
 
@@ -88,6 +89,6 @@ make
 To update **all other packages** recompile your catkin workspace
 
 ```bash
-cd ~/ros_ws
+cd ~/ros2_ws
 colcon build --symlink-install
 ```

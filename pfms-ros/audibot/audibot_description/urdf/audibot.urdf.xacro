@@ -16,21 +16,31 @@
 
   <xacro:arg name="pub_tf" default="true" />
   <xacro:arg name="robot_name" default="" />
+  <xacro:arg name="blue" default="false" />
 
   <gazebo>
     <!-- Simulated vehicle interface -->
     <plugin name="audibot_interface_plugin" filename="libaudibot_interface_plugin.so" >
-      <robotName>$(arg robot_name)</robotName>
-      <pubTf>$(arg pub_tf)</pubTf>
-      <tfFreq>100.0</tfFreq>
+      <robot_name>$(arg robot_name)</robot_name>
+      <pub_tf>$(arg pub_tf)</pub_tf>
+      <tf_freq>100.0</tf_freq>
+      <ros>
+        <namespace>$(arg robot_name)</namespace>
+      </ros>
     </plugin>
 
     <!-- Publish current joint angles -->
     <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-        <jointName>
-            steer_fl_joint, steer_fr_joint, wheel_fl_joint, wheel_fr_joint, wheel_rl_joint, wheel_rr_joint
-        </jointName>
-        <updateRate>100</updateRate>
+        <joint_name>steer_fl_joint</joint_name>
+        <joint_name>steer_fr_joint</joint_name>
+        <joint_name>wheel_fl_joint</joint_name>
+        <joint_name>wheel_fr_joint</joint_name>
+        <joint_name>wheel_rl_joint</joint_name>
+        <joint_name>wheel_rr_joint</joint_name>
+        <update_rate>100</update_rate>
+        <ros>
+          <namespace>$(arg robot_name)</namespace>
+        </ros>
     </plugin>
   </gazebo>
 
@@ -39,7 +49,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="1.57079632679 ${flip * 3.1415926535} 0" />
         <geometry>
-          <mesh filename="package://audibot_description/meshes/wheel.dae" scale="1 1 1" />
+          <mesh filename="file://$(find audibot_description)/meshes/wheel.dae" scale="1 1 1" />
         </geometry>
       </visual>
 
@@ -70,7 +80,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="1.57079632679 ${flip * pi} 0" />
         <geometry>
-          <mesh filename="package://audibot_description/meshes/wheel.dae" scale="1 1 1" />
+          <mesh filename="file://$(find audibot_description)/meshes/wheel.dae" scale="1 1 1" />
         </geometry>
       </visual>
 
@@ -120,17 +130,17 @@
       <origin xyz="0.035 0 0.025" rpy="0 0 0" />
       <geometry>
         <xacro:if value="$(arg blue)" >
-          <mesh filename="package://audibot_description/meshes/blue_body.dae" scale="1 1 1" />
+          <mesh filename="file://$(find audibot_description)/meshes/blue_body.dae" scale="1 1 1" />
         </xacro:if>
         <xacro:unless value="$(arg blue)" >
-          <mesh filename="package://audibot_description/meshes/orange_body.dae" scale="1 1 1" />
+          <mesh filename="file://$(find audibot_description)/meshes/orange_body.dae" scale="1 1 1" />
         </xacro:unless>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0.035 0 0.025" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://audibot_description/meshes/body_collision.stl" scale="1 1 1" />
+        <mesh filename="file://$(find audibot_description)/meshes/body_collision.stl" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
@@ -146,50 +156,36 @@
     <child link="base_link"/>
   </joint>
 
-    <!-- Sensor links and fixed joints -->
-    <link name="front_laser_link">
-        <visual>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
-             <box size="0.1 0.1 0.1"/>
-          </geometry>
-          <!--material name="blue"/-->
-        </visual>
+  <!-- Sensor links and fixed joints -->
+  <!--link name="front_laser_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry-->
+          <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
+            <!--box size="0.1 0.1 0.1"/>
+        </geometry-->
+        <!--material name="blue"/-->
+      <!--/visual>
 
-      <inertial>
-        <mass value="1"/>
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-      </inertial>
-    </link>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
 
-    <joint name="front_laser_joint" type="fixed">
-      <parent link="base_link"/>
-      <child link="front_laser_link"/>
-      <origin xyz="${body_depth -1.05} 0 0.2" rpy="0 0 0"/>
-    </joint>
+  <joint name="front_laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_laser_link"/>
+    <origin xyz="${body_depth -1.05} 0 0.2" rpy="0 0 0"/>
+  </joint-->
 
-
-    <link name="front_sonar_link">
-        <visual>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <!--mesh filename="package://rrbot_description/meshes/hokuyo.dae"/-->
-             <box size="0.1 0.1 0.1"/>
-          </geometry>
-          <!--material name="blue"/-->
-        </visual>
-      <inertial>
-        <mass value="1"/>
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-      </inertial>
-    </link>
-    <joint name="front_sonar_joint" type="fixed">
-      <parent link="base_link"/>
-      <child link="front_sonar_link"/>
-      <origin xyz="${body_depth -1.05} 0 0.5" rpy="0 0 0"/>
-    </joint>
-
+  <!-- Laser -->
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_link" />
+    <origin xyz="${body_depth -1.05} 0 0.1" rpy="0 0 0"/>
+  </joint>
+  <link name="laser_link"/>
 
   <xacro:rear_wheel name="rl" x="${-half_wheelbase}" y="${half_rear_track_width}" z="0" flip="1" />
   <xacro:rear_wheel name="rr" x="${-half_wheelbase}" y="${-half_rear_track_width}" z="0" flip="0" />
@@ -223,106 +219,40 @@
     <mu2>${wheel_friction}</mu2>
   </gazebo>
 
-
-    <gazebo reference="front_laser_link">
-      <sensor name='front_laser_sensor' type='ray'>
-        <pose>0 0 0 0 0 0</pose>
-        <visualize>false</visualize>
-        <update_rate>30</update_rate>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>640</samples>
-              <resolution>1</resolution>
-              <min_angle>-1.5707</min_angle>
-              <max_angle>1.5707</max_angle>
-            </horizontal>
-          </scan>
-          <range>
-            <min>0.10</min>
-            <max>30.0</max>
-            <resolution>0.01</resolution>
-          </range>
-          <noise>
-            <type>gaussian</type>
-            <!-- Noise parameters based on published spec for Hokuyo laser
-                 achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
-                 stddev of 0.01m will put 99.7% of samples within 0.03m of the true
-                 reading. -->
-            <mean>0.0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-        </ray>
-        <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-            <topicName>/$(arg robot_name)/laser/scan</topicName>
-            <frameName>/$(arg robot_name)/front_laser_link</frameName>
-        </plugin>
-      </sensor>
-    </gazebo>
-
-    <gazebo reference="front_sonar_link">
-      <sensor name='front_sonar_sensor' type='ray'>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>1</samples>
-              <resolution>1</resolution>
-              <min_angle>0</min_angle>
-              <max_angle>0</max_angle>
-            </horizontal>
-            <vertical>
-              <samples>1</samples>
-              <min_angle>0</min_angle>
-              <max_angle>0</max_angle>
-            </vertical>
-          </scan>
-          <range>
-            <min>0.2</min>
-            <max>5</max>
-            <resolution>0.2</resolution>
-          </range>
-        </ray>
-        <plugin name='front_sonar_sensor' filename='libgazebo_ros_range.so'>
-          <topicName>/$(arg robot_name)/sonar/range</topicName>
-          <frameName>/$(arg robot_name)/front_sonar_link</frameName>
-          <fov>0.2</fov>
-          <radiation>ultrasound</radiation>
-        </plugin>
-        <always_on>false</always_on>
-        <update_rate>5</update_rate>
-        <visualize>true</visualize>
-      </sensor>
-    </gazebo>
-
-    <gazebo reference="front_sonar_link">
-      <!-- front camera -->
-      <sensor name="front_camera" type="camera">
-        <camera>
-          <horizontal_fov>2.1</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0.0</mean>
-            <stddev>0.005</stddev>
-          </noise>
-        </camera>
-        <pose> 0.0 0.0 0.1 0 0 0 </pose>
-        <always_on>1</always_on>
-        <update_rate>30</update_rate>
-        <visualize>true</visualize>
-        <plugin name='front_camera' filename='libplugin_ros_cam.so'>
-          <imageTopicName>/$(arg robot_name)/front_camera/image_raw</imageTopicName>
-        </plugin>
-      </sensor>
-    </gazebo>
-
-
+  <gazebo reference="laser_link">
+    <sensor type='ray' name='laser'>
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>30</update_rate>
+      <always_on>true</always_on>      
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>640</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.5707</min_angle>
+            <max_angle>1.5707</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="laser_sensor" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <namespace>/$(arg robot_name)</namespace>
+            <remapping>~/out:=laserscan</remapping>
+          </ros>
+          <frame_name>$(arg robot_name)/laser_link</frame_name>
+          <output_type>sensor_msgs/LaserScan</output_type>
+      </plugin>
+    </sensor>
+  </gazebo>
 </robot>

@@ -1,41 +1,58 @@
-#include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
+#include <functional>
+#include <memory>
+#include "rclcpp/rclcpp.hpp"
+
+#include "nav_msgs/msg/odometry.hpp"
 
 #include <sstream>
 // thread and chrono are for time and sleeping respectively
 #include <chrono>
 #include <thread>
 #include <string>
-#include "tf/transform_datatypes.h"
-#include "pipes.h"
+// #include "tf/transform_datatypes.h"
+
 #include <mutex>
 #include <vector>
 #include <atomic>
-#include "gazebo_tf/SetGoals.h"
-#include "gazebo_tf/GetMinDistToGoal.h"
+#include "std_srvs/srv/trigger.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 
-class Reach
+// #include "gazebo_tf/GetMinDistToGoal.h"
+
+using std::placeholders::_1;
+using namespace std::chrono_literals;
+
+class Reach : public rclcpp::Node
 {
 public:
-Reach(ros::NodeHandle nh) :
-    nh_(nh), goalSet_(false),goalReached_(false), dTravelled_(0), dStart_(0)
+Reach() :
+    Node("reach_node"), 
+    goalSet_(false),goalReached_(false),dt_(0), dStart_(0), dTravelled_(0)
 {
 
-    ros::NodeHandle pnh("~"); // Create private node handle
-    std::string source="ugv"; // Default Name
-    pnh.getParam("platform", source);
+    // ros::NodeHandle pnh("~"); // Create private node handle
+    // std::string source="ugv"; // Default Name
+    // pnh.getParam("platform", source);
 
-    std::string topic_name = "/" + source + "_odom/";
+    // std::string topic_name = "/" + source + "_odom/";
 
-    ROS_INFO_STREAM("The connection to ros for platform:" << source);
-    ROS_INFO_STREAM("Topic name:" << topic_name);
+    // ROS_INFO_STREAM("The connection to ros for platform:" << source);
+    // ROS_INFO_STREAM("Topic name:" << topic_name);
 
-    sub_ = nh_.subscribe(topic_name, 1000, &Reach::OdoCallback,this);
+    //! @todo: change to use parameters for distance and platform name
+    distanceThreshold_ = 1.0;
 
-    serviceSetGoal_ = nh_.advertiseService(ros::this_node::getName() + "/set_goals", &Reach::setGoal,this);
-    serviceCheckGoal_ = nh_.advertiseService(ros::this_node::getName() + "/check_goals", &Reach::checkGoals,this);
+    sub1_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        "/orange/odom", 1000, std::bind(&Reach::odoCallback,this,_1));
 
-    minDist_=1e6;
+    sub2_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
+        "/orange/check_goals", 1000, std::bind(&Reach::goalsCallback,this,_1));
+
+    serviceCheckGoals_ = this->create_service<std_srvs::srv::Trigger>("ackerman_check_goals", 
+                                std::bind(&Reach::checkGoals,this, std::placeholders::_1, std::placeholders::_2));
+
+    // std::string my_param = this->get_parameter("robot_state_publisher/robot_description").as_string();
+    // RCLCPP_INFO(this->get_logger(), "Robot description: %s", my_param.c_str());
 
 }
 
@@ -43,140 +60,134 @@ Reach(ros::NodeHandle nh) :
 
 }
 
-bool setGoal(gazebo_tf::SetGoals::Request  &req,
-             gazebo_tf::SetGoals::Response &res)
+// void setGoals( const std::shared_ptr<pfms_interfaces::srv::SetGoals::Request> request,
+//           std::shared_ptr<pfms_interfaces::srv::SetGoals::Response>    response)
+void goalsCallback(const geometry_msgs::msg::PoseArray& msg)
 {
-  mx_.lock();
-  goals_=req.goals;
-  goalSet_=true;
-  goalReached_.assign(req.goals.size(),false);
-  goalIdx_=0;
-  for (unsigned int i=0;i<req.goals.size();i++) {
-      ROS_INFO_STREAM("Goal "<< i << " x,y ="<< goals_.at(i).x << " , " << goals_.at(i).y );
-  }
-  mx_.unlock();
-  startTime_ = ros::Time::now();
-  dStart_ = dTravelled_;
+   mx_.lock();
+   goals_=msg;
+   goalSet_=true;
+   goalReached_.assign(goals_.poses.size(),false);
+   goalDist_.assign(goals_.poses.size(),1000.0);
 
-  return true;
-}
+   goalIdx_=0;int i=0;
+   for (auto goal : goals_.poses) {
+       RCLCPP_INFO_STREAM(this->get_logger(),"Goal "<< i++ << " x,y ="<< goal.position.x << " , " << goal.position.y );
+   }
+   mx_.unlock();
+   dStart_ = dTravelled_;
+   startTime_ = this->get_clock()->now();}
 
-bool checkGoals(gazebo_tf::GetMinDistToGoal::Request  &req,
-             gazebo_tf::GetMinDistToGoal::Response &res)
-{
-
- ROS_INFO_STREAM("Checking Goals!!!!");
- mx_.lock();
- bool reached = true;
- for (unsigned int i=0;i<goals_.size();i++) {
-     reached = reached & goalReached_.at(i);
-     if(goalReached_.at(i)){
-         ROS_INFO_STREAM("Goal:" << i << " Reached!");
-     }
-     else{
-         ROS_INFO_STREAM("Goal:" << i << " NOT Reached!");
-     }
- }
- mx_.unlock();
- res.reached = reached;
- res.dist=minDist_;
-
-  return true;
-}
-
-
-void OdoCallback(const nav_msgs::Odometry::ConstPtr& msg)
+void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+          std::shared_ptr<std_srvs::srv::Trigger::Response>    response)
 {
 
-    if(odoPrev_.header.seq>0){
-        double d = pow (pow(msg->pose.pose.position.x-odoPrev_.pose.pose.position.x,2) +
-                          pow(msg->pose.pose.position.y-odoPrev_.pose.pose.position.y,2),0.5);
-        std::atomic<double> dAtomic(d); // complications because we have one variable that is atomic (dTravelled)
-        dTravelled_= dTravelled_ + dAtomic;
+    RCLCPP_INFO_STREAM(this->get_logger(),"Checking Goals within " << distanceThreshold_ << "[m]");
+    mx_.lock();
+    bool success = true;
+    std::stringstream msg;
+
+    if(goals_.poses.size()==0){
+        RCLCPP_INFO(this->get_logger(),"No goals set!");
+        success = false;
     }
-    odoPrev_=*msg;
+    else{
+        for (unsigned int i=0;i<goals_.poses.size();i++) {
+            success = success & goalReached_.at(i);
+            msg << goalDist_.at(i) << ",";
+            RCLCPP_INFO_STREAM(this->get_logger(),"Goal:" << i << " "  << goalDist_.at(i) << "[m]");
+        }
+    }
+    
+    if (success) {
+        msg << dt_;
+    }
+    else {
+        msg << "0";
+    }
+    mx_.unlock();
+    response->success = success;
+    response->message = msg.str();
+}
+
+void odoCallback(const nav_msgs::msg::Odometry& msg)
+{
+
+    double d = pow (pow(msg.pose.pose.position.x-odoPrev_.pose.pose.position.x,2) +
+                        pow(msg.pose.pose.position.y-odoPrev_.pose.pose.position.y,2),0.5);
+    std::atomic<double> dAtomic(d); // complications because we have one variable that is atomic (dTravelled) hence need to do this
+    dTravelled_= dTravelled_ + dAtomic;
+    odoPrev_=msg;
 
     if(goalSet_){
         mx_.lock();
-        if(goalIdx_<goals_.size()){
-            double dx = goals_.at(goalIdx_).x - msg->pose.pose.position.x ;
-            double dy = goals_.at(goalIdx_).y - msg->pose.pose.position.y ;
+        if(goalIdx_<goals_.poses.size()){
+            auto goal = goals_.poses.at(goalIdx_);
+            double d = distToGoal(msg,goal);
             mx_.unlock();
-            double d=std::pow( std::pow(dx,2) + std::pow(dy,2),0.5);
-            double dNow = dTravelled_;
-            ROS_INFO_STREAM_THROTTLE(5,"Goal [id,d]=[" << goalIdx_ << ","<< d << "]  odo:" << dNow-dStart_ ) ;
-            if(d<1.0){
-                ROS_INFO_STREAM("Reached Goal:" << goalIdx_ << " dist:"<< d);
+
+            RCLCPP_DEBUG_STREAM_THROTTLE(this->get_logger(),
+                *this->get_clock(),
+                1000,
+                "Goal [id,d]=[" << goalIdx_ << ","<< d << "]  odo:" << dTravelled_-dStart_ ) ;
+
+            if(d<distanceThreshold_){
+                RCLCPP_INFO_STREAM(this->get_logger(),"Reached Goal:" << goalIdx_ << " dist:"<< d);
                 goalReached_.at(goalIdx_)=true;
+                goalDist_.at(goalIdx_)=d;
                 goalIdx_++;
             }
-        }
-        else{
-          if(goalSet_){
-               std::stringstream ss;
-               ss << ros::this_node::getName() << " goals :" <<  goals_.size();
-               bool reach=true;
-               for (unsigned int i=0;i<goals_.size();i++) {
-                   reach = reach & goalReached_.at(i);
-                   ss << " G:" << i << " ";
-                   if(goalReached_.at(i)){
-                        ss << " OK ";
-                   }
-                   else {
-                       ss << " NOT ";
-                   }
-               }
-               ROS_INFO_STREAM(ss.str());
-               if (reach){
-                   ros::Time endTime = ros::Time::now();
-                   double dt = endTime.toSec() - startTime_.toSec();
-                   ROS_INFO_STREAM("All goals reached in " <<  dt <<"[s]" );
-                   minDist_=dt;
-                   double dEnd = dTravelled_;
-                   ROS_INFO_STREAM("Distance Travelled : " << dEnd-dStart_ );
-              }
-              goalSet_=false;
-          }
+
+            if(goalIdx_==goals_.poses.size()){
+                rclcpp::Duration dt = this->get_clock()->now() - startTime_;
+                dt_ =  dt.seconds();
+                RCLCPP_INFO_STREAM(this->get_logger(),"All goals reached in " <<  dt_ <<"[s] " << dTravelled_-dStart_ << "[m]" );                
+                goalSet_ = false;
+            }
         }
         mx_.unlock();
     }
 
 }
 
+double distToGoal(const nav_msgs::msg::Odometry& msg, const geometry_msgs::msg::Pose& goal)
+{
+    double dx = goal.position.x - msg.pose.pose.position.x ;
+    double dy = goal.position.y - msg.pose.pose.position.y ;
+    return std::pow( std::pow(dx,2) + std::pow(dy,2),0.5);
+}
+
 private:
-    ros::NodeHandle nh_;
-    ros::Subscriber sub_;
+
+    //ros::Subscriber sub_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub1_;
+    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr sub2_;
+
     std::atomic<bool> goalSet_;
     std::vector<bool> goalReached_;
-    std::vector<geometry_msgs::Point> goals_;
+    std::vector<double> goalDist_;
+    geometry_msgs::msg::PoseArray goals_;
+
     unsigned int goalIdx_;
     std::mutex mx_;
-    ros::ServiceServer serviceSetGoal_;
-    ros::ServiceServer serviceCheckGoal_;
-    double minDist_;
-    ros::Time startTime_;
+    
+    rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr serviceCheckGoals_;
+    
+    rclcpp::Time startTime_;
+    double dt_;
     double dStart_;
     std::atomic<double> dTravelled_;
-    nav_msgs::Odometry odoPrev_;
+    nav_msgs::msg::Odometry odoPrev_;
+    double distanceThreshold_;
 };
 
 
-/**
- * May need two threads to allow reconnecting if a timeout occurs (no comms)
- */
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "reach");
-
-  ros::NodeHandle nh;
-
-  std::shared_ptr<Reach> reachPtr(new Reach(nh));
-
-  ros::spin();
-
-  ros::shutdown();
-
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<Reach>());
+  rclcpp::shutdown();
 
   return 0;
 }

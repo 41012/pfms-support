@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="$(arg name)">
+  <!-- robot name parameter -->
+  <xacro:arg name="name" default="" />
+
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="gazebo_controllers" default="$(find husky_control)/config/control.yaml" />
+
+  <xacro:include filename="$(find husky_description)/urdf/husky_macro.urdf.xacro" />
+
+  <!-- Load husky description -->
+  <xacro:husky prefix="$(arg prefix)" />
+
+
+  <xacro:if value="$(arg is_sim)">
+
+    <gazebo>
+      <plugin name="$(arg prefix)gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <parameters>$(arg gazebo_controllers)</parameters>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="$(arg prefix)imu_controller" filename="libhector_gazebo_ros_imu.so">
+        <robotNamespace>$(arg robot_namespace)</robotNamespace>
+        <updateRate>50.0</updateRate>
+        <bodyName>$(arg prefix)base_link</bodyName>
+        <topicName>$(arg prefix)imu/data</topicName>
+        <accelDrift>0.005 0.005 0.005</accelDrift>
+        <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+        <rateDrift>0.005 0.005 0.005 </rateDrift>
+        <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+        <headingDrift>0.005</headingDrift>
+        <headingGaussianNoise>0.005</headingGaussianNoise>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="$(arg prefix)gps_controller" filename="libhector_gazebo_ros_gps.so">
+        <robotNamespace>$(arg robot_namespace)</robotNamespace>
+        <updateRate>40</updateRate>
+        <bodyName>$(arg prefix)base_link</bodyName>
+        <frameId>$(arg prefix)base_link</frameId>
+        <topicName>navsat/fix</topicName>
+        <velocityTopicName>$(arg prefix)navsat/vel</velocityTopicName>
+        <referenceLatitude>49.9</referenceLatitude>
+        <referenceLongitude>8.9</referenceLongitude>
+        <referenceHeading>0</referenceHeading>
+        <referenceAltitude>0</referenceAltitude>
+        <drift>0.0001 0.0001 0.0001</drift>
+      </plugin>
+    </gazebo>
+
+  </xacro:if>
+
+  <!-- Optional custom includes. -->
+  <xacro:include filename="$(arg urdf_extras)" />
+
+</robot>

@@ -1,37 +1,42 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(audibot_gazebo)
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
+# Default to C++17
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(gazebo_ros REQUIRED)
+find_package(gazebo_dev REQUIRED)
+find_package(gazebo_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+#find_package(example_interfaces REQUIRED)
+
+link_directories(${GAZEBO_LIBRARY_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
+
+add_library(audibot_interface_plugin SHARED
+  src/AudibotInterfacePlugin.cpp
+)
+ament_target_dependencies(audibot_interface_plugin
+  rclcpp
   gazebo_ros
   tf2_ros
   tf2_geometry_msgs
+  nav_msgs
+  geometry_msgs
+#  example_interfaces
 )
-
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-
-find_package(gazebo REQUIRED)
-link_directories(${GAZEBO_LIBRARY_DIRS})
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES audibot_interface_plugin
-)
-
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-  ${GAZEBO_INCLUDE_DIRS}
+target_include_directories(audibot_interface_plugin PUBLIC
   include
-)
-
-add_library(audibot_interface_plugin
-  src/AudibotInterfacePlugin.cpp
-)
-add_dependencies(audibot_interface_plugin
-  ${catkin_EXPORTED_TARGETS}
+  $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(audibot_interface_plugin
-  ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
 )
 
@@ -39,23 +44,17 @@ target_link_libraries(audibot_interface_plugin
 install(
   TARGETS
     audibot_interface_plugin
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(
   DIRECTORY
     launch
     rviz
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    worlds
+  DESTINATION share/${PROJECT_NAME}
 )
 
-install(
-  PROGRAMS
-    scripts/tf_prefixer.py
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-
-if (CATKIN_ENABLE_TESTING)
-  add_subdirectory(tests)
-endif()
-
+ament_package()

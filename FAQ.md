@@ -12,7 +12,7 @@ There are three possible reasons for this.
 1) Your symbolic link is not correct
 
 ```bash
-cd ~/ros_ws/src
+cd ~/ros2_ws/src
 ls -la 
 ```
 You should see <span style="color:teal">pfms_ros</span> in teal. If it is in red then your symbolic links is not correct. Not to despair we can simply re-link it, deleting a symbolic link is like removing a shortcut. You do need to find the location of your pfms_ros file which is in the pfms_support repository. For me this is ~/git/pfms_support/pfms_ros. If you accidentally checked out pfms_support elsewhere you can move it (using `mv` command), look up the syntax on the internet.
@@ -67,7 +67,7 @@ If it all looks good then execute `source ~/.bashrc`. This should not report err
 
 ## RVIZ only shows gray screen instead of robot
 
-If your RVIZ is not showing anything, it is blank as per image below. The fix is to add the command into your `~/.bashrc`. 
+If your RVIZ is not showing anything, it is blank as per image below. The fix is to add the command into your `~/.bashrc`. If your using WSL we have already specified adding this (remember the issue with xeyes and the linux kernel included on WSL).
 
 ```bash
 export LIBGL_ALWAYS_SOFTWARE=true

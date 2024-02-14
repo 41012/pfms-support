@@ -6,15 +6,17 @@ from launch.substitutions import Command, FindExecutable, LaunchConfiguration, P
 
 from launch_ros.substitutions import FindPackageShare
 from launch.actions import IncludeLaunchDescription, GroupAction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, PushRosNamespace
 from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("gazebo_tf"), "worlds", "demo.world"]
-    ),
-                          description='The world path, by default is demo.world'),
+        [FindPackageShare("gazebo_tf"), "worlds", "demo.world"]),
+        description='The world path, by default is demo.world'),
+    DeclareLaunchArgument('gui', default_value='false',
+                          description='Whether to launch the GUI'),
 ]
 
 
@@ -22,7 +24,7 @@ def generate_launch_description():
 
     # Launch args
     world_path = LaunchConfiguration('world_path')
-    prefix = LaunchConfiguration('prefix')
+    # prefix = LaunchConfiguration('prefix')
 
     config_husky_velocity_controller = PathJoinSubstitution(
         [FindPackageShare("husky_control"), "config", "control.yaml"]
@@ -54,6 +56,7 @@ def generate_launch_description():
         executable='spawner',
         arguments=['husky_velocity_controller', '-c', '/controller_manager'],
         output='screen',
+#        respawn=True,
     )
 
     node_robot_state_publisher = Node(
@@ -91,7 +94,7 @@ def generate_launch_description():
     gzclient = ExecuteProcess(
         cmd=['gzclient'],
         output='screen',
-        # condition=IfCondition(LaunchConfiguration('gui')),
+        condition=IfCondition(LaunchConfiguration('gui')),
     )
 
     # Spawn robot

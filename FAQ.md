@@ -12,13 +12,13 @@ There are three possible reasons for this.
 1) Your symbolic link is not correct
 
 ```bash
-cd ~/ros_ws/src
+cd ~/ros2_ws/src
 ls -la 
 ```
 You should see <span style="color:teal">pfms_ros</span> in teal. If it is in red then your symbolic links is not correct. Not to despair we can simply re-link it, deleting a symbolic link is like removing a shortcut. You do need to find the location of your pfms_ros file which is in the pfms_support repository. For me this is ~/git/pfms_support/pfms_ros. If you accidentally checked out pfms_support elsewhere you can move it (using `mv` command), look up the syntax on the internet.
 
 ```bash
-cd ~/ros_ws/src
+cd ~/ros2_ws/src
 rm pfms_ros
 ln -s ~/git/pfms_support/pfms_ros 
 ```
@@ -42,20 +42,20 @@ The last few should look something exactly like this (you should have only two l
 
 ```bash
 source /opt/ros/humble/setup.bash
-source /home/student/ros_ws/install/setup.bash
+source /home/student/ros2_ws/install/setup.bash
 ```
 
-If they are not use nano editor. Open the file via`nano ~/.bashrc`  then remove the lines so the only thing you have is the `source /opt/ros/humble/setup.bash ` part. Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and use CTRL+K to remove whole lines at once, or use backspace to delete a character at a time. Save the file via CTRL+X and Y (follow prompts).
+If they are not use nano editor. Open the file via`nano ~/.bashrc`  then remove the lines so the only thing you have is the `source /opt/ros2/humble/setup.bash ` part. Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and use CTRL+K to remove whole lines at once, or use backspace to delete a character at a time. Save the file via CTRL+X and Y (follow prompts).
 
 Now rebuild the package, best done by also deleting previous `build` and `devel` folders.
 
 ```bash
-cd ~/ros_ws
+cd ~/ros2_ws
 rm -rf build install log
 colcon build --symlink-install
 ```
 
-Then execute `echo "source ${HOME}/ros_ws/install/setup.bash" >> ~/.bashrc`
+Then execute `echo "source ${HOME}/ros2_ws/install/setup.bash" >> ~/.bashrc`
 
 Just sanity check again
 
@@ -67,7 +67,7 @@ If it all looks good then execute `source ~/.bashrc`. This should not report err
 
 ## RVIZ only shows gray screen instead of robot
 
-If your RVIZ is not showing anything, it is blank as per image below. The fix is to add the command into your `~/.bashrc`. 
+If your RVIZ is not showing anything, it is blank as per image below. The fix is to add the command into your `~/.bashrc`. If your using WSL we have already specified adding this (remember the issue with xeyes and the linux kernel included on WSL).
 
 ```bash
 export LIBGL_ALWAYS_SOFTWARE=true

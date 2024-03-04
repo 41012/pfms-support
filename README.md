@@ -3,43 +3,11 @@
 PFMS Support - Setup
 =========================
 
-**PREREQUISITE:** you have installed ROS and created a catkin workspace as per instructions on canvas in week 00 (Azure has all installed, refer to Update)
+**PREREQUISITE:** you have installed ROS2 and created a workspace as per instructions on canvas in week 00 
+
+On Azure we have installed pfms support packages. For your own devices refer [INSTALLATION](INSTALLATION.md)
 
 If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
-
-## Installation
-
-If not done already:
-
-```bash
-cd ~/git
-git clone git@github.com:41012/pfms-support.git
-```
-
-Proceed to install the pipes library, which has been supplied to allow using the physics simulator, at present bypassing the ROS framework for students.
-
-```bash
-cd pfms-support
-cd packages
-sudo dpkg -i pipes_3.0.0-humble-amd64.deb
-sudo ldconfig
-```
-
-If not done already, link the `pfms_ros` folder to your `ros2_ws/src`
-
-```bash
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/src
-ln -s ~/git/pfms-support/pfms-ros 
-```
-Now we can make the package.
-
-```bash
-cd ~/ros2_ws
-colcon build --symlink-install
-```
-
-You should now have all the required software. 
 
 ## Running Simulator
 
@@ -74,8 +42,8 @@ To update any of the libraries make sure `git pull` from `~/git/pfms-support`
 To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table,  your `ROSVERSION` (`humble`) and your system ( `amd64`). 
 
 ```bash
-cd ~/git/pfms-support/packages
-sudo dpkg -i pipes-X.Y.Z-ROSVERSION-SYSTEM.deb
+cd ~/git/pfms-support
+sudo apt install ./package/dpkg -i pipes-X.Y.Z-ROSVERSION-SYSTEM.deb
 ```
 
 If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.

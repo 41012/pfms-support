@@ -107,8 +107,8 @@ def generate_launch_description():
         arguments=['-entity',
                    'husky',
                    '-topic',
-                   'robot_description'],
-                #    '-x 5.0 -y 5.0'],
+                   'robot_description',
+                   '-x 0.0', '-y -5.0'],
         output='screen',
     )
 
@@ -123,7 +123,7 @@ def generate_launch_description():
     orange_audibot_options = dict(
         robot_name = 'orange',
         start_x = '0',
-        start_y = '2',
+        start_y = '5',
         start_z = '0',
         start_yaw = '0',
         pub_tf = 'true',

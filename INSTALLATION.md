@@ -11,7 +11,7 @@ Proceed to install the pipes library, which has been supplied to allow using the
 
 ```bash
 cd pfms-support
-sudo apt install ./packages/pipes_3.0.0-humble-amd64.deb
+sudo apt install ./packages/pipes_3.0.1-humble-amd64.deb
 sudo ldconfig
 ```
 

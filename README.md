@@ -33,19 +33,21 @@ dpkg -l | grep pipes
 
 | package | version  X.Y.Z |
 | ------- | -------------- |
-| pipes   | 3.0.0          |
+| pipes   | 3.0.1          |
 
 ## Upgrades
 
-To update any of the libraries make sure `git pull` from `~/git/pfms-support`
+**To update any of the libraries make sure `git pull` from `~/git/pfms-support`**
 
-To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table,  your `ROSVERSION` (`humble`) and your system ( `amd64`). 
+To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table above your `ROSVERSION` (`humble`) and your system ( `amd64`). 
 
 ```bash
 cd ~/git/pfms-support
-sudo apt install ./package/dpkg -i pipes-X.Y.Z-ROSVERSION-SYSTEM.deb
+sudo apt install ./package/pipes_X.Y.Z-ROSVERSION_SYSTEM.deb
+sudo ldconfig
 ```
 
+So it cold be `sudo apt install ./package/pipes_3.0.1-humble_amd64.deb`
 If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.
 
 ```
@@ -54,7 +56,7 @@ cmake ..
 make
 ```
 
-To update **all other packages** recompile your catkin workspace
+To update **all other packages** recompile your catkin work-space
 
 ```bash
 cd ~/ros2_ws

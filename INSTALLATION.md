@@ -55,5 +55,6 @@ Where you should see `source /opt/ros/humble/setup.bash`  displayed on screen. I
 
 ```bash
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```
 

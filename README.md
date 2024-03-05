@@ -43,11 +43,11 @@ To update **pipes** library execute below (where you need to specify the correct
 
 ```bash
 cd ~/git/pfms-support
-sudo apt install ./package/pipes_X.Y.Z-ROSVERSION_SYSTEM.deb
+sudo apt install ./packages/pipes_X.Y.Z-ROSVERSION_SYSTEM.deb
 sudo ldconfig
 ```
 
-So it cold be `sudo apt install ./package/pipes_3.0.1-humble_amd64.deb`
+So it cold be `sudo apt install ./packages/pipes_3.0.1-humble_amd64.deb`
 If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.
 
 ```

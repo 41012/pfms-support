@@ -14,6 +14,7 @@ cd pfms-support
 sudo apt install ./packages/pipes_3.0.1-humble_amd64.deb
 sudo ldconfig
 ```
+If you get following warning you can ignore it `N: Download is performed unsandboxed as root as file`, it's just stating the package is installed from a local file.
 
 If not done already, link the `pfms_ros` folder to your `ros2_ws/src`
 

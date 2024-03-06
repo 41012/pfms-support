@@ -29,6 +29,7 @@ Now we can make the package.
 ```bash
 cd ~/ros2_ws
 colcon build --symlink-install
+source ~/.bashrc
 ```
 
 **You should now have all the required software**.  and can go back to [README](README.md)

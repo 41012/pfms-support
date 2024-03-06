@@ -46,7 +46,6 @@ CMake Error at CMakeLists.txt:15 (find_package):
 Then try again installing the tools
 
 ```bash
-sudo apt install python3-colcon-common-extensions
 sudo apt install ros-dev-tools
 ```
 

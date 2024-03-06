@@ -39,7 +39,7 @@ dpkg -l | grep pipes
 
 | package | version  X.Y.Z |
 | ------- | -------------- |
-| pipes   | 3.0.1          |
+| pipes   | 3.0.2          |
 
 ## Upgrades
 
@@ -49,7 +49,7 @@ To update **pipes** library execute below (where you need to specify the correct
 
 ```bash
 cd ~/git/pfms-support
-sudo apt install ./packages/pipes_3.0.1-humble_amd64.deb
+sudo apt install ./packages/pipes_3.0.2-humble_amd64.deb
 sudo ldconfig
 ```
 

@@ -3,11 +3,17 @@
 PFMS Support - Setup
 =========================
 
-**PREREQUISITE:** you have installed ROS2 and created a workspace as per instructions on canvas in week 00 
+**PREREQUISITE:** 
 
-On Azure we have installed pfms support packages. For your own devices refer [INSTALLATION](INSTALLATION.md)
+- On Azure ROS2 and an workspace have been setup. 
+- On your own device install ROS2 and created a workspace as per instructions on [canvas](https://canvas.uts.edu.au/courses/30581/pages/customising-linux-install-for-pfms?wrap=1).
 
-If you get stuck in install there is a [Frequently Asked Questions - FAQ](./FAQ.md)
+Installation:
+
+- On Azure we have installed pfms support packages. 
+- For your own devices refer [INSTALLATION](INSTALLATION.md)
+
+If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
 ## Running Simulator
 
@@ -43,12 +49,13 @@ To update **pipes** library execute below (where you need to specify the correct
 
 ```bash
 cd ~/git/pfms-support
-sudo apt install ./packages/pipes_X.Y.Z-ROSVERSION_SYSTEM.deb
+sudo apt install ./packages/pipes_3.0.1-humble_amd64.deb
 sudo ldconfig
 ```
 
-So it cold be `sudo apt install ./packages/pipes_3.0.1-humble_amd64.deb`
-If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory.
+Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
+
+If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory of your code.
 
 ```
 rm CMakeCache.txt

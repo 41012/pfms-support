@@ -151,6 +151,28 @@ def generate_launch_description():
         arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
     )
 
+    audi_reach = Node(
+        package='gazebo_tf',
+        executable='reach',
+        name='audi_reach',
+        output='screen'
+        # output={'both': 'log'},
+        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
+    )
+
+    husky_reach = Node(
+        package='gazebo_tf',
+        executable='reach',
+        name='husky_reach',
+        output='screen',
+        # output={'both': 'log'},
+        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
+        remappings=[
+            ('/orange/odom', '/husky/odom'),
+            ('/orange/check_goals', '/husky/check_goals'),
+            ('ackerman_check_goals', 'husky_check_goals'),
+        ]
+    )
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(node_robot_state_publisher)
     ld.add_action(spawn_joint_state_broadcaster)
@@ -161,5 +183,7 @@ def generate_launch_description():
     ld.add_action(gazebo_connect)
     ld.add_action(spawn_orange_audibot)
     ld.add_action(rviz)
+    ld.add_action(audi_reach)
+    ld.add_action(husky_reach)
 
     return ld

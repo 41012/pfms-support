@@ -51,18 +51,18 @@ def generate_launch_description():
     spawn_husky_velocity_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['husky_velocity_controller', '-c', '/controller_manager'],
+        arguments=['husky_velocity_controller', '-c', '/controller_manager','--ros-args', '--log-level', 'debug'],
         output='screen',
     )
 
     spawn_joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['joint_state_broadcaster', '-c', '/controller_manager'],
+        arguments=['joint_state_broadcaster', '-c', '/controller_manager','--ros-args', '--log-level', 'debug'],
         output='screen',
     )
 
-    # Make sure spawn_husky_velocity_controller starts after spawn_joint_state_broadcaster
+    # Make sure spawn_husky_velocixxxxty_controller starts after spawn_joint_state_broadcaster
     diffdrive_controller_spawn_callback = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawn_joint_state_broadcaster,

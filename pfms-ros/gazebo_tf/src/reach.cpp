@@ -30,17 +30,8 @@ Reach() :
     goalSet_(false),goalReached_(false),dt_(0), dStart_(0), dTravelled_(0)
 {
 
-    // ros::NodeHandle pnh("~"); // Create private node handle
-    // std::string source="ugv"; // Default Name
-    // pnh.getParam("platform", source);
-
-    // std::string topic_name = "/" + source + "_odom/";
-
-    // ROS_INFO_STREAM("The connection to ros for platform:" << source);
-    // ROS_INFO_STREAM("Topic name:" << topic_name);
-
-    //! @todo: change to use parameters for distance and platform name
-    distanceThreshold_ = 1.0;
+    //! @todo: change to use parameters for distance
+    distanceThreshold_ = 0.7;
 
     sub1_ = this->create_subscription<nav_msgs::msg::Odometry>(
         "/orange/odom", 1000, std::bind(&Reach::odoCallback,this,_1));

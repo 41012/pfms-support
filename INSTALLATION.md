@@ -53,10 +53,21 @@ sudo apt install ros-dev-tools
 Also check that your `.bashrc` file sources the ros `setup.bash` file. You can do so by
 `tail ~/.bashrc`
 
-Where you should see `source /opt/ros/humble/setup.bash`  displayed on screen. If it is missing then execute 
+Where you should see `source /opt/ros/humble/setup.bash`  and something like `source /home/XXXXXX/ros2_ws/install/setup.bash` displayed on screen (wheer `XXXX` is your username and thus it depends on your device username. The `\opt\ros` are packages supplied by ros and part of system while those in  `ros2_ws` are those installed for our subject.
+
+If `/opt/ros` it is missing then execute.
 
 ```bash
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+```
+If the `ros_ws`  is missing
+
+```bash
+echo "source ${HOME}/ros2_ws/install/setup.bash" >> ~/.bashrc
+```
+Then execute below to update the system, this makes your system aware of software installed in the two locations (all packages and support files).
+```bash
 source ~/.bashrc
 ```
+
 

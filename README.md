@@ -55,7 +55,7 @@ sudo ldconfig
 
 Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
 
-To update **all other packages** recompile your catkin work-space
+To update **all other packages** recompile your ros2 work-space
 
 ```bash
 cd ~/ros2_ws

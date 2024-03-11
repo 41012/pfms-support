@@ -55,7 +55,14 @@ sudo ldconfig
 
 Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
 
-If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory of your code.
+To update **all other packages** recompile your catkin work-space
+
+```bash
+cd ~/ros2_ws
+colcon build --symlink-install
+```
+
+Finally, any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt it. vscode rebuild function or from build directory of your code.
 
 ```
 rm CMakeCache.txt
@@ -63,9 +70,3 @@ cmake ..
 make
 ```
 
-To update **all other packages** recompile your catkin work-space
-
-```bash
-cd ~/ros2_ws
-colcon build --symlink-install
-```

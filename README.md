@@ -13,7 +13,7 @@ Installation:
 - On Azure we have installed pfms support packages. 
 - For your own devices refer [INSTALLATION](INSTALLATION.md)
 
-If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
+Always check if you need to update pipes (information below on hwo to check and update), a Teams Announcement is made to indicate this. If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
 ## Running Simulator
 

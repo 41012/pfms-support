@@ -62,7 +62,7 @@ cd ~/ros2_ws
 colcon build --symlink-install
 ```
 
-Finally, any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt it. vscode rebuild function or from build directory of your code.
+Finally, any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. Either vscode rebuild function or from build directory of your code you can execute:
 
 ```
 rm CMakeCache.txt

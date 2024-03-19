@@ -22,7 +22,7 @@ You can launch the simulator for the audi and husky. You will need to launch the
 ```
 ros2 launch gazebo_tf audi_husky.launch.py
 ```
-<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:50%;" />
+<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:30%;" />
 
 The terminal where you have executed this command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
 

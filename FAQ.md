@@ -24,7 +24,7 @@ ln -s ~/git/pfms_support/pfms_ros
 ```
 2) You have not compiled the packages
 
-You need to execute `catkin_make` within the `ros_ws` folder as per instructions. When colcon is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. 
+You need to execute `colcon build --symlink-install` within the `ros2_ws` folder as per instructions. When colcon is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. 
 
 If `colcon` only produces few lines an error check if you have actually customised Linux for PfMS, in particular section on [install ROS and all other required packages](https://canvas.uts.edu.au/courses/26214/pages/customising-linux-install-for-pfms?wrap=1) and read next section below about ~/.bashrc
 

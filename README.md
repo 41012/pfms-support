@@ -45,7 +45,7 @@ dpkg -l | grep pipes
 
 **To update any of the libraries make sure `git pull` from `~/git/pfms-support`**
 
-To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table above your `ROSVERSION` (`humble`) and your system ( `amd64`). 
+To update **pipes** library execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
 
 ```bash
 cd ~/git/pfms-support

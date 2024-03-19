@@ -78,8 +78,8 @@ export LIBGL_ALWAYS_SOFTWARE=true
 Use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the command. Save via CTRL+X and Y (follow prompts).
 
 
-## Error while loading shared libraryies: libpipes.so: cannot open shared object file
+## Error while loading shared libraryies: libpfmsconnector.so: cannot open shared object file
 
 This error occurs when trying to execute (run) `./command_ugv` and is not related to the building process, pipes indeed exists on your system, it is related to the runtime environment (when you try to run the executable).
 
-Try executing `ldconfig` in the terminal window prior to running `./command_ugv`. 
+Try executing `sudo ldconfig` in the terminal window prior to running `./command_ugv`. 

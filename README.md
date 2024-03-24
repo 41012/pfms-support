@@ -45,7 +45,8 @@ dpkg -l | grep pipes
 
 **To update any of the libraries make sure `git pull` from `~/git/pfms-support`**. There are 3 steps thereafter:
 
-1) update **pipes** library execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
+1) update **pipes** library
+Execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
 
 ```bash
 cd ~/git/pfms-support
@@ -55,14 +56,18 @@ sudo ldconfig
 
 Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
 
-2) update **all other packages** recompile your ros2 work-space
+2) update **ros2_ws packages**
+
+Recompile your ros2 work-space, which will bring other changes needed,
 
 ```bash
 cd ~/ros2_ws
 colcon build --symlink-install
 ```
 
-3) Any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. From build directory of your code you can execute:
+3) re-link your code to the updates.
+
+Any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. From build directory of your code you can execute:
 
 ```
 rm CMakeCache.txt

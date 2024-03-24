@@ -46,6 +46,7 @@ dpkg -l | grep pipes
 **To update any of the libraries make sure `git pull` from `~/git/pfms-support`**. There are 3 steps thereafter:
 
 1) update **pipes** library
+
 Execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
 
 ```bash

@@ -73,6 +73,7 @@ Any code that links to pipes (such as command_ugv) or your own assignment code n
 ```
 rm CMakeCache.txt
 cmake ..
+make clean
 make
 ```
 

@@ -25,15 +25,8 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
 #Create executables
-#add_executable(ugv_remote src/ugv_remote.cpp)
-#target_link_libraries(ugv_remote ${catkin_LIBRARIES})
-
 add_executable(gazebo_connect src/gazebo_connect.cpp)
 ament_target_dependencies(gazebo_connect rclcpp gazebo_msgs nav_msgs tf2 tf2_geometry_msgs tf2_ros)
-#ament_target_dependencies(gazebo_connect rclcpp std_msgs sensor_msgs nav_msgs tf2 tf2_ros)
-
-#add_executable(odo src/odo.cpp)
-#target_link_libraries(odo ${catkin_LIBRARIES} rt pthread )
 
 add_executable(reach src/reach.cpp)
 ament_target_dependencies(reach rclcpp std_srvs geometry_msgs nav_msgs)

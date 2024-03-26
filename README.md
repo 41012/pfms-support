@@ -13,7 +13,7 @@ Installation:
 - On Azure we have installed pfms support packages. 
 - For your own devices refer [INSTALLATION](INSTALLATION.md)
 
-If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
+Always check if you need to update pipes (information below on how to check version and undertake an update). This does not occur frequently, a Teams Announcement is made to indicate a new version is released. If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
 ## Running Simulator
 
@@ -22,9 +22,9 @@ You can launch the simulator for the audi and husky. You will need to launch the
 ```
 ros2 launch gazebo_tf audi_husky.launch.py
 ```
-<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:50%;" />
-
 The terminal where you have executed this command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
+
+<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:20%;" />
 
 Version Check
 -------------------------
@@ -43,9 +43,11 @@ dpkg -l | grep pipes
 
 ## Upgrades
 
-**To update any of the libraries make sure `git pull` from `~/git/pfms-support`**
+**To update any of the libraries make sure `git pull` from `~/git/pfms-support`**. There are 3 steps thereafter:
 
-To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table above your `ROSVERSION` (`humble`) and your system ( `amd64`). 
+1) update **pipes** library
+
+Execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
 
 ```bash
 cd ~/git/pfms-support
@@ -55,17 +57,23 @@ sudo ldconfig
 
 Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
 
-If your working on any code that links to pipes (such as command_ugv) or your own assignment code. It is always good practice to rebuild it. So from build directory of your code.
+2) update **ros2_ws packages**
 
-```
-rm CMakeCache.txt
-cmake ..
-make
-```
-
-To update **all other packages** recompile your catkin work-space
+Recompile your ros2 work-space, which will bring other changes needed,
 
 ```bash
 cd ~/ros2_ws
 colcon build --symlink-install
 ```
+
+3) re-link your code to the updates.
+
+Any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. From build directory of your code you can execute:
+
+```
+rm CMakeCache.txt
+cmake ..
+make clean
+make
+```
+

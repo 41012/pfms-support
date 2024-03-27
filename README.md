@@ -37,9 +37,9 @@ dpkg -l | grep pipes
 
 ### Current versions
 
-| package | version  X.Y.Z |
-| ------- | -------------- |
-| pipes   | 3.0.2          |
+| package | version  |
+| ------- | ---------|
+| pipes   | 3.0.2    |
 
 ## Upgrades
 

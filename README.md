@@ -43,7 +43,7 @@ dpkg -l | grep pipes
 
 ## Upgrades
 
-**To update any of the libraries make sure `git pull` from `~/git/pfms-support`**. There are 3 steps thereafter:
+There are 3 steps:
 
 1) update **pipes** library
 
@@ -51,6 +51,7 @@ Execute below (make sure you use the library for your system (`amd64`), there is
 
 ```bash
 cd ~/git/pfms-support
+git pull
 sudo apt install ./packages/pipes_3.0.2-humble_amd64.deb
 sudo ldconfig
 ```

@@ -3,6 +3,12 @@
 FAQ
 =========================
 
+## EasyInstallDeprecationWarning: easy_install command is deprecated ##
+
+ The warning which occurs with `colcon build` (it is not an error) can be ignored.
+ 
+While annoying, this is simply a warning for a future date change to developers (and your now a developer). Setuptools version 58.2.0 is the last version that works with ROS 2 python packages without any warnings because it is the last version that supports the old installation method, "python setup.py install." This method has been deprecated and replaced by newer, standards-based tools, such as pip and ament. [FYI further details](https://answers.ros.org/question/396439/setuptoolsdeprecationwarning-setuppy-install-is-deprecated-use-build-and-pip-and-other-standards-based-tools/)
+
 ## [audi_husky.launch.py] is neither a launch file in package [gazebo_tf] nor is [gazebo_tf] a launch file name
 
 The error indicates ROS is unable to find the package that contains this file, which is tied to the simulation.

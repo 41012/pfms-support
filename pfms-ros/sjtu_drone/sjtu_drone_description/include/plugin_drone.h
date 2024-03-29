@@ -28,6 +28,10 @@
 #include <sensor_msgs/msg/imu.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include "pid_controller.h"
 
@@ -55,6 +59,7 @@ protected:
   virtual void Reset();
 
 private:
+  void tfTimerCallback();
   double m_timeAfterCmd;
   bool m_posCtrl;
   bool m_velMode;
@@ -79,10 +84,16 @@ private:
   rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr reset_subscriber_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr switch_mode_subscriber_;
 
-  rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pub_gt_pose_; //for publishing ground truth pose
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pub_gt_odometry_; //for publishing ground truth pose
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_gt_vec_; //ground truth velocity in the body frame
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_gt_acc_; //ground truth acceleration in the body frame
 
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  int tf_timer_count_;
+  int tf_timer_thres_;
+  std::string robot_name_;
+  std::string frame_id_;  
+  
   geometry_msgs::msg::Twist cmd_val;
   // callback functions for subscribers
   void CmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg);

@@ -18,7 +18,7 @@
 #include <cmath>
 #include <stdlib.h>
 #include <iostream>
-
+#include <gazebo_ros/conversions/builtin_interfaces.hpp>
 
 namespace gazebo {
 
@@ -58,7 +58,7 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   reset_topic_ = "reset";
   posctrl_topic_ = "posctrl";
   switch_mode_topic_ = "dronevel_mode";
-  gt_topic_ = "gt_pose";
+  gt_topic_ = "gt_odom";
   gt_vel_topic_ = "gt_vel";
   gt_acc_topic_ = "gt_acc";
   
@@ -114,6 +114,21 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   node_handle_ = std::make_shared<rclcpp::Node>("control", model_name_);
   executor_ = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
+
+  tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node_handle_);
+  tf_timer_thres_ = (int)(1e3 / 100.0);
+  tf_timer_count_ = 0;
+
+  // physics::LinkPtr footprint_link;
+  // footprint_link = _model->GetLink("base_footprint");
+  robot_name_ = _sdf->Get<std::string>("robot_name", "").first;
+  if (robot_name_.empty()) {
+    frame_id_ = link_name_;
+  } else {
+    frame_id_ = robot_name_ + "/" + link_name_;
+  }
+
+  RCLCPP_INFO_STREAM(node_handle_->get_logger(), "The robot name is" << robot_name_ << " and the frame id is " << frame_id_);
 
   ////////////////////////////////////////////////////////////////////////////////
   // Subscribers
@@ -259,13 +274,13 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   ////////////////////////////////////////////////////////////////////////////////
   // Publishers
   if (!gt_topic_.empty()){
-    pub_gt_pose_ = node_handle_->create_publisher<geometry_msgs::msg::Pose>(gt_topic_,1024);  
-    if (pub_gt_pose_->get_topic_name()[0] != '\0')
-      RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "Advertising the ground truth pose topic on: %s !", pub_gt_pose_->get_topic_name());  
+    pub_gt_odometry_ = node_handle_->create_publisher<nav_msgs::msg::Odometry>(gt_topic_,1024);  
+    if (pub_gt_odometry_->get_topic_name()[0] != '\0')
+      RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "Advertising the ground truth odometry topic on: %s !", pub_gt_odometry_->get_topic_name());  
     else
-      RCLCPP_WARN(rclcpp::get_logger("DroneSimpleController"), "Could not resolve the ground truth topic: %s !", gt_topic_.c_str());  
+      RCLCPP_WARN(rclcpp::get_logger("DroneSimpleController"), "Could not resolve the ground odometry truth topic: %s !", gt_topic_.c_str());  
   } else
-      RCLCPP_ERROR(rclcpp::get_logger("DroneSimpleController"), "No ground truth topic defined!");
+      RCLCPP_ERROR(rclcpp::get_logger("DroneSimpleController"), "No ground truth odometry topic defined!");
 
   if (!gt_vel_topic_.empty())
   {
@@ -467,6 +482,11 @@ void DroneSimpleController::Update()
     executor_->spin_some(std::chrono::milliseconds(100));
     UpdateState(dt);
     UpdateDynamics(dt);
+
+    if (tf_timer_count_++ >= tf_timer_thres_) {
+      tf_timer_count_ = 0;
+      tfTimerCallback();
+    }
     
     // save last time stamp
     last_time = sim_time;   
@@ -533,7 +553,19 @@ void DroneSimpleController::UpdateDynamics(double dt){
     gt_pose.orientation.x = pose.Rot().X();
     gt_pose.orientation.y = pose.Rot().Y();
     gt_pose.orientation.z = pose.Rot().Z();
-    pub_gt_pose_->publish(gt_pose);
+
+    nav_msgs::msg::Odometry odom;
+    odom.header.stamp = node_handle_->now();
+    odom.header.frame_id = "world"; 
+    odom.pose.pose = gt_pose;
+    odom.twist.twist.linear.x = velocity.X();
+    odom.twist.twist.linear.y = velocity.Y();
+    odom.twist.twist.linear.x = velocity.Z();
+    odom.twist.twist.angular.x = angular_velocity.X();
+    odom.twist.twist.angular.y = angular_velocity.Y();
+    odom.twist.twist.angular.z = angular_velocity.Z();
+
+    pub_gt_odometry_->publish(odom);
     
     //convert the acceleration and velocity into the body frame
     ignition::math::v6::Vector3 body_vel = pose.Rot().RotateVector(velocity);
@@ -670,6 +702,23 @@ void DroneSimpleController::Reset()
   state_stamp_ = rclcpp::Time();
 
 }
+
+void DroneSimpleController::tfTimerCallback() {
+  auto current_ros_time = gazebo_ros::Convert<builtin_interfaces::msg::Time>(last_time);
+  geometry_msgs::msg::TransformStamped t;
+  t.header.frame_id = "world";
+  t.child_frame_id = frame_id_;
+  t.header.stamp = current_ros_time;
+  t.transform.translation.x = pose.Pos().X();
+  t.transform.translation.y = pose.Pos().Y();
+  t.transform.translation.z = pose.Pos().Z();
+  t.transform.rotation.w = pose.Rot().W();
+  t.transform.rotation.x = pose.Rot().X();
+  t.transform.rotation.y = pose.Rot().Y();
+  t.transform.rotation.z = pose.Rot().Z();
+  tf_broadcaster_->sendTransform(t);
+}
+
 
 // Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(DroneSimpleController)

@@ -69,7 +69,7 @@ def generate_launch_description():
         name='two_vehicle_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_quad.rviz')]
     )
 
 
@@ -99,10 +99,10 @@ def generate_launch_description():
     )
 
     ld = launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-          'world',
-          default_value=[PythonExpression(['"',world,'" + "/racetrack_" + "', mode, '" + ".world"']),''],
-          description='SDF world file'),
+        # launch.actions.DeclareLaunchArgument(
+        #   'world',
+        #   default_value=[PythonExpression(['"',world,'" + "/racetrack_" + "', mode, '" + ".world"']),''],
+        #   description='SDF world file'),
         launch.actions.DeclareLaunchArgument(
             name='gui',
             default_value='false'

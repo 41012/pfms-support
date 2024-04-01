@@ -22,9 +22,9 @@ You can launch the simulator for the audi and husky. You will need to launch the
 ```
 ros2 launch gazebo_tf audi_husky.launch.py
 ```
-<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:50%;" />
-
 The terminal where you have executed this command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
+
+<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:20%;" />
 
 Version Check
 -------------------------
@@ -37,36 +37,44 @@ dpkg -l | grep pipes
 
 ### Current versions
 
-| package | version  X.Y.Z |
-| ------- | -------------- |
-| pipes   | 3.0.2          |
+| package | version  |
+| ------- | ---------|
+| pipes   | 3.0.2    |
 
 ## Upgrades
 
-**To update any of the libraries make sure `git pull` from `~/git/pfms-support`**
+There are 3 steps:
 
-To update **pipes** library execute below (where you need to specify the correct package name, where you need to match the X.Y.Z at current version in table above your `ROSVERSION` (`humble`) and your system ( `amd64`). 
+1) update **pipes** library
+
+Execute below (make sure you use the library for your system (`amd64`), there is an `arm64` version for Mac and RPi devices). 
 
 ```bash
 cd ~/git/pfms-support
+git pull
 sudo apt install ./packages/pipes_3.0.2-humble_amd64.deb
 sudo ldconfig
 ```
 
 Just ignore apt related `W: ... _apt ...` warning lines. They're non-fatal, and for the most part you can't fix this, and you'll get the same results with or without the warning.
 
-To update **all other packages** recompile your ros2 work-space
+2) update **ros2_ws packages**
+
+Recompile your ros2 work-space, which will bring other changes needed,
 
 ```bash
 cd ~/ros2_ws
 colcon build --symlink-install
 ```
 
-Finally, any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. Either vscode rebuild function or from build directory of your code you can execute:
+3) re-link your code to the updates.
+
+Any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. From build directory of your code you can execute:
 
 ```
 rm CMakeCache.txt
 cmake ..
+make clean
 make
 ```
 

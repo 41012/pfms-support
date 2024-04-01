@@ -10,21 +10,22 @@ PFMS Support - Setup
 
 Installation:
 
-- On Azure we have installed pfms support packages. 
+- On Azure we have installed pfms support packages (you may need to update - refer below version)
 - For your own devices refer [INSTALLATION](INSTALLATION.md)
 
 Always check if you need to update pipes (information below on how to check version and undertake an update). This does not occur frequently, a Teams Announcement is made to indicate a new version is released. If you get stuck in install or behaviour or running is odd there is a [Frequently Asked Questions - FAQ](./FAQ.md)
 
 ## Running Simulator
 
-You can launch the simulator for the audi and husky. You will need to launch the simulator if your running any code that sends commands or receives data from the simulator. 
+You will need to launch the appropriate launch file if your running any code that sends commands or receives data from the simulator. The terminal where you have executed the `ros2 launch` command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
 
-```
-ros2 launch gazebo_tf audi_husky.launch.py
-```
-The terminal where you have executed this command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
+**Assignment 2** (audi and drone) `ros2 launch gazebo_tf a2.launch.py`  
 
-<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" style="zoom:20%;" />
+<img src="./images/rviz_a2.png" alt="a2" width="400" />
+
+**Assignment 1** (audi and husky) `ros2 launch gazebo_tf audi_husky.launch.py`
+
+<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" width="400" />
 
 Version Check
 -------------------------
@@ -37,9 +38,9 @@ dpkg -l | grep pipes
 
 ### Current versions
 
-| package | version  |
-| ------- | ---------|
-| pipes   | 3.0.2    |
+| package | version |
+| ------- | ------- |
+| pipes   | 3.0.3   |
 
 ## Upgrades
 
@@ -52,7 +53,7 @@ Execute below (make sure you use the library for your system (`amd64`), there is
 ```bash
 cd ~/git/pfms-support
 git pull
-sudo apt install ./packages/pipes_3.0.2-humble_amd64.deb
+sudo apt install ./packages/pipes_3.0.3-humble_amd64.deb
 sudo ldconfig
 ```
 
@@ -69,7 +70,7 @@ colcon build --symlink-install
 
 3) re-link your code to the updates.
 
-Any code that links to pipes (such as command_ugv) or your own assignment code needs to be rebuilt. From build directory of your code you can execute:
+Any code that links to pipes (such as tutorials or your own assignment code) needs to be rebuilt. From build directory of your code you can execute:
 
 ```
 rm CMakeCache.txt

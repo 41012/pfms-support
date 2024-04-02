@@ -134,7 +134,7 @@ def generate_launch_description():
     drone_reach = Node(
         package='gazebo_tf',
         executable='reach',
-        name='husky_reach',
+        name='drone_reach',
         output='screen',
         # output={'both': 'log'},
         # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]

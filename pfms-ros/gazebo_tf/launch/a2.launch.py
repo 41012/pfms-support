@@ -4,7 +4,7 @@ import sys
 import launch
 from launch.conditions import IfCondition
 from launch.substitutions import PythonExpression
-from launch.actions import IncludeLaunchDescription, GroupAction
+from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable
 from launch_ros.actions import Node, PushRosNamespace
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -17,6 +17,13 @@ def generate_launch_description():
 
     mode = launch.substitutions.LaunchConfiguration('mode')
     world = os.path.join(get_package_share_directory('gazebo_tf'), 'worlds')
+    pkg_gazebo_tf_models = get_package_share_directory('gazebo_tf')
+
+    if 'GAZEBO_MODEL_PATH' in os.environ:
+        model_path =  os.environ['GAZEBO_MODEL_PATH'] \
+            + ':' + pkg_gazebo_tf_models + '/models'
+    else:
+        model_path =  pkg_gazebo_tf_models + '/models'
 
     gazebo_ros = get_package_share_directory('gazebo_ros')
     gazebo_client = launch.actions.IncludeLaunchDescription(
@@ -157,8 +164,10 @@ def generate_launch_description():
 
         launch.actions.DeclareLaunchArgument(
             name='extra_gazebo_args',
-            default_value='-s libgazebo_ros_init.so -s libgazebo_ros_factory.so',
+            default_value='--verbose',
             description='Extra plugins for (Gazebo)'),
+
+        SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
           
         gazebo_server,
         # gzserver,

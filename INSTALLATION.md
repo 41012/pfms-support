@@ -1,6 +1,8 @@
 ## Installation
 
-If not done already:
+If you have already installed pipes and your ros workspace, and can go back to [README](README.md) and check if you need an update.
+
+If not then follow below:
 
 ```bash
 cd ~/git
@@ -11,7 +13,7 @@ Proceed to install the pipes library, which has been supplied to allow using the
 
 ```bash
 cd pfms-support
-sudo apt install ./packages/pipes_3.0.2-humble_amd64.deb
+sudo apt install ./packages/pipes_3.0.3-humble_amd64.deb
 sudo ldconfig
 ```
 If you get following warning you can ignore it `N: Download is performed unsandboxed as root as file`, it's just stating the package is installed from a local file.
@@ -68,5 +70,4 @@ Then execute below to update the system, this makes your system aware of softwar
 ```bash
 source ~/.bashrc
 ```
-
 

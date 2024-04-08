@@ -110,13 +110,17 @@ void odoCallback(const nav_msgs::msg::Odometry& msg)
     dTravelled_= dTravelled_ + dAtomic;
     odoPrev_=msg;
 
-    if(goalSet_){
+        if(goalSet_){
         mx_.lock();
         if(goalIdx_<goals_.poses.size()){
             auto goal = goals_.poses.at(goalIdx_);
-            double d = distToGoal(msg,goal);
+            geometry_msgs::msg::Pose goalPrev;
+            if(goalIdx_>0){
+                goalPrev = goals_.poses.at(goalIdx_-1);            
+            }
             mx_.unlock();
-
+            
+            double d = distToGoal(msg,goal);
             RCLCPP_DEBUG_STREAM_THROTTLE(this->get_logger(),
                 *this->get_clock(),
                 1000,
@@ -127,6 +131,15 @@ void odoCallback(const nav_msgs::msg::Odometry& msg)
                 goalReached_.at(goalIdx_)=true;
                 goalDist_.at(goalIdx_)=d;
                 goalIdx_++;
+            }
+
+            //Let's check previous goal as we could still be rolling towards it
+            if(goalIdx_>0){
+                double dPrev = distToGoal(msg,goalPrev);
+                if(dPrev<goalDist_.at(goalIdx_-1)){
+                    // RCLCPP_INFO_STREAM(this->get_logger(),"Reached Goal:" << goalIdx_-1 << " dist:"<< dPrev);
+                    goalDist_.at(goalIdx_-1)=dPrev;
+                }
             }
 
             if(goalIdx_==goals_.poses.size()){

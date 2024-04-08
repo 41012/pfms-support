@@ -3,6 +3,12 @@
 FAQ
 =========================
 
+## EasyInstallDeprecationWarning: easy_install command is deprecated ##
+
+ The warning which occurs with `colcon build` (it is not an error) can be ignored.
+ 
+While annoying, this is simply a warning for a future date change to developers (and your now a developer). Setuptools version 58.2.0 is the last version that works with ROS 2 python packages without any warnings because it is the last version that supports the old installation method, "python setup.py install." This method has been deprecated and replaced by newer, standards-based tools, such as pip and ament. [FYI further details](https://answers.ros.org/question/396439/setuptoolsdeprecationwarning-setuppy-install-is-deprecated-use-build-and-pip-and-other-standards-based-tools/)
+
 ## [audi_husky.launch.py] is neither a launch file in package [gazebo_tf] nor is [gazebo_tf] a launch file name
 
 The error indicates ROS is unable to find the package that contains this file, which is tied to the simulation.
@@ -24,7 +30,7 @@ ln -s ~/git/pfms_support/pfms_ros
 ```
 2) You have not compiled the packages
 
-You need to execute `catkin_make` within the `ros_ws` folder as per instructions. When colcon is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. 
+You need to execute `colcon build --symlink-install` within the `ros2_ws` folder as per instructions. When colcon is running it will take some time to compile a lot of libraries and executable(s) and will give you update on progress `[ XX%]` where XX is a number from 0-100. 
 
 If `colcon` only produces few lines an error check if you have actually customised Linux for PfMS, in particular section on [install ROS and all other required packages](https://canvas.uts.edu.au/courses/26214/pages/customising-linux-install-for-pfms?wrap=1) and read next section below about ~/.bashrc
 
@@ -78,8 +84,8 @@ export LIBGL_ALWAYS_SOFTWARE=true
 Use nano editor, open file via`nano ~/.bashrc`  . Edit the file using arrows/backspace (the screen does not respond to a mouse), you can navigate via arrow keys to the bottom of file and then add the command. Save via CTRL+X and Y (follow prompts).
 
 
-## Error while loading shared libraryies: libpipes.so: cannot open shared object file
+## Error while loading shared libraryies: libpfmsconnector.so: cannot open shared object file
 
 This error occurs when trying to execute (run) `./command_ugv` and is not related to the building process, pipes indeed exists on your system, it is related to the runtime environment (when you try to run the executable).
 
-Try executing `ldconfig` in the terminal window prior to running `./command_ugv`. 
+Try executing `sudo ldconfig` in the terminal window prior to running `./command_ugv`. 

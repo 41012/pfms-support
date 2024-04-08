@@ -40,7 +40,7 @@ dpkg -l | grep pipes
 
 | package | version |
 | ------- | ------- |
-| pipes   | 3.0.3   |
+| pipes   | 3.0.4   |
 
 ## Upgrades
 
@@ -53,7 +53,7 @@ Execute below (make sure you use the library for your system (`amd64`), there is
 ```bash
 cd ~/git/pfms-support
 git pull
-sudo apt install ./packages/pipes_3.0.3-humble_amd64.deb
+sudo apt install ./packages/pipes_3.0.4-humble_amd64.deb
 sudo ldconfig
 ```
 

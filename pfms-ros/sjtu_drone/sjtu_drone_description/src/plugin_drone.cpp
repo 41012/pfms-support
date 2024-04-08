@@ -274,7 +274,7 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   ////////////////////////////////////////////////////////////////////////////////
   // Publishers
   if (!gt_topic_.empty()){
-    pub_gt_odometry_ = node_handle_->create_publisher<nav_msgs::msg::Odometry>(gt_topic_,1024);  
+    pub_gt_odometry_ = node_handle_->create_publisher<nav_msgs::msg::Odometry>(gt_topic_,1);  
     if (pub_gt_odometry_->get_topic_name()[0] != '\0')
       RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "Advertising the ground truth odometry topic on: %s !", pub_gt_odometry_->get_topic_name());  
     else

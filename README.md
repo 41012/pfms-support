@@ -30,7 +30,7 @@ You will need to launch the appropriate launch file if your running any code tha
 Version Check
 -------------------------
 
-To check versions of your installed files if there is an update provided
+To check versions of your installed files if there is an update provided, link describing updated: [VERSIONS](./VERSIONS.md) 
 
 ```
 dpkg -l | grep pipes

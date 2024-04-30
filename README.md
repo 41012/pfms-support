@@ -40,7 +40,7 @@ dpkg -l | grep pipes
 
 | package | version |
 | ------- | ------- |
-| pipes   | 3.0.4   |
+| pipes   | 3.0.5   |
 
 ## Upgrades
 
@@ -53,7 +53,7 @@ Execute below (make sure you use the library for your system (`amd64`), there is
 ```bash
 cd ~/git/pfms-support
 git pull
-sudo apt install ./packages/pipes_3.0.4-humble_amd64.deb
+sudo apt install ./packages/pipes_3.0.5-humble_amd64.deb
 sudo ldconfig
 ```
 
@@ -72,7 +72,7 @@ colcon build --symlink-install
 
 Any code that links to pipes (such as tutorials or your own assignment code) needs to be rebuilt. From build directory of your code you can execute:
 
-```
+```bash
 rm CMakeCache.txt
 cmake ..
 make clean

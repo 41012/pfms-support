@@ -3,6 +3,10 @@
 Version Changes (Pipes and ROS2_WS packages)
 =========================
 
+## 3.0.5 ##
+
+- Audi library has updated computation of distance and end pose using EIgen for Matrix manipulation. Has been tested through series of unit tests as well as against running a TSP.
+
 ## 3.0.4 ##
 
 - `PfmsHog::teleop` changed from using `gazebo_msgs::srv::DeleteEntity` and `gazebo_msgs::srv::SpawnEntity` instead of `gazebo_msgs::srv::SetEntityState`.   50 fold increase in speed, no delay, tested for `Quadcopter` `Ackerman` and `SkidSteer`. 

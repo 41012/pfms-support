@@ -68,9 +68,13 @@ cd ~/ros2_ws
 colcon build --symlink-install
 ```
 
-3) re-link your code to the updates.
+3) re-link your code to the updates by rebuilding it.
 
-Any code that links to pipes (such as tutorials or your own assignment code) needs to be rebuilt. From build directory of your code you can execute:
+Any code that links to pipes (such as tutorials or your own assignment code) needs to be rebuilt. Otherwise you will receive error which contains 
+```
+sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) 
+```
+Therefore from build directory of any of your code you can force it to rebuild by executing:
 
 ```bash
 rm CMakeCache.txt

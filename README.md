@@ -70,7 +70,7 @@ colcon build --symlink-install
 
 3) re-link your code to the updates by rebuilding it.
 
-Any code that links to pipes (such as tutorials or your own assignment code) needs to be rebuilt. Otherwise you will receive error which contains 
+Any code that links to libraries of the pipes package (such as tutorials or your own assignment code) needs to be rebuilt. Otherwise you will receive error which contains 
 ```
 sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) 
 ```

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="ice_mt_ground">
+    <static>true</static>
+    <link name="ice_mt_ground_link">
+      <collision name="collision">
+        <geometry>
+          <heightmap>
+            <uri>model://ice_mt_ground/materials/textures/b6.png</uri>
+            <size>75 75 10</size>
+            <pos>0 0 -2</pos>
+          </heightmap>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <heightmap>
+            <texture>
+              <diffuse>model://ice_mt_ground/materials/textures/new_snow_low.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>300</size>
+            </texture>
+            <texture>
+              <diffuse>model://ice_mt_ground/materials/textures/new_snow_white.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>100</size>
+            </texture>
+            <texture>
+              <diffuse>model://ice_mt_ground/materials/textures/new_snow_mid.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>1000</size>
+            </texture>
+            <blend>
+              <min_height>1</min_height>
+              <fade_dist>1</fade_dist>
+            </blend>
+            <blend>
+              <min_height>5</min_height>
+              <fade_dist>0.5</fade_dist>
+            </blend>
+            <uri>model://ice_mt_ground/materials/textures/b6.png</uri>
+            <size>75 75 10</size>
+            <pos>0 0 -2</pos>
+          </heightmap>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

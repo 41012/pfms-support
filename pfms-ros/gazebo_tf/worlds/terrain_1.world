@@ -1,3 +1,7 @@
+<?xml version="1.0"?>
+<!--
+  Terrain  for A3
+-->
 <sdf version='1.6'>
   <world name='default'>
     <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">

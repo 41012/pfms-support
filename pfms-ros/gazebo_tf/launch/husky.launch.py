@@ -13,8 +13,8 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("gazebo_tf"), "worlds", "demo.world"]),
-        description='The world path, by default is demo.world'),
+        [FindPackageShare("gazebo_tf"), "worlds", "terrain_1.world"]),
+        description='The world path, by default is terrain_1.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
 ]
@@ -126,7 +126,7 @@ def generate_launch_description():
         name='two_vehicle_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'husky.rviz')]
     )
 
     husky_reach = Node(
@@ -134,8 +134,6 @@ def generate_launch_description():
         executable='reach',
         name='husky_reach',
         output='screen',
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
         remappings=[
             ('/orange/odom', '/husky/odom'),
             ('/orange/check_goals', '/husky/check_goals'),
@@ -143,13 +141,13 @@ def generate_launch_description():
         ]
     )
     ld = LaunchDescription(ARGUMENTS)
+    ld.add_action(gzserver)
+    ld.add_action(gzclient)
+    ld.add_action(gazebo_connect)
     ld.add_action(node_robot_state_publisher)
     ld.add_action(spawn_joint_state_broadcaster)
     ld.add_action(diffdrive_controller_spawn_callback)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
     ld.add_action(spawn_robot)
-    ld.add_action(gazebo_connect)
     ld.add_action(rviz)
     ld.add_action(husky_reach)
 

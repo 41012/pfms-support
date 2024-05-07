@@ -1,7 +1,8 @@
 import os
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler
-from launch.event_handlers import OnProcessExit
+from launch.actions import (DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction)
+from launch.event_handlers import (OnExecutionComplete, OnProcessExit,
+                                OnProcessIO, OnProcessStart, OnShutdown)
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 
 from launch_ros.substitutions import FindPackageShare
@@ -95,11 +96,25 @@ def generate_launch_description():
         # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 
+    # Make sure spawn_husky_velocixxxxty_controller starts after spawn_joint_state_broadcaster
+    spawn_orange_robot_callback = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=gzserver,
+            on_start=[
+                LogInfo(msg='gzserver has started!'),
+                TimerAction(
+                    period=5.0,
+                    actions=[spawn_orange_audibot],
+                )
+            ]
+        )
+    )    
+
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(gzserver)
     ld.add_action(gzclient)
     ld.add_action(gazebo_connect)
     ld.add_action(rviz)
-    ld.add_action(spawn_orange_audibot)
+    ld.add_action(spawn_orange_robot_callback)
 
     return ld

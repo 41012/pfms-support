@@ -12,15 +12,18 @@
       </ros>
       <update_rate>10.0</update_rate>
     </plugin>  
+
     <include>
       <uri>model://sun</uri>
     </include>
 
-    <include>
-      <name>terrain_1</name>
-      <uri>model://terrain_1</uri>
+    <model name="terrain_1">
       <pose>0 0 0 0 0 0</pose>
-    </include>
+      <include>
+        <static>true</static>
+        <uri>model://terrain_1</uri>     
+      </include>
+    </model>
 
     <gui fullscreen='0'>
       <camera name='user_camera'>

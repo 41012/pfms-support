@@ -165,8 +165,6 @@ def generate_launch_description():
         executable='reach',
         name='husky_reach',
         output='screen',
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
         remappings=[
             ('/orange/odom', '/husky/odom'),
             ('/orange/check_goals', '/husky/check_goals'),

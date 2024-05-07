@@ -1,44 +1,54 @@
 import os
-import sys
-
-import launch
-from launch.conditions import IfCondition
-from launch.substitutions import PythonExpression, Command, FindExecutable, PathJoinSubstitution
-from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable, RegisterEventHandler
-from launch_ros.actions import Node, PushRosNamespace
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch.actions import ExecuteProcess
-from ament_index_python.packages import get_package_share_directory
-from launch_ros.substitutions import FindPackageShare
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
+from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+
+from launch_ros.substitutions import FindPackageShare
+from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable, AppendEnvironmentVariable
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node, PushRosNamespace
+from ament_index_python.packages import get_package_share_directory
 
 import xacro
 
+
+ARGUMENTS = [
+    DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
+        [FindPackageShare("gazebo_tf"), "worlds", "terrain_1.world"]),
+        description='The world path, by default is terrain_1.world'),
+    DeclareLaunchArgument('gui', default_value='false',
+                          description='Whether to launch the GUI'),
+    # SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value='/usr/share/gazebo-11/models:$HOME/.gazebo/models:$HOME/ros2_ws/install/gazebo_tf/share/gazebo_tf/models/'),                          
+    AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('gazebo_tf'), 'models')),                          
+]
+
+
 def generate_launch_description():
 
-    mode = launch.substitutions.LaunchConfiguration('mode')
-    world = os.path.join(get_package_share_directory('gazebo_tf'), 'worlds')
-    pkg_gazebo_tf_models = get_package_share_directory('gazebo_tf')
+    # Launch args
+    world_path = LaunchConfiguration('world_path')
+    # prefix = LaunchConfiguration('prefix')
 
-    if 'GAZEBO_MODEL_PATH' in os.environ:
-        model_path =  os.environ['GAZEBO_MODEL_PATH'] \
-            + ':' + pkg_gazebo_tf_models + '/models'
-    else:
-        model_path =  pkg_gazebo_tf_models + '/models'
-
-    gazebo_ros = get_package_share_directory('gazebo_ros')
-    gazebo_client = launch.actions.IncludeLaunchDescription(
-	launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzclient.launch.py')),
-        condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration('gui'))
-     )
     
-    gazebo_server = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
+    
+    # Gazebo server
+    gzserver = ExecuteProcess(
+        cmd=['gzserver',
+             '-s', 'libgazebo_ros_init.so',
+             '-s', 'libgazebo_ros_factory.so',
+             world_path],
+        output='screen',
     )
-    mode = launch.substitutions.LaunchConfiguration('mode')
+
+    # Gazebo client
+    gzclient = ExecuteProcess(
+        cmd=['gzclient'],
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('gui')),
+    )
+
 
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
     xacro_file_name = "sjtu_drone.urdf.xacro"
@@ -55,14 +65,16 @@ def generate_launch_description():
         executable='gazebo_connect',
         name='gazebo_connect',
         parameters=[{'use_sim_time': False}]
+        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 
     rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='two_vehicle_viz',
+        # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'quiz4.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'a2.rviz')]
     )
 
 
@@ -70,6 +82,7 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
+        # namespace=model_ns,
         output="screen",
         parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
         arguments=[robot_desc]
@@ -79,6 +92,7 @@ def generate_launch_description():
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
+        # namespace=model_ns,
         output='screen',
     )
 
@@ -101,134 +115,39 @@ def generate_launch_description():
         ]
     )
 
-    #### HUSKY
-
-    config_husky_velocity_controller = PathJoinSubstitution(
-        [FindPackageShare("husky_control"), "config", "control.yaml"]
+    orange_audibot_options = dict(
+        robot_name = 'orange',
+        start_x = '0',
+        start_y = '2',
+        start_z = '0',
+        start_yaw = '0',
+        pub_tf = 'true',
+        tf_freq = '100.0',
+        blue = 'false'
     )
-
-    # Get URDF via xacro
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare("husky_description"), "urdf", "husky.urdf.xacro"]
-            ),
-            " ",
-            "name:=husky",
-            " ",
-            "prefix:=''",
-            " ",
-            "is_sim:=true",
-            " ",
-            "gazebo_controllers:=",
-            config_husky_velocity_controller,
+    
+    spawn_orange_audibot = GroupAction(
+        actions=[
+            PushRosNamespace('orange'),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
+                ]),
+                launch_arguments=orange_audibot_options.items()
+            )
         ]
     )
-    robot_description = {"robot_description": robot_description_content}
 
-    spawn_husky_velocity_controller = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['husky_velocity_controller', '-c', '/controller_manager'],
-        output='screen',
-    )
 
-    node_robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher2",
-        output="screen",
-        parameters=[{'use_sim_time': True}, robot_description],
-    )
-
-    spawn_joint_state_broadcaster = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['joint_state_broadcaster', '-c', '/controller_manager'],
-        output='screen',
-    )
-
-    # Make sure spawn_husky_velocity_controller starts after spawn_joint_state_broadcaster
-    diffdrive_controller_spawn_callback = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawn_joint_state_broadcaster,
-            on_exit=[spawn_husky_velocity_controller],
-        )
-    )
-
-# Spawn robot
-    # <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" 
-    # args="-urdf -unpause -param robot_description -model robot -z 0.0 -J elbow_joint -1.57" respawn="false" output="screen" />
-    spawn_robot = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        name='spawn_husky',
-        arguments=['-entity',
-                   'husky',
-                   '-topic',
-                   'robot_description',
-                   '-x 0.0', '-y -5.0'],
-        output='screen',
-    )
-
-    husky_reach = Node(
-        package='gazebo_tf',
-        executable='reach',
-        name='husky_reach',
-        output='screen',
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
-        remappings=[
-            ('/orange/odom', '/husky/odom'),
-            ('/orange/check_goals', '/husky/check_goals'),
-            ('ackerman_check_goals', 'husky_check_goals'),
-        ]
-    )    
-
-    ld = launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-          'world',
-          default_value=[PythonExpression(['"',world,'" + "/terrain_1.world"']),''],
-          description='SDF world file'),
-
-        launch.actions.DeclareLaunchArgument(
-            name='gui',
-            default_value='false'
-        ),
-
-        launch.actions.DeclareLaunchArgument(
-          name='mode',
-          default_value='night',
-          description='day or night modes are available'),
-
-        launch.actions.DeclareLaunchArgument(
-            name='extra_gazebo_args',
-            default_value='--verbose',
-            description='Extra plugins for (Gazebo)'),
-
-        SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
-          
-        gazebo_server,
-        gazebo_client,
-        gazebo_connect,
-        # robot_state_publisher,
-        # joint_state_publisher,
-        # sjtu_drone_bringup,
-        # drone_reach,
-        node_robot_state_publisher,
-        spawn_joint_state_broadcaster,
-        diffdrive_controller_spawn_callback,
-        spawn_robot,
-        husky_reach,
-        rviz,
-
-    ])
+    ld = LaunchDescription(ARGUMENTS)
+    ld.add_action(gzserver)
+    ld.add_action(gzclient)
+    ld.add_action(gazebo_connect)
+    ld.add_action(rviz)
+    ld.add_action(robot_state_publisher)
+    ld.add_action(joint_state_publisher)
+    ld.add_action(sjtu_drone_bringup)
+    ld.add_action(drone_reach)
+    ld.add_action(spawn_orange_audibot)
 
     return ld
-
-
-if __name__ == '__main__':
-    generate_launch_description()
-

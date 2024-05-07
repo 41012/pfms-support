@@ -123,12 +123,12 @@
 
       <xacro:sick_lms1xx frame="base_laser" topic="scan" robot_namespace="$(arg robot_namespace)"/> -->
 
-      <joint name="laser_mount_joint" type="fixed">
-        <origin xyz="$(arg laser_xyz)" rpy="$(arg laser_rpy)" />
-        <parent link="top_plate_link" />
-        <child link="base_laser_mount" />
+      <joint name="${prefix}laser_joint" type="fixed">
+        <origin xyz="-${base_x_size/2+0.05} 0 ${base_z_size+0.05}" rpy="$(arg laser_rpy)" />
+        <parent link="${prefix}base_link" />
+        <child link="${prefix}laser_link" />
       </joint>
-      <link name="base_laser_mount"/>
+      <link name="${prefix}laser_link"/>
 
     </xacro:if>
 
@@ -208,11 +208,10 @@
 
   </xacro:macro>
 
-
-  <gazebo reference="base_laser_mount">
+<gazebo reference="laser_link">
     <sensor type='ray' name='laser'>
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>30</update_rate>
       <always_on>true</always_on>      
       <ray>
@@ -240,10 +239,11 @@
             <namespace>/$(arg robot_name)</namespace>
             <remapping>~/out:=laserscan</remapping>
           </ros>
-          <frame_name>$(arg robot_name)/base_laser_mount</frame_name>
+          <frame_name>$(arg robot_name)laser_link</frame_name>
           <output_type>sensor_msgs/LaserScan</output_type>
       </plugin>
     </sensor>
   </gazebo>
+
 
 </robot>

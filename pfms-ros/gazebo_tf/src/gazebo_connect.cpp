@@ -273,6 +273,17 @@ public:
           sendTfBroadcast(pose,"base_link" );
           // break;
         }
+        // if ((msg.name[i]).compare("husky::laser_link") == 0) 
+        // {
+        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        //   nav_msgs::msg::Odometry odom;
+        //   odom.header.stamp = this->get_clock()->now();
+        //   odom.header.frame_id="world";
+        //   odom.pose.pose=pose;
+        //   odom.twist.twist=twist;    
+        //   sendTfBroadcast(pose,"laser_link" );
+        // }
         if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
         {
           geometry_msgs::msg::Pose pose(msg.pose[i]);

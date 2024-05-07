@@ -5,7 +5,7 @@ from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import IncludeLaunchDescription, GroupAction
+from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable, AppendEnvironmentVariable
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, PushRosNamespace
@@ -17,6 +17,8 @@ ARGUMENTS = [
         description='The world path, by default is terrain_1.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
+    # SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value='/usr/share/gazebo-11/models:$HOME/.gazebo/models:$HOME/ros2_ws/install/gazebo_tf/share/gazebo_tf/models/'),                          
+    AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('gazebo_tf'), 'models')),                          
 ]
 
 
@@ -141,13 +143,13 @@ def generate_launch_description():
         ]
     )
     ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
-    ld.add_action(gazebo_connect)
     ld.add_action(node_robot_state_publisher)
     ld.add_action(spawn_joint_state_broadcaster)
     ld.add_action(diffdrive_controller_spawn_callback)
+    ld.add_action(gzserver)
+    ld.add_action(gzclient)
     ld.add_action(spawn_robot)
+    ld.add_action(gazebo_connect)
     ld.add_action(rviz)
     ld.add_action(husky_reach)
 

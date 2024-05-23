@@ -705,6 +705,12 @@
           <uri>model:///construction_cone</uri>
         </include>
       </model>      
+      <model name="yellow_cone_49">
+        <pose>18.00 20.0 0 0 0</pose>
+        <include>
+          <uri>model:///construction_cone</uri>
+        </include>
+      </model>      
 
     <!-- Focus camera bit behind platforms -->
     <gui fullscreen='0'>

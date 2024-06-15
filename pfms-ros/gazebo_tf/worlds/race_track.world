@@ -8,7 +8,7 @@
         <remapping>link_states:=link_states_demo</remapping>
       </ros>
       <update_rate>10.0</update_rate>
-    </plugin>  
+    </plugin>
     <scene>
         <sky>
             <sunset>20</sunset>

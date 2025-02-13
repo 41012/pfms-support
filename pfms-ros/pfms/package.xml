@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
-  <name>gazebo_tf</name>
+  <name>pfms</name>
   <version>0.2.0</version>
   <description>The pfms_connector package makes a bridge between ROS2 and PFMS libraries</description>
 
@@ -32,6 +32,11 @@
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>audibot</exec_depend>
+  <exec_depend>sjtu_drone_bringup</exec_depend>
+  <exec_depend>sjtu_drone_control</exec_depend>
+  <exec_depend>sjtu_drone_description</exec_depend>
+  <exec_depend>husky_gazebo</exec_depend>
   
   <!--test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend-->

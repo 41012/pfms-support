@@ -16,14 +16,14 @@ import xacro
 def generate_launch_description():
 
     mode = launch.substitutions.LaunchConfiguration('mode')
-    world = os.path.join(get_package_share_directory('gazebo_tf'), 'worlds')
-    pkg_gazebo_tf_models = get_package_share_directory('gazebo_tf')
+    world = os.path.join(get_package_share_directory('pfms'), 'worlds')
+    pkg_pfms_models = get_package_share_directory('pfms')
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
         model_path =  os.environ['GAZEBO_MODEL_PATH'] \
-            + ':' + pkg_gazebo_tf_models + '/models'
+            + ':' + pkg_pfms_models + '/models'
     else:
-        model_path =  pkg_gazebo_tf_models + '/models'
+        model_path =  pkg_pfms_models + '/models'
 
     gazebo_ros = get_package_share_directory('gazebo_ros')
     gazebo_client = launch.actions.IncludeLaunchDescription(
@@ -38,27 +38,8 @@ def generate_launch_description():
     )
     mode = launch.substitutions.LaunchConfiguration('mode')
 
-    # Gazebo server
-    # gazebo_server = ExecuteProcess(
-    #     cmd=['gzserver',
-    #          '-s', 'libgazebo_ros_init.so',
-    #          '-s', 'libgazebo_ros_factory.so',
-    #          world + '/a2.world',],
-    #     output='screen',
-    # )
-
-    # use_sim_time = LaunchConfiguration("use_sim_time", default="false")
-    # xacro_file_name = "sjtu_drone.urdf.xacro"
-    # xacro_file = os.path.join(
-    #     get_package_share_directory("sjtu_drone_description"),
-    #     "urdf", xacro_file_name
-    # )
-    # robot_description_config = xacro.process_file(xacro_file)
-    # robot_desc = robot_description_config.toxml()
-    # model_ns = "drone"
-
     gazebo_connect = Node(
-        package='gazebo_tf',
+        package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
         parameters=[{'use_sim_time': False}]
@@ -75,7 +56,18 @@ def generate_launch_description():
         tf_freq = '100.0',
         blue = 'false'
     )
-    
+
+    blue_audibot_options = dict(
+        robot_name = 'blue',
+        start_x = '0',
+        start_y = '-2',
+        start_z = '0',
+        start_yaw = '0',
+        pub_tf = 'true',
+        tf_freq = '100.0',
+        blue = 'true'
+    )
+
     spawn_orange_audibot = GroupAction(
         actions=[
             PushRosNamespace('orange'),
@@ -88,13 +80,25 @@ def generate_launch_description():
         ]
     )
 
+    spawn_blue_audibot = GroupAction(
+        actions=[
+            PushRosNamespace('blue'),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
+                ]),
+                launch_arguments=blue_audibot_options.items()
+            )
+        ]
+    )
+
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        name='two_vehicle_viz',
+        name='two_audi_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'a2.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'two_cars.rviz')]
     )
 
 
@@ -116,18 +120,32 @@ def generate_launch_description():
         output='screen',
     )
 
-    audi_reach = Node(
-        package='gazebo_tf',
+    audi_orange_reach = Node(
+        package='pfms',
         executable='reach',
-        name='audi_reach',
+        name='audi_orange_reach',
         output='screen'
         # output={'both': 'log'},
     )
 
+    audi_blue_reach = Node(
+        package='pfms',
+        executable='reach',
+        name='audi_blue_reach',
+        output='screen',
+        # output={'both': 'log'},
+        remappings=[
+            ('/orange/odom', '/blue/odom'),
+            ('/orange/check_goals', '/blue/check_goals'),
+            ('ackerman_check_goals', 'ackerman_blue_check_goals'),
+        ]        
+    )
+
+
     ld = launch.LaunchDescription([
         launch.actions.DeclareLaunchArgument(
           'world',
-          default_value=[PythonExpression(['"',world,'" + "/a2.world"']),''],
+          default_value=[PythonExpression(['"',world,'" + "/demo.world"']),''],
           description='SDF world file'),
 
         launch.actions.DeclareLaunchArgument(
@@ -148,14 +166,15 @@ def generate_launch_description():
         SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
           
         gazebo_server,
-        # gzserver,
         gazebo_client,
         gazebo_connect,
         spawn_orange_audibot,
+        spawn_blue_audibot,
         # robot_state_publisher,
         joint_state_publisher,
         rviz,
-        audi_reach,
+        audi_blue_reach,
+        audi_orange_reach,
     ])
 
     return ld

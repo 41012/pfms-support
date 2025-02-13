@@ -1,0 +1,6 @@
+husky_description:
+    ubuntu: [ros-humble-husky-description]
+husky_control:
+    ubuntu: [ros-humble-husky-control]
+husky_gazebo:
+    ubuntu: [ros-humble-husky-gazebo]

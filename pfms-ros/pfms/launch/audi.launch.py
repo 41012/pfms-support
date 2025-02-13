@@ -13,9 +13,9 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("aws_robomaker_racetrack_world"), "worlds", "racetrack_day.world"]),
-        description='The world path, by default is racetrack_day.world'),
-    DeclareLaunchArgument('gui', default_value='true',
+        [FindPackageShare("pfms"), "worlds", "demo.world"]),
+        description='The world path, by default is demo.world'),
+    DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
 ]
 
@@ -26,7 +26,6 @@ def generate_launch_description():
     world_path = LaunchConfiguration('world_path')
     # prefix = LaunchConfiguration('prefix')
 
-  
     # Gazebo server
     gzserver = ExecuteProcess(
         cmd=['gzserver',
@@ -44,17 +43,16 @@ def generate_launch_description():
     )
 
     gazebo_connect = Node(
-        package='gazebo_tf',
+        package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
         parameters=[{'use_sim_time': False}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 
     orange_audibot_options = dict(
         robot_name = 'orange',
-        start_x = '8.5',
-        start_y = '15',
+        start_x = '0',
+        start_y = '5',
         start_z = '0',
         start_yaw = '0',
         pub_tf = 'true',
@@ -79,16 +77,14 @@ def generate_launch_description():
         name='two_vehicle_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi.rviz')]
     )
 
     audi_reach = Node(
-        package='gazebo_tf',
+        package='pfms',
         executable='reach',
         name='audi_reach',
         output='screen'
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'audi_husky.rviz')]
     )
 
     ld = LaunchDescription(ARGUMENTS)

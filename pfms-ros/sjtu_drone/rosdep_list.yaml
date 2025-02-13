@@ -1,0 +1,6 @@
+sjtu_drone_description:
+    ubuntu: [ros-humble-sjtu-drone-description]
+sjtu_drone_control:
+    ubuntu: [ros-humble-sjtu-drone-control]
+sjtu_drone_bringup:
+    ubuntu: [ros-humble-sjtu-drone-bringup]

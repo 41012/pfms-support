@@ -1,0 +1,6 @@
+audibot_description:
+    ubuntu: [ros-humble-audibot-description]
+audibot_gazebo:
+    ubuntu: [ros-humble-audibot-gazebo]
+audibot:
+    ubuntu: [ros-humble-audibot]

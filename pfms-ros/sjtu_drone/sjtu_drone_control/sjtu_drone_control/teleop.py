@@ -44,9 +44,9 @@ class TeleopNode(Node):
         super().__init__('teleop_node')
 
         # Publishers
-        self.cmd_vel_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.takeoff_publisher = self.create_publisher(Empty, 'takeoff', 10)
-        self.land_publisher = self.create_publisher(Empty, 'land', 10)
+        self.cmd_vel_publisher = self.create_publisher(Twist, 'drone/cmd_vel', 10)
+        self.takeoff_publisher = self.create_publisher(Empty, 'drone/takeoff', 10)
+        self.land_publisher = self.create_publisher(Empty, 'drone/land', 10)
         
         # Velocity parameters
         self.linear_velocity = 0.0

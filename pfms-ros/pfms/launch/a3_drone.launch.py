@@ -16,14 +16,14 @@ import xacro
 def generate_launch_description():
 
     mode = launch.substitutions.LaunchConfiguration('mode')
-    world = os.path.join(get_package_share_directory('gazebo_tf'), 'worlds')
-    pkg_gazebo_tf_models = get_package_share_directory('gazebo_tf')
+    world = os.path.join(get_package_share_directory('pfms'), 'worlds')
+    pkg_pfms_models = get_package_share_directory('pfms')
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
         model_path =  os.environ['GAZEBO_MODEL_PATH'] \
-            + ':' + pkg_gazebo_tf_models + '/models'
+            + ':' + pkg_pfms_models + '/models'
     else:
-        model_path =  pkg_gazebo_tf_models + '/models'
+        model_path =  pkg_pfms_models + '/models'
 
     gazebo_ros = get_package_share_directory('gazebo_ros')
     gazebo_client = launch.actions.IncludeLaunchDescription(
@@ -58,7 +58,7 @@ def generate_launch_description():
     model_ns = "drone"
 
     gazebo_connect = Node(
-        package='gazebo_tf',
+        package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
         parameters=[{'use_sim_time': False}]
@@ -71,7 +71,7 @@ def generate_launch_description():
         name='two_vehicle_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_tf'), 'rviz', 'a3_drone.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_drone.rviz')]
     )
 
 
@@ -101,7 +101,7 @@ def generate_launch_description():
     )
 
     drone_reach = Node(
-        package='gazebo_tf',
+        package='pfms',
         executable='reach',
         name='drone_reach',
         output='screen',

@@ -12,7 +12,7 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("gazebo_tf"), "worlds", "demo.world"]
+        [FindPackageShare("pfms"), "worlds", "demo.world"]
     ),
                           description='The world path, by default is demo.world'),
 ]

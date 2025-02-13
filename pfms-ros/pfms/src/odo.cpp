@@ -9,8 +9,8 @@
 #include "tf/transform_datatypes.h"
 #include <mutex>
 #include <atomic>
-#include "gazebo_tf/SetGoal.h"
-#include "gazebo_tf/GetMinDistToGoal.h"
+#include "pfms/SetGoal.h"
+#include "pfms/GetMinDistToGoal.h"
 
 class Odo
 {
@@ -38,8 +38,8 @@ Odo(ros::NodeHandle nh) :
 ~Odo(){
 }
 
-bool setGoal(gazebo_tf::SetGoal::Request  &req,
-             gazebo_tf::SetGoal::Response &res)
+bool setGoal(pfms::SetGoal::Request  &req,
+             pfms::SetGoal::Response &res)
 {
   mx_.lock();
   goal_=req.goal;
@@ -52,8 +52,8 @@ bool setGoal(gazebo_tf::SetGoal::Request  &req,
   return true;
 }
 
-bool checkGoal(gazebo_tf::GetMinDistToGoal::Request  &req,
-             gazebo_tf::GetMinDistToGoal::Response &res)
+bool checkGoal(pfms::GetMinDistToGoal::Request  &req,
+             pfms::GetMinDistToGoal::Response &res)
 {
   mx_.lock();
   res.dist=minDist_;

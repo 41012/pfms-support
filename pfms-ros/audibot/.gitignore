@@ -1,7 +1,0 @@
-syntax: glob
-
-*.dae
-*.stl
-*.idea
-*.pyc
-**/.vscode

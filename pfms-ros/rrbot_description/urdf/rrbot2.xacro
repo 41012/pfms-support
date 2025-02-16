@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!-- Revolute-Revolute Manipulator -->
+<robot name="rrbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants for robot dimensions -->
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="mass" value="1" /> <!-- arbitrary value for mass -->
+  <xacro:property name="width" value="0.1" /> <!-- Square dimensions (widthxwidth) of beams -->
+  <xacro:property name="height1" value="2" /> <!-- Link 1 -->
+  <xacro:property name="axel_offset" value="0.05" /> <!-- Space btw top of beam and the each joint -->
+
+  <xacro:arg name="robot_name" default="rrbot" />
+  <xacro:arg name="pub_tf" default="true" />
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <!--xacro:include filename="$(find rrbot_description)/urdf/rrbot.gazebo" /-->
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find rrbot_description)/urdf/materials.xacro" />
+
+    <!-- ros_control plugin -->
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotName>$(arg robot_name)</robotName>
+        <!--robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType-->
+        <pubTf>$(arg pub_tf)</pubTf>
+        <tfFreq>100.0</tfFreq>
+      </plugin>
+      <!-- Publish current joint angles -->
+      <!--plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+          <jointName>
+              sonar_link
+          </jointName>
+          <updateRate>100</updateRate>
+      </plugin-->
+    </gazebo>
+
+    <!-- Link1 -->
+    <gazebo reference="link1">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <!-- Link2 -->
+    <gazebo reference="link2">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <!-- Link3 -->
+    <gazebo reference="link3">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <!-- camera_link -->
+    <gazebo reference="camera_link">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Red</material>
+    </gazebo>
+
+
+
+  <!-- Used for fixing robot to Gazebo 'base_link' -->
+  <link name="base_footprint"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="link1"/>
+  </joint>
+
+  <!-- Base Link -->
+  <link name="link1">
+    <collision>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${width} ${width} ${height1}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${width} ${width} ${height1}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (width*width + height1*height1)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (height1*height1 + width*width)}" iyz="0.0"
+	  izz="${mass / 12.0 * (width*width + width*width)}"/>
+    </inertial>
+  </link>
+
+
+  <!-- Hokuyo Laser -->
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0 0 ${height1 + axel_offset/2}" rpy="0 0 0"/>
+    <parent link="link1"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://rrbot_description/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <!-- Sonar -->
+
+    <joint name="sonar_joint" type="fixed">
+      <parent link="link1"/>
+      <child link="sonar_link"/>
+      <origin xyz="0 0 ${height1 - axel_offset}" rpy="0 0 0"/>
+    </joint>
+
+
+    <link name="sonar_link">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+             <box size="0.1 0.1 0.1"/>
+          </geometry>
+          <material name="blue"/>
+        </visual>
+      <inertial>
+        <mass value="1e-5"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!-- hokuyo -->
+    <gazebo reference="hokuyo_link">
+      <sensor type="ray" name="head_hokuyo_sensor">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>30</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>25</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.570796</min_angle>
+              <max_angle>1.570796</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.10</min>
+            <max>30.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise parameters based on published spec for Hokuyo laser
+                 achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                 stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                 reading. -->
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+          <robotNamespace>$(arg robot_name)</robotNamespace>
+          <topicName>laser/scan</topicName>
+          <!-- below worked on 20.04 but not on 18.04-->
+          <!--frameName>$(arg robot_name)/hokuyo_link</frameName-->
+          <frameName>/$(arg robot_name)/hokuyo_link</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+  <gazebo reference="sonar_link">
+    <sensor name='sonar' type='ray'>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2615</min_angle>
+            <max_angle>0.2615</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2615</min_angle>
+            <max_angle>0.2615</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.2</min>
+          <max>5</max>
+          <resolution>0.0523</resolution>
+        </range>
+      </ray>
+
+      <plugin name='sonar_sensor' filename='libgazebo_ros_range.so'>
+        <topicName>sonar/range</topicName>
+        <frameName>$(arg robot_name)/sonar_link</frameName>
+        <fov>0.52</fov>
+        <gaussianNoise>0.005</gaussianNoise>
+        <always_on>true</always_on>
+        <radiation>ultrasound</radiation>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>

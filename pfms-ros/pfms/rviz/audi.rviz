@@ -5,8 +5,14 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Grid1
+        - /Grid1/Offset1
+        - /TF1/Tree1
+        - /Audi1/Audi Odometry1/Shape1
+        - /Audi1/Audi Platform1
+        - /Audi1/Audi Platform1/Links1
       Splitter Ratio: 0.5
-    Tree Height: 775
+    Tree Height: 778
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -39,7 +45,7 @@ Visualization Manager:
       Name: Grid
       Normal Cell Count: 0
       Offset:
-        X: 10
+        X: 0
         Y: 0
         Z: 0
       Plane: XY
@@ -47,57 +53,19 @@ Visualization Manager:
       Reference Frame: orange/base_footprint
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        orange/base_footprint:
-          Value: true
-        orange/base_link:
-          Value: true
-        orange/camera_link:
-          Value: true
-        orange/laser_link:
-          Value: true
-        orange/steer_fl:
-          Value: true
-        orange/steer_fr:
-          Value: true
-        orange/wheel_fl:
-          Value: true
-        orange/wheel_fr:
-          Value: true
-        orange/wheel_rl:
-          Value: true
-        orange/wheel_rr:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 2
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          orange/base_footprint:
-            orange/base_link:
-              orange/camera_link:
-                {}
-              orange/laser_link:
-                {}
-              orange/steer_fl:
-                orange/wheel_fl:
-                  {}
-              orange/steer_fr:
-                orange/wheel_fr:
-                  {}
-              orange/wheel_rl:
-                {}
-              orange/wheel_rr:
-                {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
@@ -164,12 +132,12 @@ Visualization Manager:
               Value: true
             Value: false
           Enabled: true
-          Keep: 10
+          Keep: 50
           Name: Audi Odometry
           Position Tolerance: 1
           Shape:
             Alpha: 1
-            Axes Length: 1
+            Axes Length: 0.5
             Axes Radius: 0.10000000149011612
             Color: 255; 25; 0
             Head Length: 0.30000001192092896
@@ -185,6 +153,20 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /orange/odom
           Value: true
+        - Alpha: 0.5
+          Buffer Length: 1
+          Class: rviz_default_plugins/Range
+          Color: 255; 255; 255
+          Enabled: false
+          Name: Audi Range
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /orange/sonar
+          Value: false
         - Alpha: 1
           Class: rviz_default_plugins/RobotModel
           Collision Enabled: false
@@ -217,6 +199,10 @@ Visualization Manager:
               Show Axes: false
               Show Trail: false
             laser_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            sonar_link:
               Alpha: 1
               Show Axes: false
               Show Trail: false
@@ -304,33 +290,33 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 8.548384666442871
+      Distance: 20.233905792236328
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -1.6793296337127686
-        Y: 0.36645007133483887
-        Z: -4.76837158203125e-07
+        X: 0.8817555904388428
+        Y: -0.004156827926635742
+        Z: -2.384185791015625e-06
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4297962784767151
+      Pitch: 1.5697963237762451
       Target Frame: orange/base_link
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 3.1853995323181152
+      Yaw: 3.1303915977478027
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: true
-  Height: 814
-  Hide Left Dock: true
+    collapsed: false
+  Height: 1016
+  Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000025200000399fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003b00000399000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c000002610000000100000110000003c0fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730000000014000003c0000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003d80000004cfc0100000002fb0000000800540069006d00650000000000000003d80000025300fffffffb0000000800540069006d006501000000000000045000000000000000000000039d000002d800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002520000039efc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000039e000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c000002610000000100000110000002d4fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d000002d4000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003d80000004cfc0100000002fb0000000800540069006d00650000000000000003d8000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004e20000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -339,6 +325,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 925
-  X: 741
-  Y: 82
+  Width: 1850
+  X: 70
+  Y: 27

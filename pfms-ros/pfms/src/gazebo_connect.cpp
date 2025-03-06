@@ -167,7 +167,8 @@ public:
   // }
 
 
-  void sendTfBroadcast(geometry_msgs::msg::Pose pose,std::string link_name ){
+  void sendTfBroadcast(geometry_msgs::msg::Pose pose,std::string link_name )
+  {
 
     geometry_msgs::msg::TransformStamped t;
 
@@ -247,43 +248,24 @@ public:
           odom.header.frame_id="world";
           odom.pose.pose=pose;
           odom.twist.twist=twist;
-          // RCLCPP_INFO_STREAM_THROTTLE(this->get_logger(),
-          //       *this->get_clock(),
-          //       1000,
-          //       "HUSKY x,y,yaw,vx,omega:" <<
-          //         msg.pose[i].position.x << " " <<
-          //         msg.pose[i].position.y << " " <<
-          //         // tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
-          //         msg.twist[i].linear.x << " "  <<
-          //         msg.twist[i].angular.z );
-          odomPub_->publish(odom);
-          // vx_.push_back(msg.twist[i].linear.x);
-          // omega_.push_back(msg.twist[i].angular.z);
-          // if(vx_.size()>20){
-          //   double vx = std::accumulate(vx_.begin(), vx_.end(), 0.0)/vx_.size();
-          //   double omega = std::accumulate(omega_.begin(), omega_.end(), 0.0)/omega_.size();
-          //   RCLCPP_INFO_STREAM_THROTTLE(this->get_logger(),
-          //       *this->get_clock(),
-          //       3000,
-          //       "HUSKY: " <<
-          //         vx << " " << omega );
-          //   vx_.erase(vx_.begin());
-          //   omega_.erase(omega_.begin());
-          // }
+
           sendTfBroadcast(pose,"base_link" );
+          // sendTfBroadcast(pose,"sonar_link_fix" );
+
+          odomPub_->publish(odom);
           // break;
         }
-        // if ((msg.name[i]).compare("husky::laser_link") == 0) 
-        // {
-        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        //   nav_msgs::msg::Odometry odom;
-        //   odom.header.stamp = this->get_clock()->now();
-        //   odom.header.frame_id="world";
-        //   odom.pose.pose=pose;
-        //   odom.twist.twist=twist;    
-        //   sendTfBroadcast(pose,"laser_link" );
-        // }
+        // // if ((msg.name[i]).compare("husky::sonar_link") == 0) 
+        // // {
+        // //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        // //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        // //   nav_msgs::msg::Odometry odom;
+        // //   odom.header.stamp = this->get_clock()->now();
+        // //   odom.header.frame_id="world";
+        // //   odom.pose.pose=pose;
+        // //   odom.twist.twist=twist;    
+        // //   sendTfBroadcast(pose,"sonar_link" );
+        // // }
         if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
         {
           geometry_msgs::msg::Pose pose(msg.pose[i]);
@@ -327,8 +309,10 @@ public:
           odom.pose.pose=pose;
           odom.twist.twist=twist;    
           sendTfBroadcast(pose,"rear_right_wheel" );
-          break;
-        }        
+        }          
+
+
+        
       }
     }
 

@@ -46,7 +46,7 @@ def generate_launch_description():
         package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
+        parameters=[{'use_sim_time': True}]
     )
 
     orange_audibot_options = dict(

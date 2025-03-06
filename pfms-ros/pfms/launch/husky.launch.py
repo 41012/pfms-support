@@ -13,8 +13,8 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("pfms"), "worlds", "terrain_1.world"]),
-        description='The world path, by default is terrain_1.world'),
+        [FindPackageShare("pfms"), "worlds", "demo.world"]),
+        description='The world path, by default is demo.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
     AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('pfms'), 'models')),                          
@@ -117,7 +117,7 @@ def generate_launch_description():
         package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
+        parameters=[{'use_sim_time': True}]
         # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 

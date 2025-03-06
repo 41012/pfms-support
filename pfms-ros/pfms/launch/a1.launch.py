@@ -116,7 +116,7 @@ def generate_launch_description():
         package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
+        parameters=[{'use_sim_time': True}]
         # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 

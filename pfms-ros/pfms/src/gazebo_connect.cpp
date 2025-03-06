@@ -266,50 +266,50 @@ public:
         // //   odom.twist.twist=twist;    
         // //   sendTfBroadcast(pose,"sonar_link" );
         // // }
-        if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
-        {
-          geometry_msgs::msg::Pose pose(msg.pose[i]);
-          geometry_msgs::msg::Twist twist(msg.twist[i]);
-          nav_msgs::msg::Odometry odom;
-          odom.header.stamp = this->get_clock()->now();
-          odom.header.frame_id="world";
-          odom.pose.pose=pose;
-          odom.twist.twist=twist;    
-          sendTfBroadcast(pose,"front_left_wheel" );
-        }
-        if ((msg.name[i]).compare("husky::front_right_wheel") == 0) 
-        {
-          geometry_msgs::msg::Pose pose(msg.pose[i]);
-          geometry_msgs::msg::Twist twist(msg.twist[i]);
-          nav_msgs::msg::Odometry odom;
-          odom.header.stamp = this->get_clock()->now();
-          odom.header.frame_id="world";
-          odom.pose.pose=pose;
-          odom.twist.twist=twist;    
-          sendTfBroadcast(pose,"front_right_wheel" );
-        }               
-        if ((msg.name[i]).compare("husky::rear_left_wheel") == 0) 
-        {
-          geometry_msgs::msg::Pose pose(msg.pose[i]);
-          geometry_msgs::msg::Twist twist(msg.twist[i]);
-          nav_msgs::msg::Odometry odom;
-          odom.header.stamp = this->get_clock()->now();
-          odom.header.frame_id="world";
-          odom.pose.pose=pose;
-          odom.twist.twist=twist;    
-          sendTfBroadcast(pose,"rear_left_wheel" );
-        }
-        if ((msg.name[i]).compare("husky::rear_right_wheel") == 0) 
-        {
-          geometry_msgs::msg::Pose pose(msg.pose[i]);
-          geometry_msgs::msg::Twist twist(msg.twist[i]);
-          nav_msgs::msg::Odometry odom;
-          odom.header.stamp = this->get_clock()->now();
-          odom.header.frame_id="world";
-          odom.pose.pose=pose;
-          odom.twist.twist=twist;    
-          sendTfBroadcast(pose,"rear_right_wheel" );
-        }          
+        // if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
+        // {
+        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        //   nav_msgs::msg::Odometry odom;
+        //   odom.header.stamp = this->get_clock()->now();
+        //   odom.header.frame_id="world";
+        //   odom.pose.pose=pose;
+        //   odom.twist.twist=twist;    
+        //   sendTfBroadcast(pose,"front_left_wheel" );
+        // }
+        // if ((msg.name[i]).compare("husky::front_right_wheel") == 0) 
+        // {
+        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        //   nav_msgs::msg::Odometry odom;
+        //   odom.header.stamp = this->get_clock()->now();
+        //   odom.header.frame_id="world";
+        //   odom.pose.pose=pose;
+        //   odom.twist.twist=twist;    
+        //   sendTfBroadcast(pose,"front_right_wheel" );
+        // }               
+        // if ((msg.name[i]).compare("husky::rear_left_wheel") == 0) 
+        // {
+        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        //   nav_msgs::msg::Odometry odom;
+        //   odom.header.stamp = this->get_clock()->now();
+        //   odom.header.frame_id="world";
+        //   odom.pose.pose=pose;
+        //   odom.twist.twist=twist;    
+        //   sendTfBroadcast(pose,"rear_left_wheel" );
+        // }
+        // if ((msg.name[i]).compare("husky::rear_right_wheel") == 0) 
+        // {
+        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
+        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
+        //   nav_msgs::msg::Odometry odom;
+        //   odom.header.stamp = this->get_clock()->now();
+        //   odom.header.frame_id="world";
+        //   odom.pose.pose=pose;
+        //   odom.twist.twist=twist;    
+        //   sendTfBroadcast(pose,"rear_right_wheel" );
+        // }          
 
 
         

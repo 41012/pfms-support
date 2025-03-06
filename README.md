@@ -35,18 +35,18 @@ sudo apt install pfms-ros-integration ros-humble-pfms ros-dev-tools
 
 You will need to launch the appropriate launch file if your running any code that sends commands or receives data from the simulator. The terminal where you have executed the `ros2 launch` command is active, keep it running while you use the simulator (your testing your code). To terminate the simulator you have to execute CTRL+C in the terminal window.
 
+**Assignment 1** (audi and husky) `ros2 launch pfms a1.launch.py`
+
+<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" width="400" />
+
 **Assignment 2** (audi and drone) `ros2 launch pfms a2.launch.py`  
 
 <img src="./images/rviz_a2.png" alt="a2" width="400" />
 
-**Assignment 1** (audi and husky) `ros2 launch pfms audi_husky.launch.py`
-
-<img src="./images/rviz_audi_husky.png" alt="rviz_audi_husky" width="400" />
-
 Version Check
 -------------------------
 
-To check versions of your installed files if there is an update provided, link describing updated: [VERSIONS](./VERSIONS.md) 
+To check versions of your installed files 
 
 ```
 dpkg -l | grep pfms
@@ -56,8 +56,8 @@ dpkg -l | grep pfms
 
 | package              | version      |
 | -------------------- | ------------ |
-| pfms-ros-integration | 3.0.6        |
-| ros-humble-pfms      | 0.2.0-0jammy |
+| pfms-ros-integration | 3.0.7        |
+| ros-humble-pfms      | 0.3.0-0jammy |
 
 ## Upgrades
 

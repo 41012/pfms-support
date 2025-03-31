@@ -12,20 +12,20 @@ from launch_ros.actions import Node, PushRosNamespace
 from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
-    DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("pfms"), "worlds", "demo.world"]),
-        description='The world path, by default is demo.world'),
+    # DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
+    #     [FindPackageShare("pfms"), "worlds", "demo.world"]),
+    #     description='The world path, by default is demo.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
-    AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('pfms'), 'models')),                          
+    # AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('pfms'), 'models')),                          
 ]
 
 
 def generate_launch_description():
 
-    # Launch args
-    world_path = LaunchConfiguration('world_path')
-    # prefix = LaunchConfiguration('prefix')
+    # # Launch args
+    # world_path = LaunchConfiguration('world_path')
+    # # prefix = LaunchConfiguration('prefix')
 
     config_husky_velocity_controller = PathJoinSubstitution(
         [FindPackageShare("husky_control"), "config", "control.yaml"]
@@ -63,6 +63,7 @@ def generate_launch_description():
     node_robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
+        name='joint_state_publisher_husky',
         output="screen",
         parameters=[{'use_sim_time': True}, robot_description],
     )
@@ -82,21 +83,21 @@ def generate_launch_description():
         )
     )
     
-    # Gazebo server
-    gzserver = ExecuteProcess(
-        cmd=['gzserver',
-             '-s', 'libgazebo_ros_init.so',
-             '-s', 'libgazebo_ros_factory.so',
-             world_path],
-        output='screen',
-    )
+    # # Gazebo server
+    # gzserver = ExecuteProcess(
+    #     cmd=['gzserver',
+    #          '-s', 'libgazebo_ros_init.so',
+    #          '-s', 'libgazebo_ros_factory.so',
+    #          world_path],
+    #     output='screen',
+    # )
 
-    # Gazebo client
-    gzclient = ExecuteProcess(
-        cmd=['gzclient'],
-        output='screen',
-        condition=IfCondition(LaunchConfiguration('gui')),
-    )
+    # # Gazebo client
+    # gzclient = ExecuteProcess(
+    #     cmd=['gzclient'],
+    #     output='screen',
+    #     condition=IfCondition(LaunchConfiguration('gui')),
+    # )
 
     # Spawn robot
     # <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" 
@@ -109,26 +110,26 @@ def generate_launch_description():
                    'husky',
                    '-topic',
                    'robot_description',
-                   '-x 0.0', '-y -5.0'],
+                   '-x 0.0', '-y 2.0'],
         output='screen',
     )
 
-    gazebo_connect = Node(
-        package='pfms',
-        executable='gazebo_connect',
-        name='gazebo_connect',
-        parameters=[{'use_sim_time': True}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
-    )
+    # gazebo_connect = Node(
+    #     package='pfms',
+    #     executable='gazebo_connect',
+    #     name='gazebo_connect',
+    #     parameters=[{'use_sim_time': True}]
+    #     # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
+    # )
 
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='two_vehicle_viz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'husky.rviz')]
-    )
+    # rviz = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     name='two_vehicle_viz',
+    #     # output='screen',
+    #     output={'both': 'log'},
+    #     arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'husky.rviz')]
+    # )
 
     husky_reach = Node(
         package='pfms',
@@ -145,11 +146,11 @@ def generate_launch_description():
     ld.add_action(node_robot_state_publisher)
     ld.add_action(spawn_joint_state_broadcaster)
     ld.add_action(diffdrive_controller_spawn_callback)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
+    # ld.add_action(gzserver)
+    # ld.add_action(gzclient)
     ld.add_action(spawn_robot)
-    ld.add_action(gazebo_connect)
-    ld.add_action(rviz)
+    # ld.add_action(gazebo_connect)
+    # ld.add_action(rviz)
     ld.add_action(husky_reach)
 
     return ld

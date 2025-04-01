@@ -11,7 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("gazebo_tf"), "worlds", "demo.world"]
+        [FindPackageShare("pfms"), "worlds", "demo.world"]
     ),
                           description='The world path, by default is demo.world'),
 ]
@@ -61,9 +61,16 @@ def generate_launch_description():
         arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'single_vehicle_example.rviz')]
     )
 
-    return LaunchDescription([
-        gzserver,
-        gzclient,
-        spawn_audibot,
-        rviz
-    ])
+    # return LaunchDescription([
+    #     gzserver,
+    #     gzclient,
+    #     spawn_audibot,
+    #     rviz
+    # ])
+
+    ld = LaunchDescription(ARGUMENTS)
+    ld.add_action(gzserver)
+    ld.add_action(gzclient)
+    ld.add_action(spawn_audibot)
+    ld.add_action(rviz)
+    return ld

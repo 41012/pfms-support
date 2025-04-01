@@ -18,7 +18,7 @@ import xacro
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-    use_gui = DeclareLaunchArgument("use_gui", default_value="true", choices=["true", "false"], description="Whether to execute gzclient")
+    # gui = DeclareLaunchArgument("gui", default_value="true", choices=["true", "false"], description="Whether to execute gzclient")
     xacro_file_name = "sjtu_drone.urdf.xacro"
 
     world = os.path.join(get_package_share_directory('pfms'), 'worlds')
@@ -61,10 +61,10 @@ def generate_launch_description():
     robot_desc_2 = robot_description_config_2.toxml()
     model_ns_2 = "drone_2"
 
-    world_file = os.path.join(
-        get_package_share_directory("sjtu_drone_description"),
-        "worlds", "playground.world"
-    )
+    # world_file = os.path.join(
+    #     get_package_share_directory("sjtu_drone_description"),
+    #     "worlds", "playground.world"
+    # )
 
     # def launch_gzclient(context, *args, **kwargs):
     #     if context.launch_configurations.get('use_gui') == 'true':
@@ -93,7 +93,8 @@ def generate_launch_description():
             description='Extra plugins for (Gazebo)'),
 
         SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
-                 # Robot State Publisher for the first drone
+                 
+        # Robot State Publisher for the first drone
         Node(
             package="robot_state_publisher",
             executable="robot_state_publisher",
@@ -135,7 +136,7 @@ def generate_launch_description():
         Node(
             package="sjtu_drone_bringup",
             executable="spawn_drone",
-            arguments=[robot_desc_1, model_ns_1],
+            arguments=[robot_desc_1, model_ns_1, '0.0', '2.0'],
             output="screen"
         ),
 
@@ -143,7 +144,7 @@ def generate_launch_description():
         Node(
             package="sjtu_drone_bringup",
             executable="spawn_drone",
-            arguments=[robot_desc_2, model_ns_2],
+            arguments=[robot_desc_2, model_ns_2, '0.0', '-2.0'],
             output="screen"
         ),
 
@@ -153,7 +154,7 @@ def generate_launch_description():
             name='two_vehicle_viz',
             # output='screen',
             output={'both': 'log'},
-            arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'two_drones.rviz')]
+            arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'two_quads.rviz')]
         )        ,
         
         gazebo_server,

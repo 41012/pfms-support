@@ -73,6 +73,9 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     link = boost::dynamic_pointer_cast<physics::Link>(world->EntityByName(link_name_));
   }
 
+  RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "model_name %s!",model_name_.c_str());
+  RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "link_name %s!",link_name_.c_str());
+
   if (!link)
   {
     RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "gazebo_ros_baro plugin error: bodyName: %s does not exist\n", link_name_.c_str());

@@ -2,6 +2,45 @@
 <robot name="sjtu_drone"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <xacro:arg name="robot_name" default="drone" />
+
+  <gazebo>
+    <plugin name='simple_drone' filename='libplugin_drone.so'>
+      <bodyName>base_link</bodyName>
+      <robot_name>$(arg robot_name)</robot_name>
+      <ros>
+        <namespace>drone</namespace>
+      </ros>
+      <imuTopic>imu</imuTopic>
+      <rollpitchProportionalGain>10.0</rollpitchProportionalGain>
+      <rollpitchDifferentialGain>5.0</rollpitchDifferentialGain>
+      <rollpitchLimit>0.5</rollpitchLimit>
+      <yawProportionalGain>2.0</yawProportionalGain>
+      <yawDifferentialGain>1.0</yawDifferentialGain>
+      <yawLimit>1.5</yawLimit>
+      <velocityXYProportionalGain>5.0</velocityXYProportionalGain>
+      <velocityXYDifferentialGain>2.3</velocityXYDifferentialGain>
+      <velocityXYLimit>2</velocityXYLimit>
+      <velocityZProportionalGain>5.0</velocityZProportionalGain>
+      <velocityZIntegralGain>0.0</velocityZIntegralGain>
+      <velocityZDifferentialGain>1.0</velocityZDifferentialGain>
+      <velocityZLimit>-1</velocityZLimit>
+      <positionXYProportionalGain>1.1</positionXYProportionalGain>
+      <positionXYDifferentialGain>0.0</positionXYDifferentialGain>
+      <positionXYIntegralGain>0.0</positionXYIntegralGain>
+      <positionXYLimit>5</positionXYLimit>
+      <positionZProportionalGain>1.0</positionZProportionalGain>
+      <positionZDifferentialGain>0.2</positionZDifferentialGain>
+      <positionZIntegralGain>0.0</positionZIntegralGain>
+      <positionZLimit>-1</positionZLimit>
+      <maxForce>30</maxForce>
+      <motionSmallNoise>0.05</motionSmallNoise>
+      <motionDriftNoise>0.03</motionDriftNoise>
+      <motionDriftNoiseTime>5.0</motionDriftNoiseTime>
+    </plugin>
+  </gazebo>
+
+
   <link name="base_link">
     <inertial>
       <mass value="1.477"/>
@@ -54,38 +93,6 @@
   </joint>
   <link name="laser_link"/>
 
-  <gazebo>
-    <plugin name='simple_drone' filename='libplugin_drone.so'>
-      <bodyName>base_link</bodyName>
-      <rosNamespace>drone</rosNamespace>
-      <imuTopic>imu</imuTopic>
-      <rollpitchProportionalGain>10.0</rollpitchProportionalGain>
-      <rollpitchDifferentialGain>5.0</rollpitchDifferentialGain>
-      <rollpitchLimit>0.5</rollpitchLimit>
-      <yawProportionalGain>2.0</yawProportionalGain>
-      <yawDifferentialGain>1.0</yawDifferentialGain>
-      <yawLimit>1.5</yawLimit>
-      <velocityXYProportionalGain>5.0</velocityXYProportionalGain>
-      <velocityXYDifferentialGain>2.3</velocityXYDifferentialGain>
-      <velocityXYLimit>2</velocityXYLimit>
-      <velocityZProportionalGain>5.0</velocityZProportionalGain>
-      <velocityZIntegralGain>0.0</velocityZIntegralGain>
-      <velocityZDifferentialGain>1.0</velocityZDifferentialGain>
-      <velocityZLimit>-1</velocityZLimit>
-      <positionXYProportionalGain>1.1</positionXYProportionalGain>
-      <positionXYDifferentialGain>0.0</positionXYDifferentialGain>
-      <positionXYIntegralGain>0.0</positionXYIntegralGain>
-      <positionXYLimit>5</positionXYLimit>
-      <positionZProportionalGain>1.0</positionZProportionalGain>
-      <positionZDifferentialGain>0.2</positionZDifferentialGain>
-      <positionZIntegralGain>0.0</positionZIntegralGain>
-      <positionZLimit>-1</positionZLimit>
-      <maxForce>30</maxForce>
-      <motionSmallNoise>0.05</motionSmallNoise>
-      <motionDriftNoise>0.03</motionDriftNoise>
-      <motionDriftNoiseTime>5.0</motionDriftNoiseTime>
-    </plugin>
-  </gazebo>
 
   <!-- Sensors -->
   <!-- IMU sensor in 100fps -->

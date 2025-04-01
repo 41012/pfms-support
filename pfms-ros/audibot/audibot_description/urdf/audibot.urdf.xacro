@@ -351,11 +351,16 @@
       </ray>
       <plugin name="audi_sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
-          <remapping>~/out:=$(arg robot_name)/sonar</remapping>
+          <namespace>/$(arg robot_name)</namespace>
+          <!--remapping>~/out:=laserscan</remapping-->
         </ros>
+        <frame_name>$(arg robot_name)/sonar</frame_name>      
+        <!-- <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar</remapping>
+        </ros> -->
         <output_type>sensor_msgs/Range</output_type>
         <radiation_type>ultrasound</radiation_type>
-        <frame_name>sonar_link</frame_name>
+        <!-- <frame_name>sonar_link</frame_name> -->
       </plugin>
     </sensor>
   </gazebo>

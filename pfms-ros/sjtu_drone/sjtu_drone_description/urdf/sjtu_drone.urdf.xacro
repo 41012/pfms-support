@@ -9,7 +9,7 @@
       <bodyName>base_link</bodyName>
       <robot_name>$(arg robot_name)</robot_name>
       <ros>
-        <namespace>drone</namespace>
+        <namespace>$(arg robot_name)</namespace>
       </ros>
       <imuTopic>imu</imuTopic>
       <rollpitchProportionalGain>10.0</rollpitchProportionalGain>
@@ -103,7 +103,8 @@
       <update_rate> 100 </update_rate>
       <pose> 0 0 0 0 0 0 </pose>
       <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
-        <initial_orientation_as_reference>false</initial_orientation_as_reference>
+          <namespace>$(arg robot_name)</namespace>
+          <initial_orientation_as_reference>false</initial_orientation_as_reference>
       </plugin>
       <imu>
         <noise>
@@ -156,6 +157,7 @@
       </ray>
       <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
+          <namespace>$(arg robot_name)</namespace>
           <remapping>~/out:=sonar</remapping>
         </ros>
         <output_type>sensor_msgs/Range</output_type>
@@ -189,6 +191,7 @@
       <visualize>true</visualize>
       <plugin name="camera_front" filename="libgazebo_ros_camera.so">
         <ros>
+          <namespace>$(arg robot_name)</namespace>
           <remapping>image_raw:=camera_front</remapping>
           <remapping>camera_info:=camera_front_info</remapping>
         </ros>
@@ -225,6 +228,7 @@
       <visualize>true</visualize>
       <plugin name="camera_bottom" filename="libgazebo_ros_camera.so">
         <ros>
+          <namespace>$(arg robot_name)</namespace>
           <remapping>image_raw:=camera_bottom</remapping>
           <remapping>camera_info:=camera_bottom_info</remapping>
         </ros>
@@ -258,7 +262,8 @@
       </gps>
       <plugin name="gps" filename="libgazebo_ros_gps_sensor.so">
         <ros>
-          <namespace>/gps</namespace>
+          <namespace>$(arg robot_name)</namespace>
+          <!-- <namespace>/gps</namespace> -->
           <remapping>~/out:=data</remapping>
         </ros>
       </plugin>
@@ -293,11 +298,11 @@
         </ray>
         <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-            <namespace>/sjtu_drone</namespace>
+            <namespace>$(arg robot_name)</namespace>
             <remapping>~/out:=laserscan</remapping>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>laser_link</frame_name>        
+          <frame_name>$(arg robot_name)/laser_link</frame_name>        
         </plugin>
       </sensor>
   </gazebo>

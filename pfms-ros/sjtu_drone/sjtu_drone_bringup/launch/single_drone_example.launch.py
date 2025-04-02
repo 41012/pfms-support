@@ -24,6 +24,15 @@ def generate_launch_description():
     # Launch args
     world_path = LaunchConfiguration('world_path')
 
+    world = os.path.join(get_package_share_directory('pfms'), 'worlds')
+    pkg_pfms_models = get_package_share_directory('pfms')
+
+    if 'GAZEBO_MODEL_PATH' in os.environ:
+        model_path =  os.environ['GAZEBO_MODEL_PATH'] \
+            + ':' + pkg_pfms_models + '/models'
+    else:
+        model_path =  pkg_pfms_models + '/models'
+
     # Gazebo server
     gzserver = ExecuteProcess(
         cmd=['gzserver',
@@ -40,8 +49,8 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('gui')),
     )
 
-    audibot_options = dict(
-        robot_name = 'drone',
+    drone1_options = dict(
+        robot_name = 'drone1',
         start_x = '0',
         start_y = '2',
         start_z = '0',
@@ -50,23 +59,39 @@ def generate_launch_description():
         tf_freq = '100.0',
     )
 
-    # spawn_audibot = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource([
-    #         os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
-    #     ]),
-    #     launch_arguments=audibot_options.items()
-    # )
-    spawn_orange_audibot = GroupAction(
+    drone2_options = dict(
+        robot_name = 'drone2',
+        start_x = '0',
+        start_y = '-2',
+        start_z = '0',
+        start_yaw = '0',
+        pub_tf = 'true',
+        tf_freq = '100.0',
+    )
+
+    spawn_drone1 = GroupAction(
         actions=[
-            PushRosNamespace('drone'),
+            PushRosNamespace('drone1'),
              IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
                     os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
                 ]),
-                launch_arguments=audibot_options.items()
+                launch_arguments=drone1_options.items()
             )
         ]
     )    
+
+    spawn_drone2 = GroupAction(
+        actions=[
+            PushRosNamespace('drone2'),
+             IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
+                ]),
+                launch_arguments=drone2_options.items()
+            )
+        ]
+    )
 
     rviz = Node(
         package='rviz2',
@@ -85,6 +110,7 @@ def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(gzserver)
     ld.add_action(gzclient)
-    ld.add_action(spawn_orange_audibot)
+    ld.add_action(spawn_drone1)
+    ld.add_action(spawn_drone2)
     ld.add_action(rviz)
     return ld

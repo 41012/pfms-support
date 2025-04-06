@@ -32,7 +32,7 @@ def generate_launch_description():
         Node(
             package='gazebo_ros',
             executable='spawn_entity.py',
-            name='spawn_audibot',
+            name='spawn_entity',
             arguments=[
                 '-entity', LaunchConfiguration('robot_name'),
                 '-topic', 'robot_description',

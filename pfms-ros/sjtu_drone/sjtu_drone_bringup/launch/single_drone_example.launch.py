@@ -50,7 +50,7 @@ def generate_launch_description():
     )
 
     drone1_options = dict(
-        robot_name = 'drone1',
+        robot_name = 'drone3',
         start_x = '0',
         start_y = '2',
         start_z = '0',
@@ -60,7 +60,7 @@ def generate_launch_description():
     )
 
     drone2_options = dict(
-        robot_name = 'drone2',
+        robot_name = 'drone4',
         start_x = '0',
         start_y = '-2',
         start_z = '0',
@@ -71,7 +71,7 @@ def generate_launch_description():
 
     spawn_drone1 = GroupAction(
         actions=[
-            PushRosNamespace('drone1'),
+            PushRosNamespace('drone3'),
              IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
                     os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
@@ -83,7 +83,7 @@ def generate_launch_description():
 
     spawn_drone2 = GroupAction(
         actions=[
-            PushRosNamespace('drone2'),
+            PushRosNamespace('drone4'),
              IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
                     os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
@@ -108,9 +108,9 @@ def generate_launch_description():
     # ])
 
     ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
+    # ld.add_action(gzserver)
+    # ld.add_action(gzclient)
     ld.add_action(spawn_drone1)
     ld.add_action(spawn_drone2)
-    ld.add_action(rviz)
+    # ld.add_action(rviz)
     return ld

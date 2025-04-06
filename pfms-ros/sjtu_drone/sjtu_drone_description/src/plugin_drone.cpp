@@ -131,7 +131,7 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     frame_id_ = robot_name_ + "/" + link_name_;
   }
 
-  RCLCPP_INFO_STREAM(node_handle_->get_logger(), "The robot name is" << robot_name_ << " and the frame id is " << frame_id_);
+  RCLCPP_INFO_STREAM(node_handle_->get_logger(), "robot name is:" << robot_name_ << " frame id is :" << frame_id_);
 
   ////////////////////////////////////////////////////////////////////////////////
   // Subscribers

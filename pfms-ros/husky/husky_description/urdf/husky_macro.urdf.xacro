@@ -6,6 +6,7 @@
   <xacro:arg name="laser_rpy" default="$(optenv HUSKY_LMS1XX_RPY 0.0 0.0 0.0)" />
   <xacro:arg name="sonar_right_rpy" default="$(optenv HUSKY_SONAR_RIGHT_RPY 0.0 0.0 -1.57079632679)" />
   <xacro:arg name="sonar_left_rpy" default="$(optenv HUSKY_SONAR_LEFT_RPY 0.0 0.0 1.57079632679)" />
+  <xacro:arg name="sonar_back_rpy" default="$(optenv HUSKY_SONAR_LEFT_RPY 0.0 0.0 3.14159)" />
 
 
   <xacro:arg name="realsense_enabled" default="false" />
@@ -154,7 +155,12 @@
       </joint>
       <link name="${prefix}sonar_left_link"/>
 
-
+      <joint name="${prefix}sonar_back_joint" type="fixed">
+        <origin xyz="0 0 ${base_z_size+0.08}" rpy="$(arg sonar_back_rpy)" />
+        <parent link="${prefix}base_link" />
+        <child link="${prefix}sonar_back_link" />
+      </joint>
+      <link name="${prefix}sonar_back_link"/>
 
     </xacro:if>
 
@@ -238,8 +244,8 @@
 <gazebo reference="laser_link">
     <sensor type='ray' name='laser'>
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
-      <update_rate>30</update_rate>
+      <visualize>false</visualize>
+      <update_rate>20</update_rate>
       <always_on>true</always_on>      
       <ray>
         <scan>
@@ -399,5 +405,48 @@
       </plugin>
     </sensor>
   </gazebo>
+
+  <gazebo reference="sonar_back_link">
+    <sensor name="sonar_back" type="ray">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min> 
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="husky_sonar_back" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar_back</remapping>
+        </ros>
+        <output_type>sensor_msgs/Range</output_type>
+        <radiation_type>ultrasound</radiation_type>
+        <frame_name>sonar_back_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
 
 </robot>

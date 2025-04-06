@@ -3,6 +3,7 @@
   xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:arg name="robot_name" default="drone" />
+  <xacro:property name="M_PI" value="3.14159"/>
 
   <gazebo>
     <plugin name='simple_drone' filename='libplugin_drone.so'>
@@ -63,12 +64,41 @@
     </visual>
   </link>
 
-  <joint name="sonar_joint" type="fixed">
+  <joint name="sonar_bottom_joint" type="fixed">
     <parent link="base_link" />
-    <child link="sonar_link" />
+    <child link="sonar_bottom_link" />
     <origin rpy="0 1.570796326794897 0" xyz="0 0 0"/>
   </joint>
-  <link name="sonar_link"/>
+  <link name="sonar_bottom_link"/>
+
+  <joint name="sonar_front_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="sonar_front_link" />
+    <origin rpy="0 0 0" xyz="0 0 0.15"/>
+  </joint>
+  <link name="sonar_front_link"/>
+
+
+  <joint name="sonar_right_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="sonar_right_link" />
+    <origin rpy="0 0 -1.57079632679" xyz="0 0 0.15"/>
+  </joint>
+  <link name="sonar_right_link"/>
+
+  <joint name="sonar_left_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="sonar_left_link" />
+    <origin rpy="0 0 1.57079632679" xyz="0 0 0.15"/>
+  </joint>
+  <link name="sonar_left_link"/>
+
+  <joint name="sonar_back_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="sonar_back_link" />
+    <origin rpy="0 0 3.14159" xyz="0 0 0.15"/>
+  </joint>
+  <link name="sonar_back_link"/>
 
 
   <joint name="front_cam_joint" type="fixed">
@@ -124,8 +154,8 @@
 
 
   <!-- Sonar sensor in 5fps -->
-  <gazebo reference="sonar_link">
-    <sensor name="sonar" type="ray">
+  <gazebo reference="sonar_bottom_link">
+    <sensor name="sonar_bottom" type="ray">
       <always_on>true</always_on>
       <visualize>true</visualize>
       <update_rate>5</update_rate>
@@ -158,11 +188,181 @@
       <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
           <namespace>$(arg robot_name)</namespace>
-          <remapping>~/out:=sonar</remapping>
+          <remapping>~/out:=sonar_bottom</remapping>
         </ros>
         <output_type>sensor_msgs/Range</output_type>
         <radiation_type>ultrasound</radiation_type>
-        <frame_name>sonar_link</frame_name>
+        <frame_name>sonar_bottom_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Sonar sensor -->
+  <gazebo reference="sonar_front_link">
+    <sensor name="sonar_front" type="ray">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min> 
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="drone_sonar_front" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar_front</remapping>
+        </ros>
+        <output_type>sensor_msgs/Range</output_type>
+        <radiation_type>ultrasound</radiation_type>
+        <frame_name>sonar_front_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Sonar sensor -->
+  <gazebo reference="sonar_right_link">
+    <sensor name="sonar_right" type="ray">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min> 
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="drone_sonar_right" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar_right</remapping>
+        </ros>
+        <output_type>sensor_msgs/Range</output_type>
+        <radiation_type>ultrasound</radiation_type>
+        <frame_name>sonar_right_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="sonar_left_link">
+    <sensor name="sonar_left" type="ray">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min> 
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="drone_sonar_left" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar_left</remapping>
+        </ros>
+        <output_type>sensor_msgs/Range</output_type>
+        <radiation_type>ultrasound</radiation_type>
+        <frame_name>sonar_left_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+ <gazebo reference="sonar_back_link">
+    <sensor name="sonar_back" type="ray">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-${M_PI * 1.5/180}</min_angle>
+            <max_angle>${M_PI * 1.5/180}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min> 
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="drone_sonar_back" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=$(arg robot_name)/sonar_back</remapping>
+        </ros>
+        <output_type>sensor_msgs/Range</output_type>
+        <radiation_type>ultrasound</radiation_type>
+        <frame_name>sonar_back_link</frame_name>
       </plugin>
     </sensor>
   </gazebo>

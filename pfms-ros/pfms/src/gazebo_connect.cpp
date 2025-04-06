@@ -239,6 +239,7 @@ public:
   {
 
     for (unsigned int i=0;i<msg.name.size();i++){
+        // std::cout << "Link name: " << msg.name[i] << std::endl;
         if ((msg.name[i]).compare("husky::base_link") == 0) 
         {
           geometry_msgs::msg::Pose pose(msg.pose[i]);
@@ -255,17 +256,30 @@ public:
           odomPub_->publish(odom);
           // break;
         }
-        // // if ((msg.name[i]).compare("husky::sonar_link") == 0) 
-        // // {
-        // //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        // //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        // //   nav_msgs::msg::Odometry odom;
-        // //   odom.header.stamp = this->get_clock()->now();
-        // //   odom.header.frame_id="world";
-        // //   odom.pose.pose=pose;
-        // //   odom.twist.twist=twist;    
-        // //   sendTfBroadcast(pose,"sonar_link" );
-        // // }
+        if ((msg.name[i]).compare("drone1::base_link") == 0) 
+        {
+          geometry_msgs::msg::Pose pose(msg.pose[i]);
+          // geometry_msgs::msg::Twist twist(msg.twist[i]);
+          // nav_msgs::msg::Odometry odom;
+          // odom.header.stamp = this->get_clock()->now();
+          // odom.header.frame_id="world";
+          // odom.pose.pose=pose;
+          // odom.twist.twist=twist;    
+          // sendTfBroadcast(pose,"sonar_link" );
+          std::cout << msg.name[i] << " " << pose.position.x << " " << pose.position.y << std::endl;
+        }
+        if ((msg.name[i]).compare("drone2::base_link") == 0) 
+        {
+          geometry_msgs::msg::Pose pose(msg.pose[i]);
+          // geometry_msgs::msg::Twist twist(msg.twist[i]);
+          // nav_msgs::msg::Odometry odom;
+          // odom.header.stamp = this->get_clock()->now();
+          // odom.header.frame_id="world";
+          // odom.pose.pose=pose;
+          // odom.twist.twist=twist;    
+          // sendTfBroadcast(pose,"sonar_link" );
+          std::cout << msg.name[i] << " " << pose.position.x << " " << pose.position.y << std::endl;
+        }        
         // if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
         // {
         //   geometry_msgs::msg::Pose pose(msg.pose[i]);

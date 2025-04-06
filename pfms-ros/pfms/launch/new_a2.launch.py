@@ -13,6 +13,9 @@ from launch.actions import ExecuteProcess
 from launch.event_handlers import OnProcessExit
 from ament_index_python.packages import get_package_share_directory
 
+from launch.actions import TimerAction, RegisterEventHandler
+from launch.event_handlers import OnProcessStart
+
 import xacro
 
 def generate_launch_description():
@@ -96,16 +99,51 @@ def generate_launch_description():
         )
     )
 
-    spawn_robot = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        name='spawn_husky',
-        arguments=['-entity',
-                   'husky',
-                   '-topic',
-                   'robot_description',
-                   '-x 0.0', '-y -2.0'],
-        output='screen',
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='a2_viz',
+        # output='screen',
+        output={'both': 'log'},
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'new_a2.rviz')]
+    )
+
+    # spawn_robot = Node(
+    #     package='gazebo_ros',
+    #     executable='spawn_entity.py',
+    #     name='spawn_husky',
+    #     arguments=['-entity',
+    #                'husky',
+    #                '-topic',
+    #                'robot_description',
+    #                '-x 0.0', '-y -2.0'],
+    #     output='screen',
+    # )
+
+    # Delay spawn_robot by 5 seconds after rviz starts
+    spawn_robot_delayed = TimerAction(
+        period=5.0,  # Delay by 5 seconds
+        actions=[
+            Node(
+                package='gazebo_ros',
+                executable='spawn_entity.py',
+                name='spawn_husky',
+                arguments=['-entity',
+                        'husky',
+                        '-topic',
+                        'robot_description',
+                        '-x 0.0', '-y -2.0'],
+                output='screen',
+            )
+        ]
+    )
+
+    # Ensure spawn_robot starts after rviz
+    spawn_robot_after_rviz = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=rviz,
+            on_start=[spawn_robot_delayed]
+        )
     )
 
 
@@ -118,7 +156,7 @@ def generate_launch_description():
     )
 
     drone1_options = dict(
-            robot_name = 'drone1',
+            robot_name = 'drone',
             start_x = '0',
             start_y = '2',
             start_z = '0',
@@ -126,9 +164,9 @@ def generate_launch_description():
             pub_tf = 'true',
             tf_freq = '100.0',
         )
-    spawn_drone1 = GroupAction(
+    spawn_drone = GroupAction(
         actions=[
-            PushRosNamespace('drone1'),
+            PushRosNamespace('drone'),
              IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
                     os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
@@ -137,15 +175,6 @@ def generate_launch_description():
             )
         ]
     )    
-
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='a2_viz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'new_a2.rviz')]
-    )
 
 
     drone1_reach = Node(
@@ -156,9 +185,9 @@ def generate_launch_description():
         # output={'both': 'log'},
         # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
         remappings=[
-            ('/orange/odom', '/drone1/gt_odom'),
-            ('/orange/check_goals', '/drone1/check_goals'),
-            ('ackerman_check_goals', 'drone1_check_goals'),
+            ('/orange/odom', '/drone/gt_odom'),
+            ('/orange/check_goals', '/drone/check_goals'),
+            ('ackerman_check_goals', 'drone_check_goals'),
         ]
     )
 
@@ -200,14 +229,12 @@ def generate_launch_description():
         gazebo_server,
         gazebo_client,
         gazebo_connect,
-        spawn_drone1,
+        rviz,
+        spawn_drone,
         node_robot_state_publisher,
         spawn_joint_state_broadcaster,
         diffdrive_controller_spawn_callback,
-        spawn_robot,
-        # joint_state_publisher,
-        # sjtu_drone_bringup,
-        rviz,
+        spawn_robot_after_rviz,
         husky_reach,
         drone1_reach
     ])

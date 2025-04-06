@@ -14,7 +14,7 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <pose>-27 27 0 0 0 0</pose>
+        <pose>32.0 32.2 0 0 0 -1.570796327</pose>
         <geometry>
           <mesh>
             <uri>model://maze1/map.stl</uri>
@@ -22,7 +22,7 @@
         </geometry>
       </collision>
       <visual name="visual">
-        <pose>-27 27 0 0 0 0</pose>
+        <pose>32.0 32.2 0 0 0 -1.570796327</pose>
         <geometry>
           <mesh>
             <uri>model://maze1/map.stl</uri>

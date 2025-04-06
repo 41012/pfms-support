@@ -167,7 +167,7 @@ def generate_launch_description():
           
         gazebo_server,
         gazebo_client,
-        gazebo_connect,
+        # gazebo_connect,
         spawn_orange_audibot,
         spawn_blue_audibot,
         # robot_state_publisher,

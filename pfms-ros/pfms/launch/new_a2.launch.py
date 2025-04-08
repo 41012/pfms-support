@@ -15,6 +15,7 @@ import xacro
 
 def generate_launch_description():
 
+    mode = launch.substitutions.LaunchConfiguration('mode')
     world = os.path.join(get_package_share_directory('pfms'), 'worlds')
     pkg_pfms_models = get_package_share_directory('pfms')
 
@@ -36,45 +37,46 @@ def generate_launch_description():
             os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
     )
 
+
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-    
-    # xacro_file_name = "sjtu_drone.urdf.xacro"
-    # xacro_file = os.path.join(
-    #     get_package_share_directory("sjtu_drone_description"),
-    #     "urdf", xacro_file_name
-    # )
-    # robot_description_config = xacro.process_file(xacro_file)
-    # robot_desc = robot_description_config.toxml()
-    # model_ns = "drone"
+    xacro_file_name = "sjtu_drone.urdf.xacro"
+    xacro_file = os.path.join(
+        get_package_share_directory("sjtu_drone_description"),
+        "urdf", xacro_file_name
+    )
+    robot_description_config = xacro.process_file(xacro_file)
+    robot_desc = robot_description_config.toxml()
+    model_ns = "drone"
 
-    # gazebo_connect = Node(
-    #     package='pfms',
-    #     executable='gazebo_connect',
-    #     name='gazebo_connect',
-    #     parameters=[{'use_sim_time': True}]
-    #     # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
-    # )
+    gazebo_connect = Node(
+        package='pfms',
+        executable='gazebo_connect',
+        name='gazebo_connect',
+        parameters=[{'use_sim_time': True}]
+        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
+    )
 
-    drone1_options = dict(
-            robot_name = 'drone1',
-            start_x = '0',
-            start_y = '2',
-            start_z = '0',
-            start_yaw = '0',
-            pub_tf = 'true',
-            tf_freq = '100.0',
-        )
-    spawn_drone1 = GroupAction(
-        actions=[
-            PushRosNamespace('drone1'),
-             IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
-                ]),
-                launch_arguments=drone1_options.items()
-            )
-        ]
-    )    
+    # orange_audibot_options = dict(
+    #         robot_name = 'orange',
+    #         start_x = '0',
+    #         start_y = '2',
+    #         start_z = '0',
+    #         start_yaw = '0',
+    #         pub_tf = 'true',
+    #         tf_freq = '100.0',
+    #         blue = 'false'
+    #     )
+    # spawn_orange_audibot = GroupAction(
+    #     actions=[
+    #         PushRosNamespace('orange'),
+    #         IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([
+    #                 os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
+    #             ]),
+    #             launch_arguments=orange_audibot_options.items()
+    #         )
+    #     ]
+    # )
 
     rviz = Node(
         package='rviz2',
@@ -86,30 +88,30 @@ def generate_launch_description():
     )
 
 
-    # robot_state_publisher = Node(
-    #     package="robot_state_publisher",
-    #     executable="robot_state_publisher",
-    #     name="robot_state_publisher_drone",
-    #     # namespace=model_ns,
-    #     output="screen",
-    #     parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
-    #     arguments=[robot_desc]
-    # )
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher_drone",
+        # namespace=model_ns,
+        output="screen",
+        parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
+        arguments=[robot_desc]
+    )
 
-    # joint_state_publisher = Node(
-    #     package='joint_state_publisher',
-    #     executable='joint_state_publisher',
-    #     name='joint_state_publisher_drone',
-    #     # namespace=model_ns,
-    #     output='screen',
-    # )
+    joint_state_publisher = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher_drone',
+        # namespace=model_ns,
+        output='screen',
+    )
 
-    # sjtu_drone_bringup= Node(
-    #     package="sjtu_drone_bringup",
-    #     executable="spawn_drone",
-    #     arguments=[robot_desc, model_ns],
-    #     output="screen"
-    # )
+    sjtu_drone_bringup= Node(
+        package="sjtu_drone_bringup",
+        executable="spawn_drone",
+        arguments=[robot_desc, model_ns],
+        output="screen"
+    )
 
     # audi_reach = Node(
     #     package='pfms',
@@ -120,17 +122,17 @@ def generate_launch_description():
     #     # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
     # )
 
-    drone1_reach = Node(
+    drone_reach = Node(
         package='pfms',
         executable='reach',
-        name='drone1_reach',
+        name='drone_reach',
         output='screen',
         # output={'both': 'log'},
         # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
         remappings=[
-            ('/orange/odom', '/drone1/gt_odom'),
-            ('/orange/check_goals', '/drone1/check_goals'),
-            ('ackerman_check_goals', 'drone1_check_goals'),
+            ('/orange/odom', '/drone/gt_odom'),
+            ('/orange/check_goals', '/drone/check_goals'),
+            ('ackerman_check_goals', 'drone_check_goals'),
         ]
     )
 
@@ -160,14 +162,14 @@ def generate_launch_description():
           
         gazebo_server,
         gazebo_client,
-        # gazebo_connect,
-        spawn_drone1,
-        # robot_state_publisher,
-        # joint_state_publisher,
-        # sjtu_drone_bringup,
+        gazebo_connect,
+        # spawn_orange_audibot,
+        robot_state_publisher,
+        joint_state_publisher,
+        sjtu_drone_bringup,
         rviz,
         # audi_reach,
-        drone1_reach
+        drone_reach
     ])
 
     return ld

@@ -38,7 +38,7 @@ def generate_launch_description():
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
     )
-    # mode = launch.substitutions.LaunchConfiguration('mode')
+
 
     # gazebo_connect = Node(
     #     package='pfms',
@@ -58,15 +58,15 @@ def generate_launch_description():
         tf_freq = '100.0',
     )
 
-    # drone2_options = dict(
-    #     robot_name = 'drone2',
-    #     start_x = '0',
-    #     start_y = '1',
-    #     start_z = '0',
-    #     start_yaw = '0',
-    #     pub_tf = 'true',
-    #     tf_freq = '100.0',
-    # )
+    drone2_options = dict(
+        robot_name = 'drone2',
+        start_x = '0',
+        start_y = '1',
+        start_z = '0',
+        start_yaw = '0',
+        pub_tf = 'true',
+        tf_freq = '100.0',
+    )
 
     spawn_drone1 = GroupAction(
         actions=[
@@ -80,17 +80,17 @@ def generate_launch_description():
         ]
     )
 
-    # spawn_drone2 = GroupAction(
-    #     actions=[
-    #         PushRosNamespace('drone2'),
-    #         IncludeLaunchDescription(
-    #             PythonLaunchDescriptionSource([
-    #                 os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
-    #             ]),
-    #             launch_arguments=drone2_options.items()
-    #         )
-    #     ]
-    # )
+    spawn_drone2 = GroupAction(
+        actions=[
+            PushRosNamespace('drone2'),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
+                ]),
+                launch_arguments=drone2_options.items()
+            )
+        ]
+    )
 
     rviz = Node(
         package='rviz2',
@@ -98,7 +98,7 @@ def generate_launch_description():
         name='two_quad_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'new_a2.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'two_quads.rviz')]
     )
 
 
@@ -245,17 +245,17 @@ def generate_launch_description():
         gazebo_server,
         gazebo_client,
         gazebo_connect,
-        # spawn_drone1,
-        # spawn_drone2,
+        spawn_drone1,
+        spawn_drone2,
         # robot_state_publisher,
         joint_state_publisher,
-        rviz,
+        rviz
         # audi_blue_reach,
         # audi_orange_reach,
-        node_robot_state_publisher,
-        spawn_joint_state_broadcaster,
-        diffdrive_controller_spawn_callback,
-        spawn_robot
+        # node_robot_state_publisher,
+        # spawn_joint_state_broadcaster,
+        # diffdrive_controller_spawn_callback,
+        # spawn_robot
     ])
 
     return ld

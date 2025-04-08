@@ -97,15 +97,15 @@ def generate_launch_description():
     )
 
 
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher",
-        # namespace=model_ns,
-        output="screen",
-        parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
-        arguments=[robot_desc]
-    )
+    # robot_state_publisher = Node(
+    #     package="robot_state_publisher",
+    #     executable="robot_state_publisher",
+    #     name="robot_state_publisher",
+    #     # namespace=model_ns,
+    #     output="screen",
+    #     parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
+    #     arguments=[robot_desc]
+    # )
 
     joint_state_publisher = Node(
         package='joint_state_publisher',
@@ -115,12 +115,36 @@ def generate_launch_description():
         output='screen',
     )
 
-    sjtu_drone_bringup= Node(
-        package="sjtu_drone_bringup",
-        executable="spawn_drone",
-        arguments=[robot_desc, model_ns],
-        output="screen"
-    )
+    # sjtu_drone_bringup= Node(
+    #     package="sjtu_drone_bringup",
+    #     executable="spawn_drone",
+    #     arguments=[robot_desc, model_ns],
+    #     output="screen"
+    # )
+
+    drone1_options = dict(
+            robot_name = 'drone',
+            start_x = '0',
+            start_y = '2',
+            start_z = '0',
+            start_yaw = '0',
+            pub_tf = 'true',
+            tf_freq = '100.0',
+        )
+    spawn_drone = GroupAction(
+        actions=[
+            PushRosNamespace('drone'),
+             IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'launch', 'sjtu_drone_robot.launch.py')
+                ]),
+                launch_arguments=drone1_options.items()
+            )
+        ]
+    )    
+
+
+
 
     audi_reach = Node(
         package='pfms',
@@ -174,9 +198,10 @@ def generate_launch_description():
         gazebo_client,
         gazebo_connect,
         spawn_orange_audibot,
-        robot_state_publisher,
+        spawn_drone,
+        # robot_state_publisher,
         joint_state_publisher,
-        sjtu_drone_bringup,
+        # sjtu_drone_bringup,
         rviz,
         audi_reach,
         drone_reach

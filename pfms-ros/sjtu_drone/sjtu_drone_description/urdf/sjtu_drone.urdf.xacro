@@ -1,6 +1,24 @@
 <?xml version="1.0" ?>
-<robot name="sjtu_drone"
-  xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="sjtu_drone" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<!-- https://answers.ros.org/question/379014/passing-outside-parameters-into-urdf-file-using-xacro/ -->
+  <!-- Need argument to get from launch file -->
+  <xacro:arg name="params_path" default="$(find sjtu_drone_bringup)/config/drone.yaml"/> 
+
+  <!-- Need seperate property for xacro inorder processing -->
+  <xacro:property name="params_path" value="$(arg params_path)"/> 
+
+  <!-- Read in the yaml dict as mp (short for model parameters) -->
+  <xacro:property name="mp" value="${xacro.load_yaml(params_path)}"/> 
+
+  <xacro:property name="M_PI" value="3.14159265359" />
+
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
 
   <link name="base_link">
     <inertial>
@@ -27,20 +45,20 @@
   <joint name="sonar_joint" type="fixed">
     <parent link="base_link" />
     <child link="sonar_link" />
-    <origin rpy="0 1.570796326794897 0" xyz="0 0 0"/>
+    <origin rpy="0 ${M_PI/2} 0" xyz="0 0 0"/>
   </joint>
   <link name="sonar_link"/>
 
 
   <joint name="front_cam_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0.3 0 0"/>
+    <origin rpy="0 0 0" xyz="0.2 0 0"/>
     <parent link="base_link" />
     <child link="front_cam_link" />
   </joint>
   <link name="front_cam_link"/>
 
   <joint name="bottom_cam_joint" type="fixed">
-    <origin rpy="0 1.570796326794897 0" xyz="0 0 0"/>
+    <origin rpy="0 ${M_PI/2} 0" xyz="0 0 0"/>
     <parent link="base_link" />
     <child link="bottom_cam_link" />
   </joint>
@@ -56,34 +74,45 @@
 
   <gazebo>
     <plugin name='simple_drone' filename='libplugin_drone.so'>
+      <ros>
+        <namespace>${mp['namespace']}</namespace>
+        <remapping>cmd_vel:=cmd_vel</remapping>
+        <remapping>imu:=imu</remapping>
+        <remapping>sonar:=sonar</remapping>
+        <remapping>camera_front:=camera_front</remapping>
+        <remapping>camera_bottom:=camera_bottom</remapping>
+        <remapping>camera_front_info:=camera_front_info</remapping>
+        <remapping>camera_bottom_info:=camera_bottom_info</remapping>
+        <remapping>gps:=gps</remapping>
+      </ros>
+
       <bodyName>base_link</bodyName>
-      <rosNamespace>drone</rosNamespace>
-      <imuTopic>imu</imuTopic>
-      <rollpitchProportionalGain>10.0</rollpitchProportionalGain>
-      <rollpitchDifferentialGain>5.0</rollpitchDifferentialGain>
-      <rollpitchLimit>0.5</rollpitchLimit>
-      <yawProportionalGain>2.0</yawProportionalGain>
-      <yawDifferentialGain>1.0</yawDifferentialGain>
-      <yawLimit>1.5</yawLimit>
-      <velocityXYProportionalGain>5.0</velocityXYProportionalGain>
-      <velocityXYDifferentialGain>2.3</velocityXYDifferentialGain>
-      <velocityXYLimit>2</velocityXYLimit>
-      <velocityZProportionalGain>5.0</velocityZProportionalGain>
-      <velocityZIntegralGain>0.0</velocityZIntegralGain>
-      <velocityZDifferentialGain>1.0</velocityZDifferentialGain>
-      <velocityZLimit>-1</velocityZLimit>
-      <positionXYProportionalGain>1.1</positionXYProportionalGain>
-      <positionXYDifferentialGain>0.0</positionXYDifferentialGain>
-      <positionXYIntegralGain>0.0</positionXYIntegralGain>
-      <positionXYLimit>5</positionXYLimit>
-      <positionZProportionalGain>1.0</positionZProportionalGain>
-      <positionZDifferentialGain>0.2</positionZDifferentialGain>
-      <positionZIntegralGain>0.0</positionZIntegralGain>
-      <positionZLimit>-1</positionZLimit>
-      <maxForce>30</maxForce>
-      <motionSmallNoise>0.05</motionSmallNoise>
-      <motionDriftNoise>0.03</motionDriftNoise>
-      <motionDriftNoiseTime>5.0</motionDriftNoiseTime>
+      <pub_odom>true</pub_odom>
+      <rollpitchProportionalGain>${mp['rollpitchProportionalGain']}</rollpitchProportionalGain>
+      <rollpitchDifferentialGain>${mp['rollpitchDifferentialGain']}</rollpitchDifferentialGain>
+      <rollpitchLimit>${mp['rollpitchLimit']}</rollpitchLimit>
+      <yawProportionalGain>${mp['yawProportionalGain']}</yawProportionalGain>
+      <yawDifferentialGain>${mp['yawDifferentialGain']}</yawDifferentialGain>
+      <yawLimit>${mp['yawLimit']}</yawLimit>
+      <velocityXYProportionalGain>${mp['velocityXYProportionalGain']}</velocityXYProportionalGain>
+      <velocityXYDifferentialGain>${mp['velocityXYDifferentialGain']}</velocityXYDifferentialGain>
+      <velocityXYLimit>${mp['velocityXYLimit']}</velocityXYLimit>
+      <velocityZProportionalGain>${mp['velocityZProportionalGain']}</velocityZProportionalGain>
+      <velocityZIntegralGain>${mp['velocityZIntegralGain']}</velocityZIntegralGain>
+      <velocityZDifferentialGain>${mp['velocityZDifferentialGain']}</velocityZDifferentialGain>
+      <velocityZLimit>${mp['velocityZLimit']}</velocityZLimit>
+      <positionXYProportionalGain>${mp['positionXYProportionalGain']}</positionXYProportionalGain>
+      <positionXYDifferentialGain>${mp['positionXYDifferentialGain']}</positionXYDifferentialGain>
+      <positionXYIntegralGain>${mp['positionXYIntegralGain']}</positionXYIntegralGain>
+      <positionXYLimit>${mp['positionXYLimit']}</positionXYLimit>
+      <positionZProportionalGain>${mp['positionZProportionalGain']}</positionZProportionalGain>
+      <positionZDifferentialGain>${mp['positionZDifferentialGain']}</positionZDifferentialGain>
+      <positionZIntegralGain>${mp['positionZIntegralGain']}</positionZIntegralGain>
+      <positionZLimit>${mp['positionZLimit']}</positionZLimit>
+      <maxForce>${mp['maxForce']}</maxForce>
+      <motionSmallNoise>${mp['motionSmallNoise']}</motionSmallNoise>
+      <motionDriftNoise>${mp['motionDriftNoise']}</motionDriftNoise>
+      <motionDriftNoiseTime>${mp['motionDriftNoiseTime']}</motionDriftNoiseTime>
     </plugin>
   </gazebo>
 
@@ -95,32 +124,37 @@
       <visualize>1</visualize>
       <update_rate> 100 </update_rate>
       <pose> 0 0 0 0 0 0 </pose>
-      <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
-        <initial_orientation_as_reference>false</initial_orientation_as_reference>
-      </plugin>
       <imu>
         <noise>
           <type>gaussian</type>
           <rate>
             <mean> 0 </mean>
-            <stddev> 0 </stddev>
+            <stddev> 0.01 </stddev>
           </rate>
           <accel>
             <mean> 0 </mean>
-            <stddev> 0.00 </stddev>
+            <stddev> 0.01 </stddev>
           </accel>
         </noise>
       </imu>
+      <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
+        <ros>
+          <namespace>${mp['namespace']}</namespace>
+          <!-- <remapping>imu:=imu</remapping> -->
+        </ros>
+        <initial_orientation_as_reference>false</initial_orientation_as_reference>
+        <frame_name>${mp['namespace']}/base_link</frame_name>
+      </plugin>
     </sensor>
   </gazebo>
 
 
-  <!-- Sonar sensor in 5fps -->
+  <!-- Sonar sensor in 100fps -->
   <gazebo reference="sonar_link">
     <sensor name="sonar" type="ray">
-      <always_on>true</always_on>
-      <visualize>true</visualize>
-      <update_rate>5</update_rate>
+      <always_on>1</always_on>
+      <visualize>1</visualize>
+      <update_rate>30</update_rate>
       <ray>
         <scan>
           <horizontal>
@@ -149,17 +183,21 @@
       </ray>
       <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
-          <remapping>~/out:=sonar</remapping>
+          <namespace>${mp['namespace']}</namespace>
+          <!-- <remapping>~/out:=sonar</remapping> -->
         </ros>
+        <frame_name>${mp['namespace']}/sonar_link</frame_name>
         <output_type>sensor_msgs/Range</output_type>
         <radiation_type>ultrasound</radiation_type>
-        <frame_name>sonar_link</frame_name>
       </plugin>
     </sensor>
   </gazebo>
 
   <gazebo reference="front_cam_link">
     <sensor name="front_camera" type="camera">
+      <always_on>1</always_on>
+      <visualize>1</visualize>
+      <update_rate>60</update_rate>
       <camera>
         <horizontal_fov>2.09</horizontal_fov>
         <image>
@@ -174,19 +212,17 @@
         <noise>
           <type>gaussian</type>
           <mean>0.0</mean>
-          <stddev>0.005</stddev>
+          <stddev>0.01</stddev>
         </noise>
       </camera>
-      <always_on>1</always_on>
-      <update_rate>60</update_rate>
-      <visualize>true</visualize>
       <plugin name="camera_front" filename="libgazebo_ros_camera.so">
         <ros>
-          <remapping>image_raw:=camera_front</remapping>
-          <remapping>camera_info:=camera_front_info</remapping>
+          <namespace>${mp['namespace']}</namespace>
+          <!-- <remapping>~/image_raw:=camera_front</remapping>
+          <remapping>~/camera_info:=camera_front_info</remapping> -->
         </ros>
+        <frame_name>${mp['namespace']}/front_cam_link</frame_name>
         <camera_name>front</camera_name>
-        <frame_name>front_cam_link</frame_name>
         <hack_baseline>0.07</hack_baseline>
       </plugin>
     </sensor>
@@ -196,6 +232,9 @@
   <!-- downward looking camera -->
   <gazebo reference="bottom_cam_link">
     <sensor name="down_camera" type="camera">
+      <always_on>1</always_on>
+      <visualize>1</visualize>
+      <update_rate>15</update_rate>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
@@ -210,19 +249,17 @@
         <noise>
           <type>gaussian</type>
           <mean>0.0</mean>
-          <stddev>0.005</stddev>
+          <stddev>0.01</stddev>
         </noise>
       </camera>
-      <always_on>1</always_on>
-      <update_rate>15</update_rate>
-      <visualize>true</visualize>
       <plugin name="camera_bottom" filename="libgazebo_ros_camera.so">
         <ros>
-          <remapping>image_raw:=camera_bottom</remapping>
-          <remapping>camera_info:=camera_bottom_info</remapping>
+          <namespace>${mp['namespace']}</namespace>
+          <!-- <remapping>image_raw:=camera_bottom</remapping>
+          <remapping>camera_info:=camera_bottom_info</remapping> -->
         </ros>
+        <frame_name>${mp['namespace']}/bottom_cam_link</frame_name>
         <camera_name>bottom</camera_name>
-        <frame_name>bottom_cam_link</frame_name>
         <hack_baseline>0.07</hack_baseline>
       </plugin>
     </sensor>
@@ -231,7 +268,7 @@
 
   <gazebo reference="base_link">
     <sensor name="gps" type="gps">
-      <always_on>true</always_on>
+      <always_on>1</always_on>
       <update_rate>30</update_rate>
       <gps>
         <position_sensing>
@@ -251,9 +288,10 @@
       </gps>
       <plugin name="gps" filename="libgazebo_ros_gps_sensor.so">
         <ros>
-          <namespace>/gps</namespace>
-          <remapping>~/out:=data</remapping>
+          <namespace>${mp['namespace']}</namespace>
+          <remapping>~/out:=~/nav</remapping>
         </ros>
+        <frame_name>${mp['namespace']}/base_link</frame_name>
       </plugin>
     </sensor>
   </gazebo>
@@ -263,7 +301,7 @@
         <pose>0 0 0 0 0 0</pose>
         <visualize>false</visualize>
         <update_rate>30</update_rate>
-        <always_on>true</always_on>
+        <always_on>1</always_on>
         <ray>
           <scan>
             <horizontal>
@@ -286,14 +324,29 @@
         </ray>
         <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-            <namespace>/sjtu_drone</namespace>
-            <remapping>~/out:=laserscan</remapping>
+	    <namespace>${mp['namespace']}</namespace>
+	    <remapping>~/out:=~/laserscan</remapping>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>laser_link</frame_name>        
+          <frame_name>${mp['namespace']}/laser_link</frame_name>        
         </plugin>
       </sensor>
   </gazebo>
 
-
+  <gazebo reference="base_link">
+    <sensor name="collision_sensor" type="contact">
+      <update_rate>100.0</update_rate>
+      <always_on>true</always_on>
+      <contact>
+        <collision>base_footprint_fixed_joint_lump__sjtu_drone_collision_collision</collision>
+      </contact>
+      <plugin name="collision_plugin" filename="libgazebo_ros_bumper.so">
+        <ros>
+          <namespace>${mp['namespace']}</namespace>
+          <!-- <remapping>bumper_states:=bumper_states</remapping> -->
+        </ros>
+        <frame_name>${mp['namespace']}/base_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
 </robot>

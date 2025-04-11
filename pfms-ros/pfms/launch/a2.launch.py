@@ -11,6 +11,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
 
+import yaml
 import xacro
 
 def generate_launch_description():
@@ -36,16 +37,6 @@ def generate_launch_description():
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
     )
-    mode = launch.substitutions.LaunchConfiguration('mode')
-
-    # Gazebo server
-    # gazebo_server = ExecuteProcess(
-    #     cmd=['gzserver',
-    #          '-s', 'libgazebo_ros_init.so',
-    #          '-s', 'libgazebo_ros_factory.so',
-    #          world + '/a2.world',],
-    #     output='screen',
-    # )
 
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
     xacro_file_name = "sjtu_drone.urdf.xacro"
@@ -53,9 +44,20 @@ def generate_launch_description():
         get_package_share_directory("sjtu_drone_description"),
         "urdf", xacro_file_name
     )
-    robot_description_config = xacro.process_file(xacro_file)
+    yaml_file_path = os.path.join(
+        get_package_share_directory('sjtu_drone_bringup'),
+        'config', 'drone.yaml'
+    )   
+
+    robot_description_config = xacro.process_file(xacro_file, mappings={"params_path": yaml_file_path})
     robot_desc = robot_description_config.toxml()
+    # get ns from yaml
     model_ns = "drone"
+    with open(yaml_file_path, 'r') as f:
+        yaml_dict = yaml.load(f, Loader=yaml.FullLoader)
+        model_ns = yaml_dict["namespace"] #+ "/"
+    print("namespace: ", model_ns)
+
 
     gazebo_connect = Node(
         package='pfms',
@@ -66,15 +68,16 @@ def generate_launch_description():
     )
 
     orange_audibot_options = dict(
-            robot_name = 'orange',
-            start_x = '0',
-            start_y = '2',
-            start_z = '0',
-            start_yaw = '0',
-            pub_tf = 'true',
-            tf_freq = '100.0',
-            blue = 'false'
-        )
+        robot_name = 'orange',
+        start_x = '0',
+        start_y = '2.0',
+        start_z = '0',
+        start_yaw = '0',
+        pub_tf = 'true',
+        tf_freq = '100.0',
+        blue = 'false'
+    )
+    
     spawn_orange_audibot = GroupAction(
         actions=[
             PushRosNamespace('orange'),
@@ -101,9 +104,9 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
-        # namespace=model_ns,
+        namespace=model_ns,
         output="screen",
-        parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
+        parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc, "frame_prefix": model_ns + "/"}],
         arguments=[robot_desc]
     )
 
@@ -111,7 +114,7 @@ def generate_launch_description():
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
-        # namespace=model_ns,
+        namespace=model_ns,
         output='screen',
     )
 
@@ -122,13 +125,12 @@ def generate_launch_description():
         output="screen"
     )
 
+   
     audi_reach = Node(
         package='pfms',
         executable='reach',
         name='audi_reach',
         output='screen'
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
     )
 
     drone_reach = Node(
@@ -137,13 +139,19 @@ def generate_launch_description():
         name='drone_reach',
         output='screen',
         # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
         remappings=[
             ('/orange/odom', '/drone/gt_odom'),
             ('/orange/check_goals', '/drone/check_goals'),
             ('ackerman_check_goals', 'drone_check_goals'),
         ]
     )
+
+    drone_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "world", f"{model_ns}/odom"],
+        output="screen"
+    )    
 
 
     ld = launch.LaunchDescription([
@@ -170,16 +178,18 @@ def generate_launch_description():
         SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
           
         gazebo_server,
-        # gzserver,
         gazebo_client,
-        gazebo_connect,
-        spawn_orange_audibot,
+
+        sjtu_drone_bringup,
         robot_state_publisher,
         joint_state_publisher,
-        sjtu_drone_bringup,
+
+        # gazebo_connect,
         rviz,
+        spawn_orange_audibot,
         audi_reach,
-        drone_reach
+        drone_reach,
+        drone_tf
     ])
 
     return ld

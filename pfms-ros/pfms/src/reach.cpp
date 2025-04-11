@@ -69,7 +69,7 @@ void goalsCallback(const geometry_msgs::msg::PoseArray& msg)
    dStart_ = dTravelled_;
    startTime_ = this->get_clock()->now();}
 
-void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request>,
           std::shared_ptr<std_srvs::srv::Trigger::Response>    response)
 {
 

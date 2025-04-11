@@ -84,6 +84,7 @@
         <remapping>camera_front_info:=camera_front_info</remapping>
         <remapping>camera_bottom_info:=camera_bottom_info</remapping>
         <remapping>gps:=gps</remapping>
+        <remapping>laserscan:=laserscan</remapping>
       </ros>
 
       <bodyName>base_link</bodyName>
@@ -184,7 +185,7 @@
       <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
           <namespace>${mp['namespace']}</namespace>
-          <!-- <remapping>~/out:=sonar</remapping> -->
+          <remapping>~/out:=sonar</remapping>
         </ros>
         <frame_name>${mp['namespace']}/sonar_link</frame_name>
         <output_type>sensor_msgs/Range</output_type>
@@ -324,8 +325,8 @@
         </ray>
         <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-	    <namespace>${mp['namespace']}</namespace>
-	    <remapping>~/out:=~/laserscan</remapping>
+            <namespace>${mp['namespace']}</namespace>
+            <remapping>~/out:=laserscan</remapping>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>
           <frame_name>${mp['namespace']}/laser_link</frame_name>        

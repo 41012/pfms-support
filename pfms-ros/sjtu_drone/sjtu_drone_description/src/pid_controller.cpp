@@ -1,10 +1,10 @@
 // Copyright 2023 Georg Novotny
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the GNU GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     https://www.gnu.org/licenses/gpl-3.0.en.html
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "pid_controller.h"
+#include "sjtu_drone_description/pid_controller.h"
 
 PIDController::PIDController()
 {
-    
+
 }
 
-PIDController::~PIDController(){
-    
+PIDController::~PIDController()
+{
+
 }
 
 
-void PIDController::Load(sdf::ElementPtr _sdf, const std::string& prefix)
+void PIDController::Load(sdf::ElementPtr _sdf, const std::string & prefix)
 {
   gain_p = 5.0;
   gain_d = 1.0;
@@ -32,22 +33,32 @@ void PIDController::Load(sdf::ElementPtr _sdf, const std::string& prefix)
   time_constant = 0.0;
   limit = -1.0;
 
-  if (!_sdf) return;
-  if (_sdf->HasElement(prefix + "ProportionalGain")) gain_p = _sdf->GetElement(prefix + "ProportionalGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "DifferentialGain")) gain_d = _sdf->GetElement(prefix + "DifferentialGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "IntegralGain"))     gain_i = _sdf->GetElement(prefix + "IntegralGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "TimeConstant"))     time_constant = _sdf->GetElement(prefix + "TimeConstant")->Get<double>();
-  if (_sdf->HasElement(prefix + "Limit"))            limit = _sdf->GetElement(prefix + "Limit")->Get<double>();
+  if (!_sdf) {return;}
+  if (_sdf->HasElement(prefix + "ProportionalGain")) {
+    gain_p = _sdf->GetElement(prefix + "ProportionalGain")->Get<double>();
+  }
+  if (_sdf->HasElement(prefix + "DifferentialGain")) {
+    gain_d = _sdf->GetElement(prefix + "DifferentialGain")->Get<double>();
+  }
+  if (_sdf->HasElement(prefix + "IntegralGain")) {
+    gain_i = _sdf->GetElement(prefix + "IntegralGain")->Get<double>();
+  }
+  if (_sdf->HasElement(prefix + "TimeConstant")) {
+    time_constant = _sdf->GetElement(prefix + "TimeConstant")->Get<double>();
+  }
+  if (_sdf->HasElement(prefix + "Limit")) {
+    limit = _sdf->GetElement(prefix + "Limit")->Get<double>();
+  }
 }
 
 double PIDController::update(double new_input, double x, double dx, double dt)
 {
   // limit command
-  if (limit > 0.0 && fabs(new_input) > limit) new_input = (new_input < 0 ? -1.0 : 1.0) * limit;
+  if (limit > 0.0 && fabs(new_input) > limit) {new_input = (new_input < 0 ? -1.0 : 1.0) * limit;}
 
   // filter command
   if (dt + time_constant > 0.0) {
-    input  = (dt * new_input + time_constant * input) / (dt + time_constant);
+    input = (dt * new_input + time_constant * input) / (dt + time_constant);
     dinput = (new_input - input) / (dt + time_constant);
   }
 
@@ -66,4 +77,3 @@ void PIDController::reset()
   input = dinput = 0;
   p = i = d = output = 0;
 }
-

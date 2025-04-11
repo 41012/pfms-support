@@ -27,11 +27,14 @@ def main(args=None):
     content = sys.argv[1]
     namespace = sys.argv[2]
 
+
     req = SpawnEntity.Request()
     req.name = namespace
     req.xml = content
     req.robot_namespace = namespace
     req.reference_frame = "world"
+    req.initial_pose.position.x = 0.0
+    req.initial_pose.position.y = -2.0
 
     while not cli.wait_for_service(timeout_sec=1.0):
         node.get_logger().info('service not available, waiting again...')

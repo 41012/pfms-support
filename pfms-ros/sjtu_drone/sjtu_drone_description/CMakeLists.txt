@@ -25,7 +25,7 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(nav_msgs REQUIRED)
+
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${OGRE_LIBRARY_DIRS})
 include_directories(${OpenCV_INCLUDE_DIR}
@@ -65,7 +65,6 @@ ament_target_dependencies(plugin_drone
   "tf2"
   "tf2_ros"
   "tf2_geometry_msgs"
-  "nav_msgs"
 )
 
 

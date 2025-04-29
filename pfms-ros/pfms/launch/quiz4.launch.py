@@ -36,18 +36,8 @@ def generate_launch_description():
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
     )
-    mode = launch.substitutions.LaunchConfiguration('mode')
 
-    # Gazebo server
-    # gazebo_server = ExecuteProcess(
-    #     cmd=['gzserver',
-    #          '-s', 'libgazebo_ros_init.so',
-    #          '-s', 'libgazebo_ros_factory.so',
-    #          world + '/a2.world',],
-    #     output='screen',
-    # )
-
-    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
+    use_sim_time = LaunchConfiguration("use_sim_time", default="true")
     xacro_file_name = "sjtu_drone.urdf.xacro"
     xacro_file = os.path.join(
         get_package_share_directory("sjtu_drone_description"),
@@ -62,14 +52,12 @@ def generate_launch_description():
         executable='gazebo_connect',
         name='gazebo_connect',
         parameters=[{'use_sim_time': False}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
     )
 
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        name='two_vehicle_viz',
-        # output='screen',
+        name='quiz4_viz',
         output={'both': 'log'},
         arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'quiz4.rviz')]
     )
@@ -79,7 +67,6 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
-        # namespace=model_ns,
         output="screen",
         parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
         arguments=[robot_desc]

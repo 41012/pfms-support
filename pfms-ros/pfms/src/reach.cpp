@@ -69,7 +69,7 @@ void goalsCallback(const geometry_msgs::msg::PoseArray& msg)
    dStart_ = dTravelled_;
    startTime_ = this->get_clock()->now();}
 
-void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request>,
           std::shared_ptr<std_srvs::srv::Trigger::Response>    response)
 {
 
@@ -126,10 +126,12 @@ void odoCallback(const nav_msgs::msg::Odometry& msg)
                 1000,
                 "Goal [id,d]=[" << goalIdx_ << ","<< d << "]  odo:" << dTravelled_-dStart_ ) ;
 
+            // Moved to update distance to goal here
+            goalDist_.at(goalIdx_)=d;
+
             if(d<distanceThreshold_){
                 RCLCPP_INFO_STREAM(this->get_logger(),"Reached Goal:" << goalIdx_ << " dist:"<< d);
                 goalReached_.at(goalIdx_)=true;
-                goalDist_.at(goalIdx_)=d;
                 goalIdx_++;
             }
 

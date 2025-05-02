@@ -1,4 +1,4 @@
-ARG ROS_DISTRO
+ARG ROS_DISTRO=iron
 FROM ros:${ROS_DISTRO}-ros-core-jammy
 
 RUN apt-get update \
@@ -30,9 +30,11 @@ RUN curl -L https://github.com/osrf/gazebo_models/archive/refs/heads/master.zip 
     && rm -r /tmp/gazebo_models.zip
 
 WORKDIR /ros2_ws
-RUN /bin/bash -c 'cd /ros2_ws/ \
+RUN apt-get update && \
+    /bin/bash -c 'cd /ros2_ws/ \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && rosdep install --from-paths src --ignore-src -r -y \
-    && colcon build'
+    && colcon build' && \
+    apt-get clean
 
 CMD ["/bin/bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /ros2_ws/install/setup.bash && ros2 launch sjtu_drone_bringup sjtu_drone_bringup.launch.py"]

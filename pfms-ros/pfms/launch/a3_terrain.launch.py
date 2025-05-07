@@ -72,7 +72,7 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2_project3',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_project3.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_terrain.rviz')]
     )
 
 

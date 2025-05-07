@@ -58,7 +58,7 @@ def generate_launch_description():
         name='a3_audi_rviz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_racing.rviz')]
     )
 
 

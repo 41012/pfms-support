@@ -542,49 +542,58 @@ void DroneSimpleController::UpdateDynamics(double dt){
       velocity = link->WorldLinearVel();
     }
     
-    
-    //publish the ground truth pose of the drone to the ROS topic
-    geometry_msgs::msg::Pose gt_pose;
-    gt_pose.position.x = pose.Pos().X();
-    gt_pose.position.y = pose.Pos().Y();
-    gt_pose.position.z = pose.Pos().Z();
-    
-    gt_pose.orientation.w = pose.Rot().W();
-    gt_pose.orientation.x = pose.Rot().X();
-    gt_pose.orientation.y = pose.Rot().Y();
-    gt_pose.orientation.z = pose.Rot().Z();
+    // Publish ground truth pose, velocity, and acceleration at 50Hz
+    static common::Time last_publish_time = world->SimTime();
+    common::Time current_time = world->SimTime();
+    double time_since_last_publish = (current_time - last_publish_time).Double();
 
-    nav_msgs::msg::Odometry odom;
-    odom.header.stamp = node_handle_->now();
-    odom.header.frame_id = "world"; 
-    odom.pose.pose = gt_pose;
-    odom.twist.twist.linear.x = velocity.X();
-    odom.twist.twist.linear.y = velocity.Y();
-    odom.twist.twist.linear.x = velocity.Z();
-    odom.twist.twist.angular.x = angular_velocity.X();
-    odom.twist.twist.angular.y = angular_velocity.Y();
-    odom.twist.twist.angular.z = angular_velocity.Z();
+    if (time_since_last_publish >= 0.01) { // 100Hz = 1/100 seconds = 0.01 seconds
+      last_publish_time = current_time;
 
-    pub_gt_odometry_->publish(odom);
-    
-    //convert the acceleration and velocity into the body frame
-    ignition::math::v6::Vector3 body_vel = pose.Rot().RotateVector(velocity);
-    ignition::math::v6::Vector3 body_acc = pose.Rot().RotateVector(acceleration);
-    
-    //publish the velocity
-    geometry_msgs::msg::Twist tw;
-    tw.linear.x = body_vel.X();
-    tw.linear.y = body_vel.Y();
-    tw.linear.z = body_vel.Z();
-    pub_gt_vec_->publish(tw);
-    
-    //publish the acceleration
-    tw.linear.x = body_acc.X();
-    tw.linear.y = body_acc.Y();
-    tw.linear.z = body_acc.Z();
-    pub_gt_acc_->publish(tw);
-    
-            
+      //publish the ground truth pose of the drone to the ROS topic
+      geometry_msgs::msg::Pose gt_pose;
+      gt_pose.position.x = pose.Pos().X();
+      gt_pose.position.y = pose.Pos().Y();
+      gt_pose.position.z = pose.Pos().Z();
+      
+      gt_pose.orientation.w = pose.Rot().W();
+      gt_pose.orientation.x = pose.Rot().X();
+      gt_pose.orientation.y = pose.Rot().Y();
+      gt_pose.orientation.z = pose.Rot().Z();
+
+      nav_msgs::msg::Odometry odom;
+      odom.header.stamp = node_handle_->now();
+      odom.header.frame_id = "world"; 
+      odom.pose.pose = gt_pose;
+      odom.twist.twist.linear.x = velocity.X();
+      odom.twist.twist.linear.y = velocity.Y();
+      odom.twist.twist.linear.x = velocity.Z();
+      odom.twist.twist.angular.x = angular_velocity.X();
+      odom.twist.twist.angular.y = angular_velocity.Y();
+      odom.twist.twist.angular.z = angular_velocity.Z();
+
+      //AA: look at limiting this to 100Hz
+      pub_gt_odometry_->publish(odom);
+      
+      //convert the acceleration and velocity into the body frame
+      ignition::math::v6::Vector3 body_vel = pose.Rot().RotateVector(velocity);
+      ignition::math::v6::Vector3 body_acc = pose.Rot().RotateVector(acceleration);
+      
+      //publish the velocity
+      geometry_msgs::msg::Twist tw;
+      tw.linear.x = body_vel.X();
+      tw.linear.y = body_vel.Y();
+      tw.linear.z = body_vel.Z();
+      pub_gt_vec_->publish(tw);
+      
+      //publish the acceleration
+      tw.linear.x = body_acc.X();
+      tw.linear.y = body_acc.Y();
+      tw.linear.z = body_acc.Z();
+      pub_gt_acc_->publish(tw);
+      
+    } 
+               
     ignition::math::v6::Vector3 poschange = pose.Pos() - position;
     position = pose.Pos();
     

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
-  <model name="maze1">
+  <model name="track">
     <link name="link">
       <inertial>
         <mass>1</mass>
@@ -14,18 +14,18 @@
         </inertia>
       </inertial>
       <collision name="collision">
-        <pose>-51 30 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://maze1/map.stl</uri>
+            <uri>model://track/map.stl</uri>
           </mesh>
         </geometry>
       </collision>
       <visual name="visual">
-        <pose>-51 30 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://maze1/map.stl</uri>
+            <uri>model://track/map.stl</uri>
           </mesh>
         </geometry>
       </visual>

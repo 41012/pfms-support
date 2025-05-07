@@ -70,10 +70,9 @@ def generate_launch_description():
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        name='two_vehicle_viz',
-        # output='screen',
+        name='rviz2_project3',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a2.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_project3.rviz')]
     )
 
 
@@ -114,28 +113,28 @@ def generate_launch_description():
         ]
     )
 
-    orange_audibot_options = dict(
-        robot_name = 'orange',
-        start_x = '0',
-        start_y = '2',
-        start_z = '0.2',
-        start_yaw = '0',
-        pub_tf = 'true',
-        tf_freq = '100.0',
-        blue = 'false'
-    )
+    # orange_audibot_options = dict(
+    #     robot_name = 'orange',
+    #     start_x = '0',
+    #     start_y = '2',
+    #     start_z = '0.2',
+    #     start_yaw = '0',
+    #     pub_tf = 'true',
+    #     tf_freq = '100.0',
+    #     blue = 'false'
+    # )
     
-    spawn_orange_audibot = GroupAction(
-        actions=[
-            PushRosNamespace('orange'),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
-                ]),
-                launch_arguments=orange_audibot_options.items()
-            )
-        ]
-    )
+    # spawn_orange_audibot = GroupAction(
+    #     actions=[
+    #         PushRosNamespace('orange'),
+    #         IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([
+    #                 os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
+    #             ]),
+    #             launch_arguments=orange_audibot_options.items()
+    #         )
+    #     ]
+    # )
 
 
     ld = LaunchDescription(ARGUMENTS)
@@ -147,6 +146,6 @@ def generate_launch_description():
     ld.add_action(joint_state_publisher)
     ld.add_action(sjtu_drone_bringup)
     ld.add_action(drone_reach)
-    ld.add_action(spawn_orange_audibot)
+    # ld.add_action(spawn_orange_audibot)
 
     return ld

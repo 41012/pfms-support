@@ -170,7 +170,6 @@ def generate_launch_description():
         SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
           
         gazebo_server,
-        # gzserver,
         gazebo_client,
         gazebo_connect,
         spawn_orange_audibot,

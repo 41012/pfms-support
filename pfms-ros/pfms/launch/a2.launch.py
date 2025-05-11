@@ -36,7 +36,7 @@ def generate_launch_description():
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
     )
-    mode = launch.substitutions.LaunchConfiguration('mode')
+
 
     # Gazebo server
     # gazebo_server = ExecuteProcess(
@@ -93,7 +93,8 @@ def generate_launch_description():
         name='two_vehicle_viz',
         # output='screen',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a2.rviz')]
+        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a2.rviz')],
+        condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration('mode'))
     )
 
 
@@ -159,8 +160,8 @@ def generate_launch_description():
 
         launch.actions.DeclareLaunchArgument(
           name='mode',
-          default_value='night',
-          description='day or night modes are available'),
+          default_value='true',
+          description='rviz enabled'),
 
         launch.actions.DeclareLaunchArgument(
             name='extra_gazebo_args',

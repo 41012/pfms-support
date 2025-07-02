@@ -17,6 +17,8 @@ ARGUMENTS = [
         description='The world path, by default is demo.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
+    DeclareLaunchArgument('gazebo', default_value='false',
+                          description='Whether to launch the gazebo simulator'),                          
 ]
 
 
@@ -46,7 +48,8 @@ def generate_launch_description():
         package='pfms',
         executable='gazebo_connect',
         name='gazebo_connect',
-        parameters=[{'use_sim_time': True}]
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('gazebo')),
     )
 
     orange_audibot_options = dict(
@@ -84,7 +87,8 @@ def generate_launch_description():
         package='pfms',
         executable='reach',
         name='audi_reach',
-        output='screen'
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('gui')),
     )
 
     ld = LaunchDescription(ARGUMENTS)

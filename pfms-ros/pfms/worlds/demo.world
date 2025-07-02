@@ -54,48 +54,125 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name='boxes'>
-      <pose>5 -55 0.5 0 0 0</pose>
+<!-- Replace the existing 'boxes' model with these two separate models -->
 
-      <link name='bottom'>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-        </visual>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-        </collision>
-      </link>
-      <link name='top'>
-        <pose>0 0 1.25 0 0 0</pose>
-        <self_collide>true</self_collide>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>0.5 0.5 0.5</size>
-            </box>
-          </geometry>
-        </visual>
-        <collision name='collision'>
-          <geometry>
-            <box>
-              <size>0.5 0.5 0.5</size>
-            </box>
-          </geometry>
-        </collision>
-      </link>
+<model name='box1'>
+  <pose>10 2 0.275 0 0 0</pose> <!-- Bottom box positioned at half its height -->
+  
+  <link name='box1'>
+    <visual name='visual'>
+      <geometry>
+        <box>
+          <size>0.55 0.55 0.55</size>
+        </box>
+      </geometry>
+      <material>
+        <script>
+          <name>Gazebo/Red</name>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+        </script>
+      </material>
+    </visual>
+    <collision name='collision'>
+      <geometry>
+        <box>
+          <size>0.55 0.55 0.55</size>
+        </box>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass>1.0</mass>
+      <inertia>
+        <ixx>0.050458</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.050458</iyy>
+        <iyz>0</iyz>
+        <izz>0.050458</izz>
+      </inertia>
+    </inertial>
+  </link>
+</model>
 
-    </model>
+<model name='box2'>
+  <pose>10 2 1.1 0 0 0</pose> <!-- Top box positioned above Box1 -->
+  
+  <link name='box2'>
+    <visual name='visual'>
+      <geometry>
+        <box>
+          <size>2.0 2.0 1.0</size> <!-- Made collision and visual sizes consistent -->
+        </box>
+      </geometry>
+      <material>
+        <script>
+          <name>Gazebo/Blue</name>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+        </script>
+      </material>
+    </visual>
+    <collision name='collision'>
+      <geometry>
+        <box>
+          <size>2.0 2.0 1.0</size>
+        </box>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass>1.0</mass>
+      <inertia>
+        <ixx>0.166667</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.166667</iyy>
+        <iyz>0</iyz>
+        <izz>0.166667</izz>
+      </inertia>
+    </inertial>
+  </link>
+</model> 
+
+
+<model name='box3'>
+  <pose>10 10 0.5 0 0 0</pose> <!-- Top box positioned above Box1 -->
+  
+  <link name='box3'>
+    <visual name='visual'>
+      <geometry>
+        <box>
+          <size>2.0 2.0 1.0</size> <!-- Made collision and visual sizes consistent -->
+        </box>
+      </geometry>
+      <material>
+        <script>
+          <name>Gazebo/Green</name>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+        </script>
+      </material>
+    </visual>
+    <collision name='collision'>
+      <geometry>
+        <box>
+          <size>2.0 2.0 1.0</size>
+        </box>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass>1.0</mass>
+      <inertia>
+        <ixx>0.166667</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.166667</iyy>
+        <iyz>0</iyz>
+        <izz>0.166667</izz>
+      </inertia>
+    </inertial>
+  </link>
+</model> 
 
     <model name='crash_dummy'>
-      <pose>50.0 50.0 0.5 0 -0 0</pose>
+      <pose>20.0 20.0 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -133,8 +210,8 @@
         <visual name='visual'>
           <geometry>
             <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
+              <radius>1.0</radius>
+              <length>1.0</length>
             </cylinder>
           </geometry>
           <material>

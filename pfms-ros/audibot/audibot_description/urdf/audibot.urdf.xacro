@@ -185,7 +185,7 @@
   <joint name="laser_joint" type="fixed">
     <parent link="base_link" />
     <child link="laser_link" />
-    <origin xyz="${body_depth -1.05} 0 0.1" rpy="0 0 0"/>
+    <origin xyz="${body_depth -1.05} 0 0.0" rpy="0 0 0"/>
   </joint>
   <link name="laser_link"/>
 
@@ -196,12 +196,12 @@
   </joint>
   <link name="camera_link"/>
 
-  <joint name="sonar_joint" type="fixed">
+  <joint name="sonar_front_joint" type="fixed">
     <parent link="base_link" />
-    <child link="sonar_link" />
-    <origin xyz="${body_depth -1.05} 0 0.2" rpy="0 0 0"/>
+    <child link="sonar_front_link" />
+    <origin xyz="${body_depth -1.05} 0 0.3" rpy="0 0 0"/>
   </joint>
-  <link name="sonar_link"/>
+  <link name="sonar_front_link"/>
 
 
   <xacro:rear_wheel name="rl" x="${-half_wheelbase}" y="${half_rear_track_width}" z="0" flip="1" />
@@ -239,7 +239,7 @@
   <gazebo reference="laser_link">
     <sensor type='ray' name='laser'>
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>30</update_rate>
       <always_on>true</always_on>      
       <ray>
@@ -318,24 +318,24 @@
   </gazebo>
 
   <!-- Sonar sensor -->
-  <gazebo reference="sonar_link">
-    <sensor name="sonar" type="ray">
+  <gazebo reference="sonar_front_link">
+    <sensor name="front_sonar" type="ray">
       <always_on>true</always_on>
       <visualize>true</visualize>
       <update_rate>60</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>3</samples>
+            <samples>16</samples>
             <resolution>1</resolution>
-            <min_angle>-${M_PI * 1.5/180}</min_angle>
-            <max_angle>${M_PI * 1.5/180}</max_angle>
+            <min_angle>-${M_PI * 8/180}</min_angle>
+            <max_angle>${M_PI * 8/180}</max_angle>
           </horizontal>
           <vertical>
-            <samples>3</samples>
+            <samples>1</samples>
             <resolution>1</resolution>
-            <min_angle>-${M_PI * 1.5/180}</min_angle>
-            <max_angle>${M_PI * 1.5/180}</max_angle>
+            <min_angle>-${M_PI * 0.5/180}</min_angle>
+            <max_angle>${M_PI * 0.5/180}</max_angle>
           </vertical>
         </scan>
         <range>
@@ -349,13 +349,13 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="audi_sonar" filename="libgazebo_ros_ray_sensor.so">
+      <plugin name="audi_front_sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
           <remapping>~/out:=$(arg robot_name)/sonar</remapping>
         </ros>
         <output_type>sensor_msgs/Range</output_type>
         <radiation_type>ultrasound</radiation_type>
-        <frame_name>sonar_link</frame_name>
+        <frame_name>$(arg robot_name)/sonar_front_link</frame_name>
       </plugin>
     </sensor>
   </gazebo>

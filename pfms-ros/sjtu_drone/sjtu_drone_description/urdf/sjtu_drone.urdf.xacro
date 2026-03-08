@@ -2,6 +2,8 @@
 <robot name="sjtu_drone"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <!-- namespace property (husky-style gazebo syntax uses a namespace property) -->
+  <xacro:property name="robot_namespace" value="sjtu_drone"/>
   <link name="base_link">
     <inertial>
       <mass value="1.477"/>
@@ -57,7 +59,9 @@
   <gazebo>
     <plugin name='simple_drone' filename='libplugin_drone.so'>
       <bodyName>base_link</bodyName>
-      <rosNamespace>drone</rosNamespace>
+      <ros>
+        <namespace>/${robot_namespace}</namespace>
+      </ros>
       <imuTopic>imu</imuTopic>
       <rollpitchProportionalGain>10.0</rollpitchProportionalGain>
       <rollpitchDifferentialGain>5.0</rollpitchDifferentialGain>
@@ -96,6 +100,9 @@
       <update_rate> 100 </update_rate>
       <pose> 0 0 0 0 0 0 </pose>
       <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
+        <ros>
+          <namespace>/${robot_namespace}</namespace>
+        </ros>
         <initial_orientation_as_reference>false</initial_orientation_as_reference>
       </plugin>
       <imu>
@@ -149,6 +156,7 @@
       </ray>
       <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
         <ros>
+          <namespace>/${robot_namespace}</namespace>
           <remapping>~/out:=sonar</remapping>
         </ros>
         <output_type>sensor_msgs/Range</output_type>
@@ -182,6 +190,7 @@
       <visualize>true</visualize>
       <plugin name="camera_front" filename="libgazebo_ros_camera.so">
         <ros>
+          <namespace>/${robot_namespace}</namespace>
           <remapping>image_raw:=camera_front</remapping>
           <remapping>camera_info:=camera_front_info</remapping>
         </ros>
@@ -218,6 +227,7 @@
       <visualize>true</visualize>
       <plugin name="camera_bottom" filename="libgazebo_ros_camera.so">
         <ros>
+          <namespace>/${robot_namespace}</namespace>
           <remapping>image_raw:=camera_bottom</remapping>
           <remapping>camera_info:=camera_bottom_info</remapping>
         </ros>
@@ -251,7 +261,7 @@
       </gps>
       <plugin name="gps" filename="libgazebo_ros_gps_sensor.so">
         <ros>
-          <namespace>/gps</namespace>
+          <namespace>/${robot_namespace}</namespace>
           <remapping>~/out:=data</remapping>
         </ros>
       </plugin>
@@ -284,9 +294,9 @@
             <stddev>0.01</stddev>
           </noise>
         </ray>
-        <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
+          <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-            <namespace>/sjtu_drone</namespace>
+            <namespace>/${robot_namespace}</namespace>
             <remapping>~/out:=laserscan</remapping>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>

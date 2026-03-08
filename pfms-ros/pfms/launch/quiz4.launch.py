@@ -103,7 +103,7 @@ def generate_launch_description():
     ld = launch.LaunchDescription([
         launch.actions.DeclareLaunchArgument(
           'world',
-          default_value=[PythonExpression(['"',world,'" + "/demo.world"']),''],
+          default_value=[PythonExpression(['"',world,'" + "/a1.world"']),''],
           description='SDF world file'),
 
         launch.actions.DeclareLaunchArgument(

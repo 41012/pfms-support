@@ -15,9 +15,20 @@
 #ifndef PLUGIN_DRONE_H
 #define PLUGIN_DRONE_H
 
-#include "gazebo/gazebo.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/common/Events.hh"
+#include <gz/sim/System.hh>
+#include <gz/sim/Model.hh>
+#include <gz/sim/Link.hh>
+#include <gz/sim/Util.hh>
+#include <gz/plugin/Register.hh>
+#include <gz/sim/components/Pose.hh>
+#include <gz/sim/components/LinearVelocity.hh>
+#include <gz/sim/components/AngularVelocity.hh>
+#include <gz/sim/components/LinearAcceleration.hh>
+#include <gz/sim/components/Inertial.hh>
+#include <gz/sim/components/ExternalWorldWrenchCmd.hh>
+#include <gz/math/Pose3.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/common/Time.hh>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
@@ -42,19 +53,33 @@
 
 using namespace std::placeholders;
 
-namespace gazebo
+namespace gz
 {
-class DroneSimpleController : public ModelPlugin
+namespace sim
+{
+namespace systems
+{
+class DroneSimpleController : public System,
+                                public ISystemConfigure,
+                                public ISystemPreUpdate
 {
 public:
   DroneSimpleController();
   virtual ~DroneSimpleController();
 
+public:
+  void Configure(const Entity &_entity,
+                 const std::shared_ptr<const sdf::Element> &_sdf,
+                 EntityComponentManager &_ecm,
+                 EventManager &_eventMgr) override;
+
+  void PreUpdate(const UpdateInfo &_info,
+                 EntityComponentManager &_ecm) override;
+
 protected:
-  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-  virtual void LoadControllerSettings(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-  virtual void Update();
-  void UpdateDynamics(double dt);
+  virtual void LoadControllerSettings(const std::shared_ptr<const sdf::Element> &_sdf);
+  virtual void Update(const UpdateInfo &_info, EntityComponentManager &_ecm);
+  void UpdateDynamics(double dt, EntityComponentManager &_ecm);
   void UpdateState(double dt);
   virtual void Reset();
 
@@ -65,11 +90,11 @@ private:
   bool m_velMode;
   unsigned int navi_state;
 
-  /// \brief The parent World
-  physics::WorldPtr world;
+  /// \brief Model entity
+  Model model;
 
-  /// \brief The link referred to by this plugin
-  physics::LinkPtr link;
+  /// \brief Link entity
+  Entity link;
 
   std::shared_ptr<rclcpp::executors::MultiThreadedExecutor> executor_;
   std::shared_ptr<rclcpp::Node> node_handle_;
@@ -105,9 +130,9 @@ private:
   void SwitchModeCallback(const std_msgs::msg::Bool::SharedPtr msg);
 
   rclcpp::Time state_stamp_;
-  ignition::math::v6::Pose3<double> pose;
-  ignition::math::v6::Vector3<double> euler;
-  ignition::math::v6::Vector3<double> velocity, acceleration, angular_velocity, position;
+  gz::math::Pose3d pose;
+  gz::math::Vector3d euler;
+  gz::math::Vector3d velocity, acceleration, angular_velocity, position;
 
   std::string link_name_;
   std::string model_name_;
@@ -139,16 +164,15 @@ private:
     PIDController pos_z;
   } controllers_;
 
-  ignition::math::v6::Vector3<double> inertia;
+  gz::math::Vector3d inertia;
   double mass;
 
   /// \brief save last_time
-  common::Time last_time;
-
-  // Pointer to the update event connection
-  event::ConnectionPtr updateConnection;
+  std::chrono::steady_clock::duration last_sim_time;
 };
 
+}
+}
 }
 
 #endif // PLUGIN_DRONE_HPP

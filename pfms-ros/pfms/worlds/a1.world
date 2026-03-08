@@ -1,58 +1,33 @@
 <?xml version="1.0"?>
-<!--
-  Gazebo ROS state plugin demo
-
-  Try for example to get a model's state w.r.t. the world:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "boxes"}'
-
-  Or a link's state w.r.t. the world:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "boxes::bottom", reference_frame: "world"}'
-
-  Or a light's state w.r.t. another entity:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "sun", reference_frame: "ground_plane"}'
-
-  > When setting state, note that the changes for static entities may not be visible on gzclient due to https://bitbucket.org/osrf/gazebo/issues/2560
-
-  Try teleporting a model:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "boxes", pose: {position: {y: 2}}}}'
-
-  Or rotating a light:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "sun", pose: {position: {z: 10}, orientation: {x: 0.1, y: 0.2, z: 0.3, w: 0.5}}}}'
-
-  Try teleporting a model:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "boxes::top", reference_frame: "boxes::top", twist: {angular: {x: 2}}}}'
-
-  Try listening to model states:
-
-      ros2 topic echo /demo/model_states_demo
-
-  Try listening to link states:
-
-      ros2 topic echo /demo/link_states_demo
--->
-<sdf version="1.6">
+<sdf version="1.9">
   <world name="default">
-    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
-      <ros>
-        <namespace>/demo</namespace>
-        <remapping>model_states:=model_states_demo</remapping>
-        <remapping>link_states:=link_states_demo</remapping>
-      </ros>
-      <update_rate>10.0</update_rate>
-    </plugin>
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
 
     <include>
-      <uri>model://ground_plane</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
     </include>
-    <include>
-      <uri>model://sun</uri>
-    </include>
+    
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
 
 <!-- Replace the existing 'boxes' model with these two separate models -->
 
@@ -67,10 +42,9 @@
         </box>
       </geometry>
       <material>
-        <script>
-          <name>Gazebo/Red</name>
-          <uri>file://media/materials/scripts/gazebo.material</uri>
-        </script>
+        <ambient>1 0 0 1</ambient>
+        <diffuse>1 0 0 1</diffuse>
+        <specular>1 0 0 1</specular>
       </material>
     </visual>
     <collision name='collision'>
@@ -105,10 +79,9 @@
         </box>
       </geometry>
       <material>
-        <script>
-          <name>Gazebo/Blue</name>
-          <uri>file://media/materials/scripts/gazebo.material</uri>
-        </script>
+        <ambient>0 0 1 1</ambient>
+        <diffuse>0 0 1 1</diffuse>
+        <specular>0 0 1 1</specular>
       </material>
     </visual>
     <collision name='collision'>
@@ -144,10 +117,9 @@
         </box>
       </geometry>
       <material>
-        <script>
-          <name>Gazebo/Green</name>
-          <uri>file://media/materials/scripts/gazebo.material</uri>
-        </script>
+        <ambient>0 1 0 1</ambient>
+        <diffuse>0 1 0 1</diffuse>
+        <specular>0 1 0 1</specular>
       </material>
     </visual>
     <collision name='collision'>
@@ -193,19 +165,6 @@
               <length>1</length>
             </cylinder>
           </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
         </collision>
         <visual name='visual'>
           <geometry>
@@ -215,25 +174,35 @@
             </cylinder>
           </geometry>
           <material>
-            <script>
-              <name>Gazebo/Grey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
           </material>
         </visual>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
     </model>
 
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
-        <pose>-30.7614 1.32089 33.8068 0 0.655644 0.025013</pose>
-        <view_controller>orbit</view_controller>
-        <projection_type>perspective</projection_type>
-      </camera>
-    </gui>
+    <!-- <model name="audibot">
+      <self_collide>false</self_collide>
+      <pose>0 0 0 0 0 0</pose>
+      <include merge="true">
+        <uri>package://audibot_description/models/orange_audibot</uri>
+        <experimental:params>
+          <sensor element_id="base_footprint::navsat_sensor" action="modify">
+            <update_rate>5</update_rate>
+            <topic>audibot/navsat</topic>
+          </sensor>
+          <sensor element_id="chassis::imu_sensor" action="modify">
+            <update_rate>100</update_rate>
+            <topic>audibot/imu</topic>
+          </sensor>
+          <sensor element_id="camera::camera_sensor" action="modify">
+            <update_rate>30</update_rate>
+            <topic>audibot/image_raw</topic>
+          </sensor>
+        </experimental:params>
+      </include>
+    </model> -->
 
   </world>
 </sdf>

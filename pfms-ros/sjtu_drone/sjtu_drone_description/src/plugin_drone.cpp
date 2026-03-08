@@ -18,9 +18,11 @@
 #include <cmath>
 #include <stdlib.h>
 #include <iostream>
-#include <gazebo_ros/conversions/builtin_interfaces.hpp>
+#include <gz/sim/components/Name.hh>
 
-namespace gazebo {
+namespace gz {
+namespace sim {
+namespace systems {
 
 DroneSimpleController::DroneSimpleController()
 { 
@@ -33,24 +35,31 @@ DroneSimpleController::DroneSimpleController()
 // Destructor
 DroneSimpleController::~DroneSimpleController()
 {
-  this->updateConnection.reset();
+  // Cleanup handled by System lifecycle
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the controller
-void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+// Configure the controller
+void DroneSimpleController::Configure(const Entity &_entity,
+                 const std::shared_ptr<const sdf::Element> &_sdf,
+                 EntityComponentManager &_ecm,
+                 EventManager &/*_eventMgr*/)
 {
-
   if(!rclcpp::ok()){
-    RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "A ROS node for Gazebo has not been initialized, unable to load plugin. Load the Gazebo system plugin 'libgazebo_ros_init.so' in the gazebo_ros package");
+    RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "A ROS node for Gazebo has not been initialized, unable to load plugin.");
+    return;
   }
 
-  
-  world = _model->GetWorld();
+  this->model = gz::sim::Model(_entity);
+  if (!this->model.Valid(_ecm)) {
+    ignerr << "DroneSimpleController plugin should be attached to a model entity\n";
+    return;
+  }
+
   RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "The drone plugin is loading!");
   
   //default parameters
-  model_name_ = _model->GetName().substr(0, _model->GetName().find("::"));
+  model_name_ = this->model.Name(_ecm);
   cmd_normal_topic_ = "cmd_vel";
   imu_topic_ = "imu";
   takeoff_topic_ = "takeoff";
@@ -65,40 +74,28 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   
   if (!_sdf->HasElement("bodyName"))
   {
-    link = _model->GetLink();
-    link_name_ = link->GetName();
+    // Get canonical link
+    this->link = this->model.CanonicalLink(_ecm);
+    auto linkName = _ecm.Component<components::Name>(this->link);
+    if (linkName) {
+      link_name_ = linkName->Data();
+    }
   }
   else {
-    link_name_ = _sdf->GetElement("bodyName")->Get<std::string>();
-    link = boost::dynamic_pointer_cast<physics::Link>(world->EntityByName(link_name_));
+    link_name_ = _sdf->Get<std::string>("bodyName");
+    this->link = this->model.LinkByName(_ecm, link_name_);
   }
 
-  if (!link)
+  if (!this->link || this->link == kNullEntity)
   {
-    RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "gazebo_ros_baro plugin error: bodyName: %s does not exist\n", link_name_.c_str());
+    RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "DroneSimpleController plugin error: bodyName: %s does not exist\n", link_name_.c_str());
     return;
   }
 
-  if (!_sdf->HasElement("maxForce"))
-    max_force_ = -1;
-  else
-    max_force_ = _sdf->GetElement("maxForce")->Get<double>();
-
-
-  if (!_sdf->HasElement("motionSmallNoise"))
-    motion_small_noise_ = 0;
-  else
-    motion_small_noise_ = _sdf->GetElement("motionSmallNoise")->Get<double>();
-
-  if (!_sdf->HasElement("motionDriftNoise"))
-    motion_drift_noise_ = 0;
-  else
-    motion_drift_noise_ = _sdf->GetElement("motionDriftNoise")->Get<double>();
-
-  if (!_sdf->HasElement("motionDriftNoiseTime"))
-    motion_drift_noise_time_ = 1.0;
-  else
-    motion_drift_noise_time_ = _sdf->GetElement("motionDriftNoiseTime")->Get<double>();
+  max_force_ = _sdf->Get<double>("maxForce", -1.0).first;
+  motion_small_noise_ = _sdf->Get<double>("motionSmallNoise", 0.0).first;
+  motion_drift_noise_ = _sdf->Get<double>("motionDriftNoise", 0.0).first;
+  motion_drift_noise_time_ = _sdf->Get<double>("motionDriftNoiseTime", 1.0).first;
 
   RCLCPP_INFO_STREAM(rclcpp::get_logger("DroneSimpleController"), "Using following parameters: \n" <<
                       "\t\tlink_name: "<<  link_name_.c_str() << ",\n" <<
@@ -109,8 +106,16 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                     );
 
   // get inertia and mass of quadrotor body
-  inertia = link->GetInertial()->PrincipalMoments();
-  mass = link->GetInertial()->Mass();
+  auto inertialComp = _ecm.Component<components::Inertial>(this->link);
+  if (!inertialComp) {
+    _ecm.CreateComponent(this->link, components::Inertial());
+    return;
+  }
+  auto inertial_data = inertialComp->Data();
+  // Get principal moments (diagonal elements of the inertia matrix)
+  auto moi = inertial_data.Moi();
+  inertia = gz::math::Vector3d(moi(0, 0), moi(1, 1), moi(2, 2));
+  mass = inertial_data.MassMatrix().Mass();
 
   node_handle_ = std::make_shared<rclcpp::Node>("control", model_name_);
   executor_ = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
@@ -304,24 +309,28 @@ void DroneSimpleController::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   
 
-  LoadControllerSettings(_model, _sdf);
+  LoadControllerSettings(_sdf);
   
   Reset();
 
   executor_->add_node(node_handle_);
-  updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&DroneSimpleController::Update, this));
+
+  // Create components needed for updates
+  _ecm.CreateComponent(this->link, components::WorldPose());
+  _ecm.CreateComponent(this->link, components::WorldLinearVelocity());
+  _ecm.CreateComponent(this->link, components::WorldAngularVelocity());
+  _ecm.CreateComponent(this->link, components::WorldLinearAcceleration());
+  _ecm.CreateComponent(this->link, components::ExternalWorldWrenchCmd());
 
   RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "The drone plugin finished loading!");
 }
 
 /**
- * @brief Initiliaze the PID params
+ * @brief Initialize the PID params
  * 
- * @param _model shared pointer to the model object
  * @param _sdf shared pointer to the sdf object
  */
-void DroneSimpleController::LoadControllerSettings(physics::ModelPtr _model, sdf::ElementPtr _sdf){
+void DroneSimpleController::LoadControllerSettings(const std::shared_ptr<const sdf::Element> &_sdf){
     controllers_.roll.Load(_sdf, "rollpitch");
     controllers_.pitch.Load(_sdf, "rollpitch");
     controllers_.yaw.Load(_sdf, "yaw");
@@ -345,6 +354,36 @@ void DroneSimpleController::LoadControllerSettings(physics::ModelPtr _model, sdf
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// PreUpdate - called every simulation iteration
+void DroneSimpleController::PreUpdate(const UpdateInfo &_info,
+                 EntityComponentManager &_ecm)
+{
+  // Skip if paused
+  if (_info.paused)
+    return;
+
+  // Get time
+  std::chrono::steady_clock::duration current_sim_time = _info.simTime;
+  double dt = std::chrono::duration<double>(current_sim_time - last_sim_time).count();
+  if (dt == 0.0) {
+    last_sim_time = current_sim_time;
+    return;
+  }
+    
+  executor_->spin_some(std::chrono::milliseconds(10));
+  UpdateState(dt);
+  UpdateDynamics(dt, _ecm);
+
+  if (tf_timer_count_++ >= tf_timer_thres_) {
+    tf_timer_count_ = 0;
+    tfTimerCallback();
+  }
+    
+  // save last time stamp
+  last_sim_time = current_sim_time;   
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Callbacks
 /**
 * @brief Callback function for the drone command topic.
@@ -364,15 +403,15 @@ void DroneSimpleController::CmdCallback(const geometry_msgs::msg::Twist::SharedP
 {
   cmd_val = *cmd;
 
-
-  static common::Time last_sim_time = world->SimTime();
+  static auto last_cmd_time = std::chrono::steady_clock::now();
   static double time_counter_for_drift_noise = 0;
   static double drift_noise[4] = {0.0, 0.0, 0.0, 0.0};
-  // Get simulator time
-  common::Time cur_sim_time = world->SimTime();
-  double dt = (cur_sim_time - last_sim_time).Double();
+  
+  // Get current time
+  auto cur_cmd_time = std::chrono::steady_clock::now();
+  double dt = std::chrono::duration<double>(cur_cmd_time - last_cmd_time).count();
   // save last time stamp
-  last_sim_time = cur_sim_time;
+  last_cmd_time = cur_cmd_time;
 
   // generate noise
   if(time_counter_for_drift_noise > motion_drift_noise_time_)
@@ -410,10 +449,10 @@ void DroneSimpleController::PosCtrlCallback(const std_msgs::msg::Bool::SharedPtr
 */
 void DroneSimpleController::ImuCallback(const sensor_msgs::msg::Imu::SharedPtr imu)
 {
-  //directly read the quternion from the IMU data
+  //directly read the quaternion from the IMU data
   pose.Rot().Set(imu->orientation.w, imu->orientation.x, imu->orientation.y, imu->orientation.z);
   euler = pose.Rot().Euler();
-  angular_velocity = pose.Rot().RotateVector(ignition::math::v6::Vector3(imu->angular_velocity.x, imu->angular_velocity.y, imu->angular_velocity.z));
+  angular_velocity = pose.Rot().RotateVector(gz::math::Vector3d(imu->angular_velocity.x, imu->angular_velocity.y, imu->angular_velocity.z));
 }
 
 /**
@@ -422,6 +461,7 @@ void DroneSimpleController::ImuCallback(const sensor_msgs::msg::Imu::SharedPtr i
 */
 void DroneSimpleController::TakeoffCallback(const std_msgs::msg::Empty::SharedPtr msg)
 {
+  (void)msg;
   if(navi_state == LANDED_MODEL)
   {
     navi_state = TAKINGOFF_MODEL;
@@ -436,6 +476,7 @@ void DroneSimpleController::TakeoffCallback(const std_msgs::msg::Empty::SharedPt
 */
 void DroneSimpleController::LandCallback(const std_msgs::msg::Empty::SharedPtr msg)
 {
+  (void)msg;
   if(navi_state == FLYING_MODEL||navi_state == TAKINGOFF_MODEL)
   {
     navi_state = LANDING_MODEL;
@@ -451,6 +492,7 @@ void DroneSimpleController::LandCallback(const std_msgs::msg::Empty::SharedPtr m
 */
 void DroneSimpleController::ResetCallback(const std_msgs::msg::Empty::SharedPtr msg)
 {
+  (void)msg;
   RCLCPP_INFO(rclcpp::get_logger("DroneSimpleController"), "Reset quadrotor!!");
   Reset();
 }
@@ -465,31 +507,6 @@ void DroneSimpleController::ResetCallback(const std_msgs::msg::Empty::SharedPtr 
 void DroneSimpleController::SwitchModeCallback(const std_msgs::msg::Bool::SharedPtr msg)
 {
     m_velMode = msg->data;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Update the controller
-/**
-* @brief Update method called by the Gazebo simulator every simulation iteration.
-*/
-void DroneSimpleController::Update()
-{ 
-    // Get simulator time
-    common::Time sim_time = world->SimTime();
-    double dt = (sim_time - last_time).Double();
-    if (dt == 0.0) return;
-    
-    executor_->spin_some(std::chrono::milliseconds(100));
-    UpdateState(dt);
-    UpdateDynamics(dt);
-
-    if (tf_timer_count_++ >= tf_timer_thres_) {
-      tf_timer_count_ = 0;
-      tfTimerCallback();
-    }
-    
-    // save last time stamp
-    last_time = sim_time;   
 }
 
 /**
@@ -526,26 +543,32 @@ void DroneSimpleController::UpdateState(double dt){
 * 
 * @param dt The time step to use for the update.
 */
-void DroneSimpleController::UpdateDynamics(double dt){
-  ignition::math::v6::Vector3<double> force, torque;
+void DroneSimpleController::UpdateDynamics(double dt, EntityComponentManager &_ecm){
+  gz::math::Vector3d force, torque;
    
-  // Get Pose/Orientation from Gazebo (if no state subscriber is active)
-  //  if (imu_subscriber_.getTopic()=="")
-    {
-      pose = link->WorldPose();
-      angular_velocity = link->WorldAngularVel();
-      euler = pose.Rot().Euler();
-    }
-   // if (state_topic_.empty())
-    {
-      acceleration = (link->WorldLinearVel() - velocity) / dt;
-      velocity = link->WorldLinearVel();
-    }
+  // Get Pose/Orientation from Gazebo using ECS components
+  auto poseComp = _ecm.Component<components::WorldPose>(this->link);
+  if (poseComp) {
+    pose = poseComp->Data();
+    euler = pose.Rot().Euler();
+  }
+  
+  auto angVelComp = _ecm.Component<components::WorldAngularVelocity>(this->link);
+  if (angVelComp) {
+    angular_velocity = angVelComp->Data();
+  }
+  
+  auto linVelComp = _ecm.Component<components::WorldLinearVelocity>(this->link);
+  if (linVelComp) {
+    auto new_velocity = linVelComp->Data();
+    acceleration = (new_velocity - velocity) / dt;
+    velocity = new_velocity;
+  }
     
-    // Publish ground truth pose, velocity, and acceleration at 50Hz
-    static common::Time last_publish_time = world->SimTime();
-    common::Time current_time = world->SimTime();
-    double time_since_last_publish = (current_time - last_publish_time).Double();
+  // Publish ground truth pose, velocity, and acceleration at 100Hz
+  static auto last_publish_time = std::chrono::steady_clock::now();
+  auto current_time = std::chrono::steady_clock::now();
+  double time_since_last_publish = std::chrono::duration<double>(current_time - last_publish_time).count();
 
     if (time_since_last_publish >= 0.01) { // 100Hz = 1/100 seconds = 0.01 seconds
       last_publish_time = current_time;
@@ -567,7 +590,7 @@ void DroneSimpleController::UpdateDynamics(double dt){
       odom.pose.pose = gt_pose;
       odom.twist.twist.linear.x = velocity.X();
       odom.twist.twist.linear.y = velocity.Y();
-      odom.twist.twist.linear.x = velocity.Z();
+      odom.twist.twist.linear.z = velocity.Z();
       odom.twist.twist.angular.x = angular_velocity.X();
       odom.twist.twist.angular.y = angular_velocity.Y();
       odom.twist.twist.angular.z = angular_velocity.Z();
@@ -576,8 +599,8 @@ void DroneSimpleController::UpdateDynamics(double dt){
       pub_gt_odometry_->publish(odom);
       
       //convert the acceleration and velocity into the body frame
-      ignition::math::v6::Vector3 body_vel = pose.Rot().RotateVector(velocity);
-      ignition::math::v6::Vector3 body_acc = pose.Rot().RotateVector(acceleration);
+      gz::math::Vector3d body_vel = pose.Rot().RotateVector(velocity);
+      gz::math::Vector3d body_acc = pose.Rot().RotateVector(acceleration);
       
       //publish the velocity
       geometry_msgs::msg::Twist tw;
@@ -594,20 +617,21 @@ void DroneSimpleController::UpdateDynamics(double dt){
       
     } 
                
-    ignition::math::v6::Vector3 poschange = pose.Pos() - position;
+    gz::math::Vector3d poschange = pose.Pos() - position;
     position = pose.Pos();
     
   
-    // Get gravity
-    ignition::math::v6::Vector3 gravity_body = pose.Rot().RotateVector(world->Gravity());
+    // Get gravity (hardcoded for Ignition)
+    gz::math::Vector3d world_gravity(0.0, 0.0, -9.81);
+    gz::math::Vector3d gravity_body = pose.Rot().RotateVector(world_gravity);
     double gravity = gravity_body.Length();
-    double load_factor = gravity * gravity / world->Gravity().Dot(gravity_body);  // Get gravity
+    double load_factor = gravity * gravity / world_gravity.Dot(gravity_body);
   
     // Rotate vectors to coordinate frames relevant for control
-    ignition::math::v6::Quaternion heading_quaternion(cos(euler[2]/2), 0.0, 0.0, sin(euler[2]/2));
-    ignition::math::v6::Vector3 velocity_xy = heading_quaternion.RotateVectorReverse(velocity);
-    ignition::math::v6::Vector3 acceleration_xy = heading_quaternion.RotateVectorReverse(acceleration);
-    ignition::math::v6::Vector3 angular_velocity_body = pose.Rot().RotateVectorReverse(angular_velocity);
+    gz::math::Quaterniond heading_quaternion(cos(euler[2]/2), 0.0, 0.0, sin(euler[2]/2));
+    gz::math::Vector3d velocity_xy = heading_quaternion.RotateVectorReverse(velocity);
+    gz::math::Vector3d acceleration_xy = heading_quaternion.RotateVectorReverse(acceleration);
+    gz::math::Vector3d angular_velocity_body = pose.Rot().RotateVectorReverse(angular_velocity);
   
     // update controllers
     force.Set(0.0, 0.0, 0.0);
@@ -620,7 +644,7 @@ void DroneSimpleController::UpdateDynamics(double dt){
             double vy = controllers_.pos_y.update(cmd_val.linear.y, position[1], poschange[1], dt);
             double vz = controllers_.pos_z.update(cmd_val.linear.z, position[2], poschange[2], dt);
 
-            ignition::math::v6::Vector3 vb = heading_quaternion.RotateVectorReverse(ignition::math::v6::Vector3(vx,vy,vz));
+            gz::math::Vector3d vb = heading_quaternion.RotateVectorReverse(gz::math::Vector3d(vx,vy,vz));
             
             double pitch_command =  controllers_.velocity_x.update(vb[0], velocity_xy[0], acceleration_xy[0], dt) / gravity;
             double roll_command  = -controllers_.velocity_y.update(vb[1], velocity_xy[1], acceleration_xy[1], dt) / gravity;
@@ -660,26 +684,33 @@ void DroneSimpleController::UpdateDynamics(double dt){
     
     
   
-    // process robot state information
+    // Apply forces and torques using ECS components
+    gz::msgs::Wrench wrenchMsg;
+    
     if(navi_state == LANDED_MODEL)
     {
-  
+      // No forces when landed
+      gz::msgs::Set(wrenchMsg.mutable_force(), gz::math::Vector3d::Zero);
+      gz::msgs::Set(wrenchMsg.mutable_torque(), gz::math::Vector3d::Zero);
     }
     else if(navi_state == FLYING_MODEL)
     {
-      link->AddRelativeForce(force);
-      link->AddRelativeTorque(torque);
+      // Convert from relative to world frame
+      gz::msgs::Set(wrenchMsg.mutable_force(), pose.Rot().RotateVector(force));
+      gz::msgs::Set(wrenchMsg.mutable_torque(), pose.Rot().RotateVector(torque));
     }
     else if(navi_state == TAKINGOFF_MODEL)
     {
-      link->AddRelativeForce(force*1.5);
-      link->AddRelativeTorque(torque*1.5);
+      gz::msgs::Set(wrenchMsg.mutable_force(), pose.Rot().RotateVector(force * 1.5));
+      gz::msgs::Set(wrenchMsg.mutable_torque(), pose.Rot().RotateVector(torque * 1.5));
     }
     else if(navi_state == LANDING_MODEL)
     {
-      link->AddRelativeForce(force*0.8);
-      link->AddRelativeTorque(torque*0.8);
+      gz::msgs::Set(wrenchMsg.mutable_force(), pose.Rot().RotateVector(force * 0.8));
+      gz::msgs::Set(wrenchMsg.mutable_torque(), pose.Rot().RotateVector(torque * 0.8));
     }
+    
+    _ecm.SetComponentData<components::ExternalWorldWrenchCmd>(this->link, wrenchMsg);
    
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -698,26 +729,22 @@ void DroneSimpleController::Reset()
   controllers_.velocity_y.reset();
   controllers_.velocity_z.reset();
 
-  // Set the force and torque acting on the drone to zero
-  link->SetForce(ignition::math::Vector3(0.0, 0.0, 0.0));
-  link->SetTorque(ignition::math::v6::Vector3(0.0, 0.0, 0.0));
-
   // Reset the state of the drone
   pose.Reset();
-  velocity.Set();
-  angular_velocity.Set();
-  acceleration.Set();
-  euler.Set();
+  velocity = gz::math::Vector3d::Zero;
+  angular_velocity = gz::math::Vector3d::Zero;
+  acceleration = gz::math::Vector3d::Zero;
+  euler = gz::math::Vector3d::Zero;
   state_stamp_ = rclcpp::Time();
-
+  navi_state = LANDED_MODEL;
+  m_timeAfterCmd = 0;
 }
 
 void DroneSimpleController::tfTimerCallback() {
-  auto current_ros_time = gazebo_ros::Convert<builtin_interfaces::msg::Time>(last_time);
   geometry_msgs::msg::TransformStamped t;
   t.header.frame_id = "world";
   t.child_frame_id = frame_id_;
-  t.header.stamp = current_ros_time;
+  t.header.stamp = node_handle_->now();
   t.transform.translation.x = pose.Pos().X();
   t.transform.translation.y = pose.Pos().Y();
   t.transform.translation.z = pose.Pos().Z();
@@ -730,6 +757,14 @@ void DroneSimpleController::tfTimerCallback() {
 
 
 // Register this plugin with the simulator
-GZ_REGISTER_MODEL_PLUGIN(DroneSimpleController)
+IGNITION_ADD_PLUGIN(
+    gz::sim::systems::DroneSimpleController,
+    gz::sim::System,
+    gz::sim::systems::DroneSimpleController::ISystemConfigure,
+    gz::sim::systems::DroneSimpleController::ISystemPreUpdate)
+IGNITION_ADD_PLUGIN_ALIAS(gz::sim::systems::DroneSimpleController,
+                          "ignition::gazebo::systems::DroneSimpleController")
 
-} // namespace gazebo
+} // namespace systems
+} // namespace sim
+} // namespace gz

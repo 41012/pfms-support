@@ -18,14 +18,14 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
-find_package(gazebo_msgs REQUIRED)
+find_package(ros_gz_interfaces REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
 #Create executables
 add_executable(gazebo_connect src/gazebo_connect.cpp)
-ament_target_dependencies(gazebo_connect rclcpp gazebo_msgs nav_msgs tf2 tf2_geometry_msgs tf2_ros)
+ament_target_dependencies(gazebo_connect rclcpp ros_gz_interfaces nav_msgs tf2 tf2_geometry_msgs tf2_ros)
 
 add_executable(reach src/reach.cpp)
 ament_target_dependencies(reach rclcpp std_srvs geometry_msgs nav_msgs)
@@ -38,11 +38,18 @@ install(TARGETS
 
 install(
   DIRECTORY
+    config
     launch
     models
     rviz
     worlds
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS
+    scripts/pose_to_tf.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()

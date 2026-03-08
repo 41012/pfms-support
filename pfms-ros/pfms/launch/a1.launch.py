@@ -1,187 +1,245 @@
 import os
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler
-from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
-
-from launch_ros.substitutions import FindPackageShare
-from launch.actions import IncludeLaunchDescription, GroupAction
-from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node, PushRosNamespace
+import subprocess
 from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
+                             OpaqueFunction, GroupAction)
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node, PushRosNamespace
 
-ARGUMENTS = [
-    DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("pfms"), "worlds", "demo.world"]),
-        description='The world path, by default is demo.world'),
-    DeclareLaunchArgument('gui', default_value='false',
-                          description='Whether to launch the GUI'),
-]
+
+def launch_setup(context):
+    # Package directories
+    pfms_dir = get_package_share_directory('pfms')
+    audibot_gazebo_dir = get_package_share_directory('audibot_gazebo')
+    audibot_description_dir = get_package_share_directory('audibot_description')
+    husky_gazebo_dir = get_package_share_directory('husky_gazebo')
+
+    # -------------------------------------------------------
+    # Gazebo Simulation (Ignition Harmonic)
+    # -------------------------------------------------------
+    world_file = os.path.join(pfms_dir, 'worlds', 'a1.world')
+
+    start_paused_str = LaunchConfiguration('start_paused').perform(context)
+    gui_str = LaunchConfiguration('gui').perform(context)
+    
+    # Build Gazebo arguments: add -s flag for headless mode when gui=false
+    gz_args = world_file
+    if gui_str.lower() != 'true':
+        gz_args += ' -s'  # Server only (headless)
+    if start_paused_str.lower() != 'true':
+        gz_args += ' -r'  # Run on start
+
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_ign_gazebo'),
+                         'launch', 'ign_gazebo.launch.py')),
+        launch_arguments={'ign_args': gz_args}.items()
+    )
+
+    # -------------------------------------------------------
+    # Clock Bridge (Global - single clock publisher)
+    # -------------------------------------------------------
+    clock_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='clock_bridge',
+        parameters=[{
+            'config_file': os.path.join(pfms_dir, 'config', 'clock_bridge.yaml'),
+        }],
+        output='screen'
+    )
+
+    # -------------------------------------------------------
+    # World Control Bridge (Global)
+    # -------------------------------------------------------
+    world_control_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='world_control_bridge',
+        parameters=[{
+            'config_file': os.path.join(pfms_dir, 'config', 'world_control_bridge.yaml'),
+            'use_sim_time': True,
+        }],
+        output='screen'
+    )
+
+    # -------------------------------------------------------
+    # Orange Audibot
+    # -------------------------------------------------------
+    orange_sdf_file = os.path.join(
+        audibot_description_dir, 'models', 'orange_audibot', 'model.sdf')
+    with open(orange_sdf_file, 'r') as f:
+        orange_robot_desc = f.read()
+
+    bridge_config_orange = os.path.join(
+        audibot_gazebo_dir, 'config', 'ros_gz_bridge_orange.yaml')
+
+    # Spawn the orange audibot into the world at runtime (it is not embedded in a1.world)
+    spawn_orange_audibot = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_orange_audibot',
+        arguments=['-file', orange_sdf_file, '-x', '-3', '-y', '1.5', '-z', '0'],
+        output='screen'
+    )
+
+    orange_group = GroupAction([
+        PushRosNamespace('orange'),
+        Node(
+            package='ros_ign_bridge',
+            executable='parameter_bridge',
+            name='orange_bridge',
+            parameters=[{
+                'config_file': bridge_config_orange,
+                'qos_overrides./tf_static.publisher.durability': 'transient_local',
+            }],
+            output='screen',
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='both',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': orange_robot_desc},
+                {'frame_prefix': 'orange/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf.py',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'orange/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_footprint'},
+            ],
+            remappings=[
+                ('audibot/pose', '/orange/pose'),
+            ],
+            output='screen'
+        ),
+    ])
+
+    # -------------------------------------------------------
+    # Husky
+    # -------------------------------------------------------
+    # Process xacro to get robot description string
+    husky_xacro_file = os.path.join(husky_gazebo_dir, 'urdf', 'husky.urdf.xacro')
+    husky_robot_desc = subprocess.check_output(
+        ['xacro', husky_xacro_file]).decode('utf-8')
+
+    # Spawn husky into Gazebo from the /husky/robot_description topic
+    spawn_husky = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_husky',
+        output='screen',
+        arguments=['-topic', '/husky/robot_description',
+                   '-name', 'husky',
+                   '-x', '0', '-y', '-5', '-z', '0.4']
+    )
+
+    # Bridge topics between Gazebo and ROS2 for the husky
+    husky_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='husky_gz_bridge',
+        parameters=[{
+            'config_file': os.path.join(husky_gazebo_dir, 'config', 'ros_gz_bridge_husky.yaml'),
+            'use_sim_time': True,
+        }],
+        output='screen',
+        remappings=[
+            ('tf', '/tf'),
+            ('tf_static', '/tf_static'),
+        ]
+    )
+
+    husky_group = GroupAction([
+        PushRosNamespace('husky'),
+        # RSP publishes to /husky/robot_description
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='screen',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': husky_robot_desc},
+                {'frame_prefix': 'husky/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf.py',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'husky/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_link'},
+                {'input_mode': 'odom'},
+                {'publish_rate_hz': 20.0},
+            ],
+            remappings=[
+                ('odom', '/husky/odom'),
+            ],
+            output='screen'
+        ),
+        spawn_husky,
+        husky_bridge,
+    ])
+
+    # -------------------------------------------------------
+    # RViz2
+    # -------------------------------------------------------
+    rviz_config = os.path.join(pfms_dir, 'rviz', 'a1.rviz')
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': True}],
+        output='screen'
+    )
+
+    return [
+        gz_sim,
+        clock_bridge,
+        # world_control_bridge,
+        spawn_orange_audibot,
+        orange_group,
+        husky_group,
+        rviz_node,
+    ]
 
 
 def generate_launch_description():
-
-    # Launch args
-    world_path = LaunchConfiguration('world_path')
-    # prefix = LaunchConfiguration('prefix')
-
-    config_husky_velocity_controller = PathJoinSubstitution(
-        [FindPackageShare("husky_control"), "config", "control.yaml"]
-    )
-
-    # Get URDF via xacro
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare("husky_description"), "urdf", "husky.urdf.xacro"]
-            ),
-            " ",
-            "name:=husky",
-            " ",
-            "prefix:=''",
-            " ",
-            "is_sim:=true",
-            " ",
-            "gazebo_controllers:=",
-            config_husky_velocity_controller,
-        ]
-    )
-    robot_description = {"robot_description": robot_description_content}
-
-    spawn_husky_velocity_controller = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['husky_velocity_controller', '-c', '/controller_manager'],
-        output='screen',
-#        respawn=True,
-    )
-
-    node_robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="screen",
-        parameters=[{'use_sim_time': True}, robot_description],
-    )
-
-    spawn_joint_state_broadcaster = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['joint_state_broadcaster', '-c', '/controller_manager'],
-        output='screen',
-    )
-
-    # Make sure spawn_husky_velocity_controller starts after spawn_joint_state_broadcaster
-    diffdrive_controller_spawn_callback = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawn_joint_state_broadcaster,
-            on_exit=[spawn_husky_velocity_controller],
-        )
-    )
-    
-    # Gazebo server
-    gzserver = ExecuteProcess(
-        cmd=['gzserver',
-             '-s', 'libgazebo_ros_init.so',
-             '-s', 'libgazebo_ros_factory.so',
-             world_path],
-        output='screen',
-    )
-
-    # Gazebo client
-    gzclient = ExecuteProcess(
-        cmd=['gzclient'],
-        output='screen',
-        condition=IfCondition(LaunchConfiguration('gui')),
-    )
-
-    # Spawn robot
-    # <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" 
-    # args="-urdf -unpause -param robot_description -model robot -z 0.0 -J elbow_joint -1.57" respawn="false" output="screen" />
-    spawn_robot = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        name='spawn_husky',
-        arguments=['-entity',
-                   'husky',
-                   '-topic',
-                   'robot_description',
-                   '-x 0.0', '-y -5.0'],
-        output='screen',
-    )
-
-    gazebo_connect = Node(
-        package='pfms',
-        executable='gazebo_connect',
-        name='gazebo_connect',
-        parameters=[{'use_sim_time': True}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
-    )
-
-    orange_audibot_options = dict(
-        robot_name = 'orange',
-        start_x = '0',
-        start_y = '5',
-        start_z = '0',
-        start_yaw = '0',
-        pub_tf = 'true',
-        tf_freq = '100.0',
-        blue = 'false'
-    )
-    spawn_orange_audibot = GroupAction(
-        actions=[
-            PushRosNamespace('orange'),
-             IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
-                ]),
-                launch_arguments=orange_audibot_options.items()
-            )
-        ]
-    )
-
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='two_vehicle_viz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
-    )
-
-    audi_reach = Node(
-        package='pfms',
-        executable='reach',
-        name='audi_reach',
-        output='screen'
-        # output={'both': 'log'},
-        # arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'audi_husky.rviz')]
-    )
-
-    husky_reach = Node(
-        package='pfms',
-        executable='reach',
-        name='husky_reach',
-        output='screen',
-        remappings=[
-            ('/orange/odom', '/husky/odom'),
-            ('/orange/check_goals', '/husky/check_goals'),
-            ('ackerman_check_goals', 'husky_check_goals'),
-        ]
-    )
-    ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(node_robot_state_publisher)
-    ld.add_action(spawn_joint_state_broadcaster)
-    ld.add_action(diffdrive_controller_spawn_callback)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
-    ld.add_action(spawn_robot)
-    ld.add_action(gazebo_connect)
-    ld.add_action(spawn_orange_audibot)
-    ld.add_action(rviz)
-    ld.add_action(audi_reach)
-    ld.add_action(husky_reach)
-
-    return ld
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'gui',
+            default_value='false',
+            description='Launch Gazebo with GUI (true) or headless mode (false)'),
+        DeclareLaunchArgument(
+            'start_paused',
+            default_value='false',
+            description='Start the simulation in a paused state'),
+        OpaqueFunction(function=launch_setup)
+    ])

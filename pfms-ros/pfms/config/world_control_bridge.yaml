@@ -1,0 +1,6 @@
+# Bridge configuration for world control
+- ros_topic_name: "/world/control"
+  gz_topic_name: "/world/default/control"
+  ros_type_name: "ros_gz_interfaces/msg/WorldControl"
+  gz_type_name: "gz.msgs.WorldControl"
+  direction: ROS_TO_GZ

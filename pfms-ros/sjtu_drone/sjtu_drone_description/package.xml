@@ -10,9 +10,8 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>gazebo_ros</depend>
-  <depend>gazebo_plugins</depend>
-  <depend>gazebo_dev</depend>
+  <depend>ignition_cmake_vendor</depend>
+  <depend>ros_ign</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>

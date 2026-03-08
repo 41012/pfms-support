@@ -24,7 +24,7 @@ PIDController::~PIDController(){
 }
 
 
-void PIDController::Load(sdf::ElementPtr _sdf, const std::string& prefix)
+void PIDController::Load(const std::shared_ptr<const sdf::Element> &_sdf, const std::string& prefix)
 {
   gain_p = 5.0;
   gain_d = 1.0;
@@ -33,11 +33,11 @@ void PIDController::Load(sdf::ElementPtr _sdf, const std::string& prefix)
   limit = -1.0;
 
   if (!_sdf) return;
-  if (_sdf->HasElement(prefix + "ProportionalGain")) gain_p = _sdf->GetElement(prefix + "ProportionalGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "DifferentialGain")) gain_d = _sdf->GetElement(prefix + "DifferentialGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "IntegralGain"))     gain_i = _sdf->GetElement(prefix + "IntegralGain")->Get<double>();
-  if (_sdf->HasElement(prefix + "TimeConstant"))     time_constant = _sdf->GetElement(prefix + "TimeConstant")->Get<double>();
-  if (_sdf->HasElement(prefix + "Limit"))            limit = _sdf->GetElement(prefix + "Limit")->Get<double>();
+  if (_sdf->HasElement(prefix + "ProportionalGain")) gain_p = _sdf->Get<double>(prefix + "ProportionalGain");
+  if (_sdf->HasElement(prefix + "DifferentialGain")) gain_d = _sdf->Get<double>(prefix + "DifferentialGain");
+  if (_sdf->HasElement(prefix + "IntegralGain"))     gain_i = _sdf->Get<double>(prefix + "IntegralGain");
+  if (_sdf->HasElement(prefix + "TimeConstant"))     time_constant = _sdf->Get<double>(prefix + "TimeConstant");
+  if (_sdf->HasElement(prefix + "Limit"))            limit = _sdf->Get<double>(prefix + "Limit");
 }
 
 double PIDController::update(double new_input, double x, double dx, double dt)

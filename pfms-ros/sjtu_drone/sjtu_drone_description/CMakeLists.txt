@@ -15,9 +15,9 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(gazebo_ros REQUIRED)
-find_package(gazebo_plugins REQUIRED)
-find_package(gazebo_dev REQUIRED)
+find_package(ignition-gazebo6 REQUIRED)
+find_package(ignition-plugin1 REQUIRED)
+find_package(ros_ign REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -49,11 +49,15 @@ target_compile_features(plugin_drone PUBLIC c_std_99 cxx_std_17)  # Require C99 
 target_include_directories(plugin_drone PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+  
+target_link_libraries(plugin_drone
+  ignition-gazebo6::core
+  ignition-plugin1::register
+)
+
 ament_target_dependencies(plugin_drone
   "rclcpp"
-  "gazebo_ros"
-  "gazebo_plugins"
-  "gazebo_dev"
+  "ros_ign"
   "std_msgs"
   "geometry_msgs"
   "sensor_msgs"

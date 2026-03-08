@@ -8,9 +8,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(gazebo_ros REQUIRED)
-find_package(gazebo_dev REQUIRED)
-find_package(gazebo_msgs REQUIRED)
+find_package(ros_gz REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
@@ -25,7 +23,7 @@ add_library(audibot_interface_plugin SHARED
 )
 ament_target_dependencies(audibot_interface_plugin
   rclcpp
-  gazebo_ros
+  ros_gz
   tf2_ros
   tf2_geometry_msgs
   nav_msgs

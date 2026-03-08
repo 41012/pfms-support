@@ -13,8 +13,8 @@ from ament_index_python.packages import get_package_share_directory
 
 ARGUMENTS = [
     DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("pfms"), "worlds", "demo.world"]),
-        description='The world path, by default is demo.world'),
+        [FindPackageShare("pfms"), "worlds", "a1.world"]),
+        description='The world path, by default is a1.world'),
     DeclareLaunchArgument('gui', default_value='false',
                           description='Whether to launch the GUI'),
     DeclareLaunchArgument('gazebo', default_value='false',

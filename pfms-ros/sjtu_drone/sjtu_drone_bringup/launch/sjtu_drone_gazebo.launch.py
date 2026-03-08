@@ -26,68 +26,40 @@ import xacro
 
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-    use_gui = DeclareLaunchArgument("use_gui", default_value="true", choices=["true", "false"], description="Whether to execute gzclient")
     xacro_file_name = "sjtu_drone.urdf.xacro"
-    pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
     xacro_file = os.path.join(
         get_package_share_directory("sjtu_drone_description"),
         "urdf", xacro_file_name
     )
     robot_description_config = xacro.process_file(xacro_file)
     robot_desc = robot_description_config.toxml()
-    model_ns = "drone"
 
-    world_file = os.path.join(
-        get_package_share_directory("sjtu_drone_description"),
-        "worlds", "playground.world"
+    # Include the higher-level scenario launch `a1_sup.launch.py` which
+    # handles Gazebo (Ignition) bringup and robot spawning.
+    pkg_pfms = get_package_share_directory('pfms')
+    a1_sup_launch = os.path.join(pkg_pfms, 'launch', 'a1_sup.launch.py')
+
+    # Path to sjtu_drone SDF
+    sjtu_sdf = os.path.join(get_package_share_directory('sjtu_drone_description'), 'models', 'sjtu_drone', 'sjtu_drone.sdf')
+
+    # Bridge configuration (passed into gazebo_bringup)
+    bridge_config = os.path.join(get_package_share_directory('sjtu_drone_bringup'), 'config', 'ros_ign_bridge.yaml')
+
+    # Include the generic gazebo bringup from audibot_gazebo, but tell it
+    # to spawn the sjtu_drone model and use our bridge config.
+    gz_bringup = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'gazebo_bringup.launch.py')
+        ),
+        launch_arguments={
+            'robot_sdf_file': sjtu_sdf,
+            'world_sdf_file': os.path.join(get_package_share_directory('pfms'), 'worlds', 'a1.world'),
+            'gz_bridge_file': bridge_config,
+            'verbose': 'true',
+            'start_paused': 'false',
+        }.items()
     )
 
-    def launch_gzclient(context, *args, **kwargs):
-        if context.launch_configurations.get('use_gui') == 'true':
-            return [IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py')
-                ),
-                launch_arguments={'verbose': 'true'}.items()
-            )]
-        return []
-
     return LaunchDescription([
-        use_gui,
-        Node(
-            package="robot_state_publisher",
-            executable="robot_state_publisher",
-            name="robot_state_publisher",
-#            namespace=model_ns,
-            output="screen",
-            parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
-            arguments=[robot_desc]
-        ),
-
-        Node(
-            package='joint_state_publisher',
-            executable='joint_state_publisher',
-            name='joint_state_publisher',
- #           namespace=model_ns,
-            output='screen',
-        ),
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
-            ),
-            launch_arguments={'world': world_file,
-                              'verbose': "true",
-                              'extra_gazebo_args': 'verbose'}.items()
-        ),
-
-        OpaqueFunction(function=launch_gzclient),
-
-        Node(
-            package="sjtu_drone_bringup",
-            executable="spawn_drone",
-            arguments=[robot_desc, model_ns],
-            output="screen"
-        )
+        gz_bringup,
     ])

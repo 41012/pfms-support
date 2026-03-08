@@ -7,11 +7,12 @@
 
 #include "tf2/utils.h" //To use getYaw function from the quaternion of orientation
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
-#include "gazebo_msgs/msg/link_states.hpp"
+#include "ros_gz_interfaces/msg/entity_factory.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 //#include "sensor_msgs/msg/laser_scan.hpp"
 
 using std::placeholders::_1;
@@ -54,8 +55,10 @@ public:
 
       //sub2 = nh_.subscribe("/orange/steering_cmd", 1000, &GazeboConnect::publishMarkers,this);
 
-      sub1_ = this->create_subscription<gazebo_msgs::msg::LinkStates>(
-        "/demo/link_states_demo", 1000, std::bind(&GazeboConnect::gazeboLinkStatesCallback,this,_1));
+      // Subscribe to Gazebo Harmonic's pose topic (requires ros_gz_bridge to be configured)
+      // The topic name should match the bridged topic from Gazebo
+      sub1_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+        "/model/husky/pose", 10, std::bind(&GazeboConnect::gazeboPoseCallback,this,_1));
 
       odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>("husky/odom", 1000);
 
@@ -235,174 +238,33 @@ public:
 // - husky::front_right_wheel
 // - husky::rear_left_wheel
 // - husky::rear_right_wheel
-  void gazeboLinkStatesCallback(const gazebo_msgs::msg::LinkStates& msg)
+  
+  // Updated callback for Gazebo Harmonic using PoseStamped
+  void gazeboPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
-
-    for (unsigned int i=0;i<msg.name.size();i++){
-        if ((msg.name[i]).compare("husky::base_link") == 0) 
-        {
-          geometry_msgs::msg::Pose pose(msg.pose[i]);
-          geometry_msgs::msg::Twist twist(msg.twist[i]);
-          nav_msgs::msg::Odometry odom;
-          odom.header.stamp = this->get_clock()->now();
-          odom.header.frame_id="world";
-          odom.pose.pose=pose;
-          odom.twist.twist=twist;
-
-          sendTfBroadcast(pose,"base_link" );
-          // sendTfBroadcast(pose,"sonar_link_fix" );
-
-          odomPub_->publish(odom);
-          // break;
-        }
-        // // if ((msg.name[i]).compare("husky::sonar_link") == 0) 
-        // // {
-        // //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        // //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        // //   nav_msgs::msg::Odometry odom;
-        // //   odom.header.stamp = this->get_clock()->now();
-        // //   odom.header.frame_id="world";
-        // //   odom.pose.pose=pose;
-        // //   odom.twist.twist=twist;    
-        // //   sendTfBroadcast(pose,"sonar_link" );
-        // // }
-        // if ((msg.name[i]).compare("husky::front_left_wheel") == 0) 
-        // {
-        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        //   nav_msgs::msg::Odometry odom;
-        //   odom.header.stamp = this->get_clock()->now();
-        //   odom.header.frame_id="world";
-        //   odom.pose.pose=pose;
-        //   odom.twist.twist=twist;    
-        //   sendTfBroadcast(pose,"front_left_wheel" );
-        // }
-        // if ((msg.name[i]).compare("husky::front_right_wheel") == 0) 
-        // {
-        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        //   nav_msgs::msg::Odometry odom;
-        //   odom.header.stamp = this->get_clock()->now();
-        //   odom.header.frame_id="world";
-        //   odom.pose.pose=pose;
-        //   odom.twist.twist=twist;    
-        //   sendTfBroadcast(pose,"front_right_wheel" );
-        // }               
-        // if ((msg.name[i]).compare("husky::rear_left_wheel") == 0) 
-        // {
-        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        //   nav_msgs::msg::Odometry odom;
-        //   odom.header.stamp = this->get_clock()->now();
-        //   odom.header.frame_id="world";
-        //   odom.pose.pose=pose;
-        //   odom.twist.twist=twist;    
-        //   sendTfBroadcast(pose,"rear_left_wheel" );
-        // }
-        // if ((msg.name[i]).compare("husky::rear_right_wheel") == 0) 
-        // {
-        //   geometry_msgs::msg::Pose pose(msg.pose[i]);
-        //   geometry_msgs::msg::Twist twist(msg.twist[i]);
-        //   nav_msgs::msg::Odometry odom;
-        //   odom.header.stamp = this->get_clock()->now();
-        //   odom.header.frame_id="world";
-        //   odom.pose.pose=pose;
-        //   odom.twist.twist=twist;    
-        //   sendTfBroadcast(pose,"rear_right_wheel" );
-        // }          
-
-
-        
-      }
-    }
-
-        // else if ((msg->name[i]).compare("audibot::base_footprint") == 0) {
-        //     geometry_msgs::Pose pose(msg->pose[i]);
-        //     geometry_msgs::Twist twist(msg->twist[i]);
-        //     nav_msgs::Odometry odom;
-        //     odom.header.seq=seq_++;
-        //     odom.header.stamp = ros::Time::now();
-        //     odom.header.frame_id="world";
-        //     odom.pose.pose=pose;
-        //     odom.twist.twist=twist;
-        //     ROS_INFO_STREAM_THROTTLE(60.0,"AUDI x,y,yaw,vx,vy:" <<
-        //                           msg->pose[i].position.x << " " <<
-        //                           msg->pose[i].position.y << " " <<
-        //                           tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
-        //                           msg->twist[i].linear.x << " "  <<
-        //                           msg->twist[i].linear.y );
-
-        //   ugv_odom_pub.publish(odom);
-        //   sendTfBroadcast(pose,"base_footprint" );
-        // }
-        // else if ((msg->name[i]).compare("blue::base_footprint") == 0) {
-        //     geometry_msgs::Pose pose(msg->pose[i]);
-        //     geometry_msgs::Twist twist(msg->twist[i]);
-        //     nav_msgs::Odometry odom;
-        //     odom.header.seq=seq_++;
-        //     odom.header.stamp = ros::Time::now();
-        //     odom.header.frame_id="world";
-        //     odom.pose.pose=pose;
-        //     odom.twist.twist=twist;
-        //     ROS_INFO_STREAM_THROTTLE(60.0,"BLUE x,y,yaw,vx,vy:" <<
-        //                           msg->pose[i].position.x << " " <<
-        //                           msg->pose[i].position.y << " " <<
-        //                           tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
-        //                           msg->twist[i].linear.x << " "  <<
-        //                           msg->twist[i].linear.y );
-
-        //   ugv_odom_pub2.publish(odom);
-        //   // sendTfBroadcast(pose,"base_footprint" );
-        // }        
-//         else if ((msg->name[i]).compare("orange::base_footprint") == 0) {
-//             geometry_msgs::Pose pose(msg->pose[i]);
-//             geometry_msgs::Twist twist(msg->twist[i]);
-//             nav_msgs::Odometry odom;
-//             odom.header.seq=seq_++;
-//             odom.header.stamp = ros::Time::now();
-//             odom.header.frame_id="world";
-//             odom.pose.pose=pose;
-//             odom.twist.twist=twist;
-//             ROS_INFO_STREAM_THROTTLE(60.0,"ORANGE x,y,yaw,vx,vy:" <<
-//                                   msg->pose[i].position.x << " " <<
-//                                   msg->pose[i].position.y << " " <<
-//                                   tf::getYaw(msg->pose[i].orientation)*180/M_PI << " " <<
-//                                   msg->twist[i].linear.x << " "  <<
-//                                   msg->twist[i].linear.y );
-
-//           ugv_odom_pub.publish(odom);
-// //           sendTfBroadcast(pose,"base_footprint" );
-//         }
-//         else if ((msg->name[i]).compare("pole1::base_footprint") == 0) {
-//             geometry_msgs::Pose pose(msg->pose[i]);
-//             sendTfBroadcast(pose,"pole1/base_footprint" );
-//         }
-//         else if ((msg->name[i]).compare("pole2::base_footprint") == 0) {
-//             geometry_msgs::Pose pose(msg->pose[i]);
-//             sendTfBroadcast(pose,"pole2/base_footprint" );
-//         }
-  //   }
-  // }
-
-  // gazebo_connect::string_code hashit (std::string const& inString) {
-  //   if (inString == "pole2::base_footprint") return gazebo_connect::ePole2;
-  //   if (inString == "pole1::base_footprint") return gazebo_connect::ePole1;
-  // }
+    geometry_msgs::msg::Pose pose = msg->pose;
+    
+    nav_msgs::msg::Odometry odom;
+    odom.header.stamp = this->get_clock()->now();
+    odom.header.frame_id = "world";
+    odom.child_frame_id = "base_link";
+    odom.pose.pose = pose;
+    // Note: Velocity information needs to be obtained from /model/husky/odometry topic
+    // or calculated from pose differences if needed
+    
+    sendTfBroadcast(pose, "base_link");
+    odomPub_->publish(odom);
+  }
+ 
 
 private:
-    //ros::NodeHandle nh_;
-    rclcpp::Subscription<gazebo_msgs::msg::LinkStates>::SharedPtr sub1_;
-    // ros::Publisher uav_odom_pub,ugv_odom_pub,viz_pub_,ugv_odom_pub2;
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr sub1_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
 
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-    // ros::Subscriber sub,sub2;
     unsigned int seq_;
     std::vector<double> vx_;
     std::vector<double> omega_;
-    // ros::Time tfTimeStamp_;
-    // ros::Time tfTimeStampPole1_;
-    // ros::Time tfTimeStampPole2_;
 };
 
 

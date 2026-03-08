@@ -1,0 +1,76 @@
+# Timing consistency
+- ros_topic_name: '/clock'
+  gz_topic_name: '/clock'
+  ros_type_name: 'rosgraph_msgs/msg/Clock'
+  gz_type_name: 'gz.msgs.Clock'
+  direction: GZ_TO_ROS
+
+# Position of joints [ie. wheels] (published by ignition::gazebo::systems::JointStatePublisher)
+- ros_topic_name: '/joint_states'
+  gz_topic_name: '/model/husky/joint_states'
+  ros_type_name: 'sensor_msgs/msg/JointState'
+  gz_type_name: 'ignition.msgs.Model'
+  direction: GZ_TO_ROS
+
+# # Odometry (published by ignition::gazebo::systems::OdometryPublisher)
+- ros_topic_name: '/husky/odom'
+  gz_topic_name: '/model/husky/odometry'
+  ros_type_name: 'nav_msgs/msg/Odometry'
+  gz_type_name: 'ignition.msgs.Odometry'
+  direction: GZ_TO_ROS
+
+# Intertial Measurement Unit
+- ros_topic_name: '/husky/imu'
+  gz_topic_name: '/model/husky/imu'
+  ros_type_name: 'sensor_msgs/msg/Imu'
+  gz_type_name: 'ignition.msgs.IMU'
+  direction: GZ_TO_ROS
+
+# Command velocity
+- ros_topic_name: '/husky/cmd_vel'
+  gz_topic_name: '/model/husky/cmd_vel'
+  ros_type_name: 'geometry_msgs/msg/Twist'
+  gz_type_name: 'ignition.msgs.Twist'
+  direction: ROS_TO_GZ
+
+# Lidar: laserscan
+- ros_topic_name: "/husky/laserscan"
+  gz_topic_name: "/model/husky/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+# # Lidar: pointcloud
+# - ros_topic_name: "/husky/laserscan/points"
+#   gz_topic_name: "/model/husky/scan/points"
+#   ros_type_name: "sensor_msgs/msg/PointCloud2"
+#   gz_type_name: "gz.msgs.PointCloudPacked"
+#   direction: GZ_TO_ROS
+
+# Camera: RGB
+- ros_topic_name: "/husky/camera/image"
+  gz_topic_name: "/model/husky/camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+# # Camera: depth
+# - ros_topic_name: "/husky/camera/depth/image"
+#   gz_topic_name: "/model/husky/camera/depth_image"
+#   ros_type_name: "sensor_msgs/msg/Image"
+#   gz_type_name: "ignition.msgs.Image"
+#   direction: GZ_TO_ROS
+
+# # Camera: depth pointcloud
+# - ros_topic_name: "/husky/camera/depth/points"
+#   gz_topic_name: "/model/husky/camera/points"
+#   ros_type_name: "sensor_msgs/msg/PointCloud2"
+#   gz_type_name: "ignition.msgs.PointCloudPacked"
+#   direction: GZ_TO_ROS
+
+# CSonar
+- ros_topic_name: "/husky/sonar"
+  gz_topic_name: "/model/husky/sonar"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS

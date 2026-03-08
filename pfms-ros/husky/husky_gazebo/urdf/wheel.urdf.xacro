@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wheel">
+  <!-- Properties -->
+  <xacro:property name="wheel_separation" value="0.5708"/>
+  <xacro:property name="wheel_radius" value="0.1651"/>
+
+  <xacro:macro name="wheel" params="wheel_id x_pos y_pos">
+    <link name="${wheel_id}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="file://$(find husky_gazebo)/urdf/meshes/wheel.dae"/>
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5707963267948966 0 0"/> 
+        <contact_coefficients mu="0.5" kp="1+e07" kd="1"/> 
+        <geometry>
+          <cylinder length="0.1143" radius="${wheel_radius}"/>
+        </geometry>
+      </collision>
+      
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="2.637"/>
+        <inertia ixx="0.02467" ixy="0" ixz="0"
+                iyy="0.04411" iyz="0"
+                izz="0.02467" />
+      </inertial>
+    </link>
+
+    <!-- Add joint to main body -->
+    <joint name="${wheel_id}_wheel_joint" type="revolute">
+      <parent link="base_link"/>
+      <child link="${wheel_id}_wheel_link" />
+      <origin xyz="${x_pos} ${y_pos} 0.03282" rpy="0 0 0"/>
+      <limit lower="-1e+16" upper="1e+16" effort="1e+16" velocity="1e+16"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.004"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

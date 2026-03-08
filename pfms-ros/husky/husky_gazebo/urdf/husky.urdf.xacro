@@ -1,0 +1,192 @@
+<?xml version="1.0" ?>
+<robot name="husky" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find husky_gazebo)/urdf/common_properties.urdf.xacro"/>
+  <xacro:include filename="$(find husky_gazebo)/urdf/husky.gazebo.xacro"/>
+  <xacro:include filename="$(find husky_gazebo)/urdf/wheel.urdf.xacro"/>
+
+  <xacro:property name="r200_cam_rgb_px" value="0.005"/>
+  <xacro:property name="r200_cam_rgb_py" value="0.018"/>
+  <xacro:property name="r200_cam_rgb_pz" value="0.013"/>
+  <xacro:property name="r200_cam_depth_offset" value="0.01"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/base_link.dae"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <visual name="base_link_fixed_joint_lump__front_bumper_link_visual_3">
+      <origin xyz="0.48 0 0.091" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/bumper.dae"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <visual name="base_link_fixed_joint_lump__rear_bumper_link_visual_4">
+      <origin xyz="-0.48 0 0.091" rpy="0 0 3.14159"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/bumper.dae"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <visual name="base_link_fixed_joint_lump__top_chassis_link_visual_5">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/top_chassis.dae"/>
+      </geometry>
+    </visual>
+    <visual name="base_link_fixed_joint_lump__top_plate_link_visual_6">
+      <origin xyz="0.0812 0 0.245" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/top_plate.dae"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <visual name="base_link_fixed_joint_lump__arch_visual_7">
+      <origin xyz="0.0012 0 0.251" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/jpl04_arch_nosensor.stl"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+    <collision name="base_link_collision">
+      <origin xyz="0 0 0.12" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.9874 0.5709 0.05"/>
+      </geometry>
+    </collision>
+    <collision name="base_link_collision_bottom">
+      <origin xyz="0 0 0.046" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.80 0.5709 0.095"/>
+      </geometry>
+    </collision>
+    <collision name="base_link_collision_1">
+      <origin xyz="0 0 0.185625" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.78992 0.5709 0.12375"/>
+      </geometry>
+    </collision>
+    <collision name="base_link_fixed_joint_lump__top_plate_link_collision_3">
+      <origin xyz="0.0812 0 0.245" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_gazebo)/urdf/meshes/top_plate.dae"/>
+      </geometry>
+    </collision>
+    <collision name="base_link_fixed_joint_lump__top_plate_link_collision_4">
+      <origin xyz="0.0812 0 0.245" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.32 0.41 0.09"/>
+      </geometry>
+    </collision>
+    
+    <inertial>
+      <origin xyz="0 0 0.062329" rpy="0 0 0"/>
+      <mass value="46.064"/>
+      <inertia ixx="0.615397" ixy="-0.0240585" ixz="-0.120749"
+               iyy="1.75388" iyz="-0.0028322"
+               izz="2.03641" />
+    </inertial>
+  </link>
+
+  <!-- Wheels -->
+  <xacro:wheel wheel_id="front_left" x_pos="0.256" y_pos="${wheel_separation/2}"/>
+  <xacro:wheel wheel_id="front_right" x_pos="0.256" y_pos="-${wheel_separation/2}"/>
+  <xacro:wheel wheel_id="rear_left" x_pos="-0.256" y_pos="${wheel_separation/2}"/>
+  <xacro:wheel wheel_id="rear_right" x_pos="-0.256" y_pos="-${wheel_separation/2}"/>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0.0 0 0.068" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link"/>
+
+  <joint name="scan_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_scan"/>
+    <origin xyz="0 0 0.68" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_scan">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.09"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <inertial>
+      <mass value="0" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="sonar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="sonar_link"/>
+    <origin xyz="0 0 0.71" rpy="0 0 0"/>
+  </joint>
+
+  <link name="sonar_link"/>
+
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.45 0.0 0.25" rpy="0 0 0"/> <!-- 0.5 0.0 0.9 -->
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <link name="camera_link">
+    <visual>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.08 0.05"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <visual>
+     <origin xyz="0.015 0 0" rpy="0 1.57 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.02"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+  </link>
+
+  <joint name="camera_rgb_joint" type="fixed">
+    <origin xyz="${r200_cam_rgb_px} ${r200_cam_rgb_py} ${r200_cam_rgb_pz}" rpy="0 0 0"/>
+    <parent link="camera_link"/>
+    <child link="camera_rgb_frame"/>
+  </joint>
+  <link name="camera_rgb_frame"/>
+
+  <joint name="camera_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    <parent link="camera_rgb_frame"/>
+    <child link="camera_rgb_optical_frame"/>
+  </joint>
+  <link name="camera_rgb_optical_frame"/>
+
+  <joint name="camera_depth_joint" type="fixed">
+    <origin xyz="${r200_cam_rgb_px} ${r200_cam_rgb_py + r200_cam_depth_offset} ${r200_cam_rgb_pz}" rpy="0 0 0"/>
+    <parent link="camera_link"/>
+    <child link="camera_depth_frame"/>
+  </joint>
+  <link name="camera_depth_frame"/>
+
+  <joint name="camera_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    <parent link="camera_depth_frame"/>
+    <child link="camera_depth_optical_frame"/>
+  </joint>
+  <link name="camera_depth_optical_frame"/>
+
+</robot>

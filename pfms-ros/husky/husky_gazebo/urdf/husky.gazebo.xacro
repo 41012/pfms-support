@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<robot name="husky" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="laser_visual"  default="false" />
+  <xacro:arg name="camera_visual" default="false"/>
+  <xacro:arg name="imu_visual"    default="false"/>
+
+  <xacro:include filename="$(find husky_gazebo)/urdf/wheel.urdf.xacro"/>
+
+  <gazebo reference="imu_link">
+    <sensor type="imu" name="imu">
+      <always_on>true</always_on>
+      <visualize>$(arg imu_visual)</visualize>
+      <update_rate>100</update_rate>
+      <topic>model/husky/imu</topic>
+      <gz_frame_id>husky/imu_link</gz_frame_id>
+      <imu>
+        <angular_velocity>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+              <bias_mean>0.0000075</bias_mean>
+              <bias_stddev>0.0000008</bias_stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+              <bias_mean>0.0000075</bias_mean>
+              <bias_stddev>0.0000008</bias_stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+              <bias_mean>0.0000075</bias_mean>
+              <bias_stddev>0.0000008</bias_stddev>
+            </noise>
+          </z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+              <bias_mean>0.1</bias_mean>
+              <bias_stddev>0.001</bias_stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+              <bias_mean>0.1</bias_mean>
+              <bias_stddev>0.001</bias_stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+              <bias_mean>0.1</bias_mean>
+              <bias_stddev>0.001</bias_stddev>
+            </noise>
+          </z>
+        </linear_acceleration>
+      </imu>
+      <plugin
+        filename="ignition-gazebo-imu-system"
+        name="ignition::gazebo::systems::Imu">
+      </plugin>
+    </sensor>
+    <material>Gazebo/Grey</material>
+  </gazebo>
+ 
+  <!-- Move base directly without faffing around with diff drive controllers -->
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-velocity-control-system"
+      name="ignition::gazebo::systems::VelocityControl">
+      <topic>model/husky/cmd_vel</topic>
+    </plugin>
+  </gazebo>
+
+  <!-- Publish odometry separately -->
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-odometry-publisher-system"
+      name="ignition::gazebo::systems::OdometryPublisher">
+      <topic>model/husky/odometry</topic>
+      <odom_publish_frequency>20</odom_publish_frequency>
+      <odom_frame>world</odom_frame>
+      <robot_base_frame>husky/base_link</robot_base_frame>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-joint-state-publisher-system"
+      name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>model/husky/joint_states</topic>
+    </plugin>
+  </gazebo>
+
+  <!-- Lidar and cameras use the general Sensors plugin -->
+  <gazebo>
+    <plugin
+        filename="libignition-gazebo-sensors-system.so"
+        name="ignition::gazebo::systems::Sensors">
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="base_scan">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_lidar" name="lidar">
+      <pose relative_to='base_scan'>0 0 0 0 0 0</pose>
+      <visualize>$(arg laser_visual)</visualize>
+      <topic>model/husky/scan</topic>
+      <update_rate>3</update_rate>
+      <gz_frame_id>husky/base_scan</gz_frame_id>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.28319</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.2</min>
+          <max>40</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="sonar_link">
+    <sensor name="sonar" type="gpu_lidar">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>60</update_rate>
+      <topic>model/husky/sonar</topic>
+      <gz_frame_id>husky/sonar_link</gz_frame_id>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.026</min_angle>
+            <max_angle>0.026</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>3</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.026</min_angle>
+            <max_angle>0.026</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>20</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="rgbd_camera" type="rgbd_camera">
+      <camera>
+        <horizontal_fov>2.0944</horizontal_fov>
+        <image>
+          <width>720</width>
+          <height>480</height>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>40</far>
+        </clip>
+        <!-- depth_camera near/far clip seems to be ignored for some reason -->
+        <!--    We're using Ignition Gazebo Fortress, which uses sdf format 1.9: http://sdformat.org/tutorials?tut=roadmap -->
+        <!--    This takes the depth_camera parameter with near / far clip http://sdformat.org/spec?ver=1.4&elem=sensor  -->
+        <!-- We also use ign sensors v6 ( run ls | grep libignition-sensors in /usr/lib/x86_64-linux-gnu)-->
+        <!-- Looking at the source code, the sdf sets HasDepthCamera() and corresponding HasDepthNearClip() & HasDepthFarClip() which are used in RgbdCameraSensor.cc, so this should work? -->
+        <!--    SDF description of Camera: https://github.com/gazebosim/sdformat/blob/sdf9/src/Camera.cc#L598-->
+        <!--    Camera sensor source code: https://github.com/gazebosim/gz-sensors/blob/ign-sensors6/src/RgbdCameraSensor.cc#L311  -->
+        <depth_camera>
+          <clip>
+            <near>0.4</near>
+            <far>10</far>
+          </clip>
+        </depth_camera>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>3</update_rate> <!--10-->
+      <visualize>$(arg camera_visual)</visualize>
+      <topic>/model/husky/camera</topic>
+      <gz_frame_id>husky/camera_link</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+</robot>

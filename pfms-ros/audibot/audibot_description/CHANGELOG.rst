@@ -2,6 +2,11 @@
 Changelog for package audibot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.2 (2026-03-05)
+------------------
+* Added orange/blue model variants, and the laser and sonar
+* Contributors: Alen Alempijevic
+
 0.2.1 (2020-07-29)
 ------------------
 * Bump minimum CMake version to 3.0.2 as recommended for ROS Noetic

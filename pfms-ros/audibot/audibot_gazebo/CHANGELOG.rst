@@ -2,6 +2,12 @@
 Changelog for package audibot_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.2 (2020-07-29)
+------------------
+* Ported to Gazebo Fortress
+* Corrected for velocity being too high when teleporting the robot
+* Contributors: Micho Radovnikovich, Alen Alempijevic
+
 0.2.1 (2020-07-29)
 ------------------
 * Bump minimum CMake version to 3.0.2 as recommended for ROS Noetic

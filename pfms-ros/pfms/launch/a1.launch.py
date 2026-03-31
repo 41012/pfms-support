@@ -118,7 +118,7 @@ def launch_setup(context):
         ),
         Node(
             package='pfms',
-            executable='pose_to_tf.py',
+            executable='pose_to_tf',
             name='pose_to_tf',
             parameters=[
                 {'use_sim_time': True},
@@ -188,7 +188,7 @@ def launch_setup(context):
         ),
         Node(
             package='pfms',
-            executable='pose_to_tf.py',
+            executable='pose_to_tf',
             name='pose_to_tf',
             parameters=[
                 {'use_sim_time': True},

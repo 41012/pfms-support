@@ -30,9 +30,13 @@ ament_target_dependencies(gazebo_connect rclcpp ros_gz_interfaces nav_msgs tf2 t
 add_executable(reach src/reach.cpp)
 ament_target_dependencies(reach rclcpp std_srvs geometry_msgs nav_msgs)
 
+add_executable(pose_to_tf src/pose_to_tf.cpp)
+ament_target_dependencies(pose_to_tf rclcpp geometry_msgs nav_msgs tf2_ros)
+
 install(TARGETS
   gazebo_connect
   reach
+  pose_to_tf
   DESTINATION lib/${PROJECT_NAME}
 )
 

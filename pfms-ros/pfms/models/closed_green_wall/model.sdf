@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<sdf version='1.6'>
+<sdf version='1.9'>
   <model name='closed_green_wall'>
     <link name='link_0'>
       <inertial>
@@ -12,31 +12,23 @@
           <iyz>0</iyz>
           <izz>0.166667</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </inertial>
-      <pose frame=''>3.37098 -0.107634 -0 0 -0 0</pose>
+      <pose>3.37098 -0.107634 0 0 0 0</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
       <enable_wind>0</enable_wind>
       <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
           <ambient>0.3 1.0 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <diffuse>0.3 1.0 0.3 1</diffuse>
           <specular>0.01 0.01 0.01 1</specular>
           <emissive>0 0 0 1</emissive>
         </material>
@@ -46,7 +38,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
@@ -110,31 +102,23 @@
           <iyz>0</iyz>
           <izz>0.166667</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </inertial>
-      <pose frame=''>0.024232 -3.42805 -0 0 0 -1.59986</pose>
+      <pose>0.024232 -3.42805 0 0 0 -1.59986</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
       <enable_wind>0</enable_wind>
       <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
           <ambient>0.3 1.0 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <diffuse>0.3 1.0 0.3 1</diffuse>
           <specular>0.01 0.01 0.01 1</specular>
           <emissive>0 0 0 1</emissive>
         </material>
@@ -144,7 +128,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
@@ -208,31 +192,23 @@
           <iyz>0</iyz>
           <izz>0.166667</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </inertial>
-      <pose frame=''>-3.40001 0.065208 -0 0 -0 0</pose>
+      <pose>-3.40001 0.065208 0 0 0 0</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
       <enable_wind>0</enable_wind>
       <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
           <ambient>0.3 1.0 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <diffuse>0.3 1.0 0.3 1</diffuse>
           <specular>0.01 0.01 0.01 1</specular>
           <emissive>0 0 0 1</emissive>
         </material>
@@ -242,7 +218,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
@@ -306,31 +282,23 @@
           <iyz>0</iyz>
           <izz>0.166667</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </inertial>
-      <pose frame=''>0.004806 3.47046 -0 0 0 -1.59986</pose>
+      <pose>0.004806 3.47046 0 0 0 -1.59986</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
       <enable_wind>0</enable_wind>
       <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
           <ambient>0.3 1.0 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <diffuse>0.3 1.0 0.3 1</diffuse>
           <specular>0.01 0.01 0.01 1</specular>
           <emissive>0 0 0 1</emissive>
         </material>
@@ -340,7 +308,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.2 7 4.5</size>
@@ -396,7 +364,7 @@
     <joint name='link_0_JOINT_1' type='fixed'>
       <parent>link_0</parent>
       <child>link_0_clone_clone</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -413,7 +381,7 @@
     <joint name='link_0_clone_0_JOINT_3' type='fixed'>
       <parent>link_0_clone_0</parent>
       <child>link_0_clone</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -430,7 +398,7 @@
     <joint name='link_0_clone_JOINT_0' type='fixed'>
       <parent>link_0_clone</parent>
       <child>link_0</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>
@@ -447,7 +415,7 @@
     <joint name='link_0_clone_clone_JOINT_2' type='fixed'>
       <parent>link_0_clone_clone</parent>
       <child>link_0_clone_0</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <physics>
         <ode>
           <limit>

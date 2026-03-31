@@ -1,59 +1,33 @@
 <?xml version="1.0"?>
-<!--
-  Gazebo ROS state plugin demo
-
-  Try for example to get a model's state w.r.t. the world:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "boxes"}'
-
-  Or a link's state w.r.t. the world:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "boxes::bottom", reference_frame: "world"}'
-
-  Or a light's state w.r.t. another entity:
-
-      ros2 service call /demo/get_entity_state 'gazebo_msgs/GetEntityState' '{name: "sun", reference_frame: "ground_plane"}'
-
-  > When setting state, note that the changes for static entities may not be visible on gzclient due to https://bitbucket.org/osrf/gazebo/issues/2560
-
-  Try teleporting a model:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "boxes", pose: {position: {y: 2}}}}'
-
-  Or rotating a light:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "sun", pose: {position: {z: 10}, orientation: {x: 0.1, y: 0.2, z: 0.3, w: 0.5}}}}'
-
-  Try teleporting a model:
-
-      ros2 service call /demo/set_entity_state 'gazebo_msgs/SetEntityState' '{state: {name: "boxes::top", reference_frame: "boxes::top", twist: {angular: {x: 2}}}}'
-
-  Try listening to model states:
-
-      ros2 topic echo /demo/model_states_demo
-
-  Try listening to link states:
-
-      ros2 topic echo /demo/link_states_demo
--->
-<sdf version="1.6">
+<sdf version="1.9">
   <world name="default">
-    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
-      <ros>
-        <namespace>/demo</namespace>
-        <remapping>model_states:=model_states_demo</remapping>
-        <remapping>link_states:=link_states_demo</remapping>
-      </ros>
-      <update_rate>10.0</update_rate>
-    </plugin>
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
 
     <include>
-      <uri>model://ground_plane</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
     </include>
-    <include>
-      <uri>model://sun</uri>
-    </include>
-    <!--gravity>0 0 -9.8</gravity-->
+    
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
 
     <model name='asphalt_plane'>
       <static>1</static>
@@ -86,11 +60,9 @@
             </box>
           </geometry>
           <material>
-            <script>
-              <uri>model://asphalt_plane/materials/scripts</uri>
-              <uri>model://asphalt_plane/materials/textures</uri>
-              <name>vrc/asphalt</name>
-            </script>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
           </material>
         </visual>
         <self_collide>0</self_collide>
@@ -100,21 +72,166 @@
       <pose>0 0 0 0 -0 0</pose>
     </model>    
 
-    <population name="open_air_jail">
-        <model name="wall">
-          <include>
-            <static>true</static>
-            <uri>model://closed_green_wall</uri>
-          </include>
-        </model>
-        <pose>0 -10 2.25 0 0 0</pose>
-        <distribution>
-          <type>grid</type>
-          <rows>3</rows>
-          <cols>5</cols>
-          <step>20 20 0</step>
-        </distribution>
-      </population>
+    <!-- Manually placed walls instead of population (Gazebo Harmonic compatibility) -->
+    <!-- Row 1 -->
+    <model name='wall_0_0'>
+      <pose>-40 -10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_0_1'>
+      <pose>-20 -10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_0_2'>
+      <pose>0 -10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_0_3'>
+      <pose>20 -10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_0_4'>
+      <pose>40 -10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <!-- Row 2 -->
+    <model name='wall_1_0'>
+      <pose>-40 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_1_1'>
+      <pose>-20 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_1_2'>
+      <pose>0 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_1_3'>
+      <pose>20 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_1_4'>
+      <pose>40 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <!-- Row 3 -->
+    <model name='wall_2_0'>
+      <pose>-40 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_2_1'>
+      <pose>-20 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_2_2'>
+      <pose>0 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_2_3'>
+      <pose>20 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_2_4'>
+      <pose>40 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+
+    <model name='box1'>
+      <pose>10 2 0.275 0 0 0</pose> <!-- Bottom box positioned at half its height -->
+      
+      <link name='box1'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.55 0.55 0.55</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.55 0.55 0.55</size>
+            </box>
+          </geometry>
+        </collision>
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.050458</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.050458</iyy>
+            <iyz>0</iyz>
+            <izz>0.050458</izz>
+          </inertia>
+        </inertial>
+      </link>
+    </model>
 
     <gui fullscreen='0'>
       <camera name='user_camera'>

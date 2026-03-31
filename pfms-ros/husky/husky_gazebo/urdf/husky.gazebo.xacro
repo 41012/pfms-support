@@ -180,38 +180,4 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="camera_link">
-    <sensor name="rgbd_camera" type="rgbd_camera">
-      <camera>
-        <horizontal_fov>2.0944</horizontal_fov>
-        <image>
-          <width>720</width>
-          <height>480</height>
-        </image>
-        <clip>
-          <near>0.1</near>
-          <far>40</far>
-        </clip>
-        <!-- depth_camera near/far clip seems to be ignored for some reason -->
-        <!--    We're using Ignition Gazebo Fortress, which uses sdf format 1.9: http://sdformat.org/tutorials?tut=roadmap -->
-        <!--    This takes the depth_camera parameter with near / far clip http://sdformat.org/spec?ver=1.4&elem=sensor  -->
-        <!-- We also use ign sensors v6 ( run ls | grep libignition-sensors in /usr/lib/x86_64-linux-gnu)-->
-        <!-- Looking at the source code, the sdf sets HasDepthCamera() and corresponding HasDepthNearClip() & HasDepthFarClip() which are used in RgbdCameraSensor.cc, so this should work? -->
-        <!--    SDF description of Camera: https://github.com/gazebosim/sdformat/blob/sdf9/src/Camera.cc#L598-->
-        <!--    Camera sensor source code: https://github.com/gazebosim/gz-sensors/blob/ign-sensors6/src/RgbdCameraSensor.cc#L311  -->
-        <depth_camera>
-          <clip>
-            <near>0.4</near>
-            <far>10</far>
-          </clip>
-        </depth_camera>
-      </camera>
-      <always_on>1</always_on>
-      <update_rate>3</update_rate> <!--10-->
-      <visualize>$(arg camera_visual)</visualize>
-      <topic>/model/husky/camera</topic>
-      <gz_frame_id>husky/camera_link</gz_frame_id>
-    </sensor>
-  </gazebo>
-
 </robot>

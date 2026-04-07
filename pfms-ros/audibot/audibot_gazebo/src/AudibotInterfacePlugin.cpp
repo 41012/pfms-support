@@ -70,10 +70,9 @@ namespace audibot_gazebo {
         this->node_.Subscribe("/model/" + model_.Name(_ecm) + "/speed_cmd", &AudibotInterfacePlugin::recvSpeedCmd, this);
         this->node_.Subscribe("/model/" + model_.Name(_ecm) + "/steering_cmd", &AudibotInterfacePlugin::recvSteeringCmd, this);
         this->node_.Subscribe("/model/" + model_.Name(_ecm) + "/gear_cmd", &AudibotInterfacePlugin::recvGearCmd, this);
-        this->pub_twist_ = this->node_.Advertise<msgs::Twist>("/model/" + model_.Name(_ecm) + "/twist");
-
+        
         if (this->publish_ground_truth_pose_) {
-            this->pub_pose_ = this->node_.Advertise<msgs::Pose_V>("/model/" + model_.Name(_ecm) + "/pose");
+            this->pub_odom_ = this->node_.Advertise<msgs::Odometry>("/model/" + model_.Name(_ecm) + "/odom");
         }
 
         if (this->publish_gnss_heading_) {
@@ -300,25 +299,14 @@ namespace audibot_gazebo {
         }
         this->last_vehicle_pose_ = vehicle_pose;
 
-        if ((1e-9 * (this->current_time_ - this->twist_pub_stamp_)) > TWIST_SAMPLE_TIME) {
-            this->twist_pub_stamp_ = this->current_time_;
-            msgs::Twist twist_msg;
-            twist_msg.mutable_header()->mutable_stamp()->CopyFrom(convert<msgs::Time>(_info.simTime));
-            twist_msg.mutable_linear()->set_x(this->current_speed_);
-            twist_msg.mutable_linear()->set_y(yvel);
-            twist_msg.mutable_linear()->set_z(0.0);
-            twist_msg.mutable_angular()->set_x(0.0);
-            twist_msg.mutable_angular()->set_y(0.0);
-            twist_msg.mutable_angular()->set_z(yawvel);
-            this->pub_twist_.Publish(twist_msg);
-
+        if ((1e-9 * (this->current_time_ - this->odom_pub_stamp_)) > ODOM_SAMPLE_TIME) {
+            this->odom_pub_stamp_ = this->current_time_;
+            
             if (this->publish_ground_truth_pose_) {
-                msgs::Pose *pose_msg = nullptr;
-                this->posev_msg_.Clear();
-                pose_msg = this->posev_msg_.add_pose();
-                IGN_ASSERT(pose_msg != nullptr, "Pose msg is null");
-
-                auto header = pose_msg->mutable_header();
+                msgs::Odometry odom_msg;
+                
+                // Set header
+                auto header = odom_msg.mutable_header();
                 header->mutable_stamp()->CopyFrom(convert<msgs::Time>(_info.simTime));
                 auto frame = header->add_data();
                 frame->set_key("frame_id");
@@ -326,13 +314,23 @@ namespace audibot_gazebo {
                 auto child_frame = header->add_data();
                 child_frame->set_key("child_frame_id");
                 child_frame->add_value("base_footprint");
-                pose_msg->set_name("world_to_footprint");
-                msgs::Set(pose_msg, vehicle_pose);
-                this->pub_pose_.Publish(this->posev_msg_);
+                
+                // Set pose
+                msgs::Set(odom_msg.mutable_pose(), vehicle_pose);
+                
+                // Set twist
+                odom_msg.mutable_twist()->mutable_linear()->set_x(this->current_speed_);
+                odom_msg.mutable_twist()->mutable_linear()->set_y(yvel);
+                odom_msg.mutable_twist()->mutable_linear()->set_z(0.0);
+                odom_msg.mutable_twist()->mutable_angular()->set_x(0.0);
+                odom_msg.mutable_twist()->mutable_angular()->set_y(0.0);
+                odom_msg.mutable_twist()->mutable_angular()->set_z(yawvel);
+                
+                this->pub_odom_.Publish(odom_msg);
             }
         }
 
-        if (((1e-9 * (this->current_time_ - this->heading_pub_stamp_)) > TWIST_SAMPLE_TIME) && this->publish_gnss_heading_) {
+        if (((1e-9 * (this->current_time_ - this->heading_pub_stamp_)) > ODOM_SAMPLE_TIME) && this->publish_gnss_heading_) {
             this->heading_pub_stamp_ = this->current_time_;
             msgs::Double heading_msg;
             Set(&heading_msg, 90.0 - 180.0 / M_PI * (yaw + this->world_heading_offset_));

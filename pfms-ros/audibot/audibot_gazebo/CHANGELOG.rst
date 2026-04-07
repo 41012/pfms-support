@@ -2,6 +2,13 @@
 Changelog for package audibot_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.3 (2026-04-07)
+------------------
+* Now publishing Odometry instead of seperate Twist message
+* Disabeled publishing imu and gnss/navsat messages 
+* Contributors: Micho Radovnikovich, Alen Alempijevic
+
+
 0.2.2 (2020-07-29)
 ------------------
 * Ported to Gazebo Fortress

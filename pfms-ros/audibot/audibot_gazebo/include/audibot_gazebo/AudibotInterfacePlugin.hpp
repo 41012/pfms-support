@@ -62,14 +62,13 @@ namespace audibot_gazebo {
             Entity wheel_fr_joint_;
             Entity world_entity_;
             transport::Node node_;
-            transport::Node::Publisher pub_twist_;
-            transport::Node::Publisher pub_pose_;
+            transport::Node::Publisher pub_odom_;
             transport::Node::Publisher pub_gnss_heading_;
-            static constexpr double TWIST_SAMPLE_TIME = 0.01;
+            static constexpr double ODOM_SAMPLE_TIME = 0.01;
             static constexpr double GNSS_HEADING_SAMPLE_TIME = 0.02;
 
             // Persistent internal values
-            uint64_t twist_pub_stamp_ = 0;
+            uint64_t odom_pub_stamp_ = 0;
             uint64_t heading_pub_stamp_ = 0;
             double current_bicycle_angle_ = 0.0;
             bool first_update_ = true;
@@ -77,7 +76,6 @@ namespace audibot_gazebo {
             bool rollover_ = false;
             math::Pose3d last_vehicle_pose_;
             double current_speed_ = 0.0;
-            msgs::Pose_V posev_msg_;
             bool publish_ground_truth_pose_;
             bool publish_gnss_heading_;
             double world_heading_offset_;

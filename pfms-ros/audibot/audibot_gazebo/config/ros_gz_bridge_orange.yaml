@@ -1,15 +1,15 @@
 ---
 # Clock is now published by dedicated clock_bridge in pfms launch file
 # Removed to prevent multiple clock publishers
-- ros_topic_name: "/orange/imu"
-  gz_topic_name: "/orange_audibot/imu"
-  ros_type_name: "sensor_msgs/msg/Imu"
-  gz_type_name: "gz.msgs.IMU"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/orange/twist"
-  gz_topic_name: "/model/orange_audibot/twist"
-  ros_type_name: "geometry_msgs/msg/TwistStamped"
-  gz_type_name: "gz.msgs.Twist"
+# - ros_topic_name: "/orange/imu"
+#   gz_topic_name: "/orange_audibot/imu"
+#   ros_type_name: "sensor_msgs/msg/Imu"
+#   gz_type_name: "gz.msgs.IMU"
+#   direction: GZ_TO_ROS
+- ros_topic_name: "/orange/odom"
+  gz_topic_name: "/model/orange_audibot/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
   direction: GZ_TO_ROS
 - ros_topic_name: "/orange/steering_cmd"
   gz_topic_name: "/model/orange_audibot/steering_cmd"
@@ -51,21 +51,16 @@
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS
-- ros_topic_name: "/orange/pose"
-  gz_topic_name: "/model/orange_audibot/pose"
-  ros_type_name: "geometry_msgs/msg/PoseArray"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/orange/fix"
-  gz_topic_name: "/orange_audibot/navsat"
-  ros_type_name: "sensor_msgs/msg/NavSatFix"
-  gz_type_name: "gz.msgs.NavSat"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/orange/gnss_heading"
-  gz_topic_name: "/model/orange_audibot/gnss_heading"
-  ros_type_name: "std_msgs/msg/Float64"
-  gz_type_name: "gz.msgs.Double"
-  direction: GZ_TO_ROS
+# - ros_topic_name: "/orange/fix"
+#   gz_topic_name: "/orange_audibot/navsat"
+#   ros_type_name: "sensor_msgs/msg/NavSatFix"
+#   gz_type_name: "gz.msgs.NavSat"
+#   direction: GZ_TO_ROS
+# - ros_topic_name: "/orange/gnss_heading"
+#   gz_topic_name: "/model/orange_audibot/gnss_heading"
+#   ros_type_name: "std_msgs/msg/Float64"
+#   gz_type_name: "gz.msgs.Double"
+#   direction: GZ_TO_ROS
 - ros_topic_name: "/orange/camera/image_raw"
   gz_topic_name: "/orange_audibot/image_raw"
   ros_type_name: "sensor_msgs/msg/Image"

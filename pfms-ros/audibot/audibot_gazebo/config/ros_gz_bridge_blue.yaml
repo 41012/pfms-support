@@ -4,15 +4,15 @@
   ros_type_name: "rosgraph_msgs/msg/Clock"
   gz_type_name: "gz.msgs.Clock"
   direction: GZ_TO_ROS
-- ros_topic_name: "/audibot/imu"
-  gz_topic_name: "/blue_audibot/imu"
-  ros_type_name: "sensor_msgs/msg/Imu"
-  gz_type_name: "gz.msgs.IMU"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/audibot/twist"
-  gz_topic_name: "/model/blue_audibot/twist"
-  ros_type_name: "geometry_msgs/msg/TwistStamped"
-  gz_type_name: "gz.msgs.Twist"
+# - ros_topic_name: "/audibot/imu"
+#   gz_topic_name: "/blue_audibot/imu"
+#   ros_type_name: "sensor_msgs/msg/Imu"
+#   gz_type_name: "gz.msgs.IMU"
+#   direction: GZ_TO_ROS
+- ros_topic_name: "/audibot/odom"
+  gz_topic_name: "/model/blue_audibot/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
   direction: GZ_TO_ROS
 - ros_topic_name: "/audibot/steering_cmd"
   gz_topic_name: "/model/blue_audibot/steering_cmd"
@@ -44,21 +44,16 @@
   ros_type_name: "sensor_msgs/msg/JointState"
   gz_type_name: "gz.msgs.Model"
   direction: GZ_TO_ROS
-- ros_topic_name: "/audibot/pose"
-  gz_topic_name: "/model/blue_audibot/pose"
-  ros_type_name: "geometry_msgs/msg/PoseArray"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/audibot/fix"
-  gz_topic_name: "/blue_audibot/navsat"
-  ros_type_name: "sensor_msgs/msg/NavSatFix"
-  gz_type_name: "gz.msgs.NavSat"
-  direction: GZ_TO_ROS
-- ros_topic_name: "/audibot/gnss_heading"
-  gz_topic_name: "/model/blue_audibot/gnss_heading"
-  ros_type_name: "std_msgs/msg/Float64"
-  gz_type_name: "gz.msgs.Double"
-  direction: GZ_TO_ROS
+# - ros_topic_name: "/audibot/fix"
+#   gz_topic_name: "/blue_audibot/navsat"
+#   ros_type_name: "sensor_msgs/msg/NavSatFix"
+#   gz_type_name: "gz.msgs.NavSat"
+#   direction: GZ_TO_ROS
+# - ros_topic_name: "/audibot/gnss_heading"
+#   gz_topic_name: "/model/blue_audibot/gnss_heading"
+#   ros_type_name: "std_msgs/msg/Float64"
+#   gz_type_name: "gz.msgs.Double"
+#   direction: GZ_TO_ROS
 - ros_topic_name: "/audibot/camera/image_raw"
   gz_topic_name: "/blue_audibot/image_raw"
   ros_type_name: "sensor_msgs/msg/Image"

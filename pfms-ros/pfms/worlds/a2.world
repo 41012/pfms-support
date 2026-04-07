@@ -75,7 +75,7 @@
     <!-- Manually placed walls instead of population (Gazebo Harmonic compatibility) -->
     <!-- Row 1 -->
     <model name='wall_0_0'>
-      <pose>-40 -10 2.25 0 0 0</pose>
+      <pose>-40 -30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -83,7 +83,7 @@
     </model>
     
     <model name='wall_0_1'>
-      <pose>-20 -10 2.25 0 0 0</pose>
+      <pose>-20 -30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -91,7 +91,7 @@
     </model>
     
     <model name='wall_0_2'>
-      <pose>0 -10 2.25 0 0 0</pose>
+      <pose>0 -30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -99,7 +99,7 @@
     </model>
     
     <model name='wall_0_3'>
-      <pose>20 -10 2.25 0 0 0</pose>
+      <pose>20 -30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -107,7 +107,7 @@
     </model>
     
     <model name='wall_0_4'>
-      <pose>40 -10 2.25 0 0 0</pose>
+      <pose>40 -30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -116,7 +116,7 @@
     
     <!-- Row 2 -->
     <model name='wall_1_0'>
-      <pose>-40 10 2.25 0 0 0</pose>
+      <pose>-40 -10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -124,7 +124,7 @@
     </model>
     
     <model name='wall_1_1'>
-      <pose>-20 10 2.25 0 0 0</pose>
+      <pose>-20 -10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -132,7 +132,7 @@
     </model>
     
     <model name='wall_1_2'>
-      <pose>0 10 2.25 0 0 0</pose>
+      <pose>0 -10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -140,7 +140,7 @@
     </model>
     
     <model name='wall_1_3'>
-      <pose>20 10 2.25 0 0 0</pose>
+      <pose>20 -10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -148,7 +148,7 @@
     </model>
     
     <model name='wall_1_4'>
-      <pose>40 10 2.25 0 0 0</pose>
+      <pose>40 -10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -157,7 +157,7 @@
     
     <!-- Row 3 -->
     <model name='wall_2_0'>
-      <pose>-40 30 2.25 0 0 0</pose>
+      <pose>-40 10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -165,7 +165,7 @@
     </model>
     
     <model name='wall_2_1'>
-      <pose>-20 30 2.25 0 0 0</pose>
+      <pose>-20 10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -173,15 +173,25 @@
     </model>
     
     <model name='wall_2_2'>
-      <pose>0 30 2.25 0 0 0</pose>
+      <pose>0 10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
       <static>true</static>
     </model>
-    
+
+
+    <model name='wall_2_X'>
+      <pose>10 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+
+
     <model name='wall_2_3'>
-      <pose>20 30 2.25 0 0 0</pose>
+      <pose>20 10 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
       </include>
@@ -189,6 +199,47 @@
     </model>
     
     <model name='wall_2_4'>
+      <pose>40 10 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+
+    <!-- Row 4 -->
+    <model name='wall_3_0'>
+      <pose>-40 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_3_1'>
+      <pose>-20 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_3_2'>
+      <pose>0 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+
+    <model name='wall_3_3'>
+      <pose>20 30 2.25 0 0 0</pose>
+      <include>
+        <uri>closed_green_wall</uri>
+      </include>
+      <static>true</static>
+    </model>
+    
+    <model name='wall_3_4'>
       <pose>40 30 2.25 0 0 0</pose>
       <include>
         <uri>closed_green_wall</uri>
@@ -196,14 +247,15 @@
       <static>true</static>
     </model>
 
+
     <model name='box1'>
-      <pose>10 2 0.275 0 0 0</pose> <!-- Bottom box positioned at half its height -->
+      <pose>10 20 1.25 0 0 0</pose> <!-- Bottom box positioned at half its height -->
       
       <link name='box1'>
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.55 0.55 0.55</size>
+              <size>2.50 2.50 2.50</size>
             </box>
           </geometry>
           <material>
@@ -215,19 +267,19 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.55 0.55 0.55</size>
+              <size>2.50 2.50 2.50</size>
             </box>
           </geometry>
         </collision>
         <inertial>
-          <mass>1.0</mass>
+          <mass>100.0</mass>
           <inertia>
-            <ixx>0.050458</ixx>
+            <ixx>266.67</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.050458</iyy>
+            <iyy>266.67</iyy>
             <iyz>0</iyz>
-            <izz>0.050458</izz>
+            <izz>266.67</izz>
           </inertia>
         </inertial>
       </link>
@@ -235,7 +287,7 @@
 
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-30.7614 1.32089 33.8068 0 0.655644 0.025013</pose>
+        <pose>0 0 80 0 1.57 0</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

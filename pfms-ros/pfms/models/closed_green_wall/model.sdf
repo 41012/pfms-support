@@ -361,75 +361,7 @@
         </surface>
       </collision>
     </link>
-    <joint name='link_0_JOINT_1' type='fixed'>
-      <parent>link_0</parent>
-      <child>link_0_clone_clone</child>
-      <pose>0 0 0 0 0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='link_0_clone_0_JOINT_3' type='fixed'>
-      <parent>link_0_clone_0</parent>
-      <child>link_0_clone</child>
-      <pose>0 0 0 0 0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='link_0_clone_JOINT_0' type='fixed'>
-      <parent>link_0_clone</parent>
-      <child>link_0</child>
-      <pose>0 0 0 0 0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='link_0_clone_clone_JOINT_2' type='fixed'>
-      <parent>link_0_clone_clone</parent>
-      <child>link_0_clone_0</child>
-      <pose>0 0 0 0 0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <static>0</static>
+    <static>1</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>
 </sdf>

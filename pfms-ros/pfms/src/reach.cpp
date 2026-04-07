@@ -30,16 +30,16 @@ Reach() :
     goalSet_(false),goalReached_(false),dt_(0), dStart_(0), dTravelled_(0)
 {
 
-    //! @todo: change to use parameters for distance
-    distanceThreshold_ = 0.7;
+    this->declare_parameter("tolerance", 0.5);
+    tolerance_ = this->get_parameter("tolerance").as_double();
 
     sub1_ = this->create_subscription<nav_msgs::msg::Odometry>(
-        "/orange/odom", 1000, std::bind(&Reach::odoCallback,this,_1));
+        "/odom", 1000, std::bind(&Reach::odoCallback,this,_1));
 
     sub2_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/orange/check_goals", 1000, std::bind(&Reach::goalsCallback,this,_1));
+        "/register_goals", 1000, std::bind(&Reach::goalsCallback,this,_1));
 
-    serviceCheckGoals_ = this->create_service<std_srvs::srv::Trigger>("ackerman_check_goals", 
+    serviceCheckGoals_ = this->create_service<std_srvs::srv::Trigger>("/check_goals", 
                                 std::bind(&Reach::checkGoals,this, std::placeholders::_1, std::placeholders::_2));
 
     // std::string my_param = this->get_parameter("robot_state_publisher/robot_description").as_string();
@@ -63,7 +63,7 @@ void goalsCallback(const geometry_msgs::msg::PoseArray& msg)
 
    goalIdx_=0;int i=0;
    for (auto goal : goals_.poses) {
-       RCLCPP_INFO_STREAM(this->get_logger(),"Goal "<< i++ << " x,y ="<< goal.position.x << " , " << goal.position.y );
+       RCLCPP_INFO_STREAM(this->get_logger(),"Goal "<< i++ << " [x,y]=["<< goal.position.x << "," << goal.position.y << "]");
    }
    mx_.unlock();
    dStart_ = dTravelled_;
@@ -73,7 +73,7 @@ void checkGoals(const std::shared_ptr<std_srvs::srv::Trigger::Request>,
           std::shared_ptr<std_srvs::srv::Trigger::Response>    response)
 {
 
-    RCLCPP_INFO_STREAM(this->get_logger(),"Checking Goals within " << distanceThreshold_ << "[m]");
+    RCLCPP_INFO_STREAM(this->get_logger(),"Checking Goals within " << tolerance_ << "[m]");
     mx_.lock();
     bool success = true;
     std::stringstream msg;
@@ -129,7 +129,7 @@ void odoCallback(const nav_msgs::msg::Odometry& msg)
             // Moved to update distance to goal here
             goalDist_.at(goalIdx_)=d;
 
-            if(d<distanceThreshold_){
+            if(d<tolerance_){
                 RCLCPP_INFO_STREAM(this->get_logger(),"Reached Goal:" << goalIdx_ << " dist:"<< d);
                 goalReached_.at(goalIdx_)=true;
                 goalIdx_++;
@@ -138,10 +138,16 @@ void odoCallback(const nav_msgs::msg::Odometry& msg)
             //Let's check previous goal as we could still be rolling towards it
             if(goalIdx_>0){
                 double dPrev = distToGoal(msg,goalPrev);
-                if(dPrev<goalDist_.at(goalIdx_-1)){
-                    // RCLCPP_INFO_STREAM(this->get_logger(),"Reached Goal:" << goalIdx_-1 << " dist:"<< dPrev);
+                // Keep updating while within tolerance or if getting closer
+                if(dPrev < tolerance_ && dPrev < goalDist_.at(goalIdx_-1)){
                     goalDist_.at(goalIdx_-1)=dPrev;
+                    // RCLCPP_INFO_STREAM(this->get_logger(),
+                    //     "** Prev Goal [id,d]=[" << goalIdx_-1 << ","<< dPrev << "]" ) ;                    
                 }
+                // RCLCPP_INFO_STREAM_THROTTLE(this->get_logger(),
+                //     *this->get_clock(),
+                //     1000,
+                //     "Prev Goal [id,d]=[" << goalIdx_-1 << ","<< dPrev << "]" ) ;
             }
 
             if(goalIdx_==goals_.poses.size()){
@@ -184,7 +190,7 @@ private:
     double dStart_;
     std::atomic<double> dTravelled_;
     nav_msgs::msg::Odometry odoPrev_;
-    double distanceThreshold_;
+    double tolerance_; //<! tolerance to consider goal reached in [m] 
 };
 
 

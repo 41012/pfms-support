@@ -31,7 +31,8 @@ public:
     this->declare_parameter<std::string>("parent_frame", "world");
     this->declare_parameter<std::string>("child_frame", "base_footprint");
     this->declare_parameter<double>("publish_rate_hz", 20.0);
-    this->declare_parameter<std::string>("input_mode", "pose_array");
+    this->declare_parameter<std::string>("input_mode", "odom");
+    this->declare_parameter<std::string>("input_topic", "odom");
 
     // Get parameters
     frame_prefix_ = this->get_parameter("frame_prefix").as_string();
@@ -40,6 +41,7 @@ public:
     child_frame_ = frame_prefix_ + child_frame_base;
     double publish_rate_hz = this->get_parameter("publish_rate_hz").as_double();
     input_mode_ = this->get_parameter("input_mode").as_string();
+    std::string input_topic = this->get_parameter("input_topic").as_string();
 
     // Protect against invalid rates
     if (publish_rate_hz <= 0.0) {
@@ -57,11 +59,11 @@ public:
     // Create subscription based on input mode
     if (input_mode_ == "odom") {
       odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
-          "odom", qos,
+          input_topic, qos,
           std::bind(&PoseToTF::odomCallback, this, std::placeholders::_1));
     } else {
       pose_array_sub_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
-          "audibot/pose", qos,
+          input_topic, qos,
           std::bind(&PoseToTF::poseArrayCallback, this, std::placeholders::_1));
     }
 

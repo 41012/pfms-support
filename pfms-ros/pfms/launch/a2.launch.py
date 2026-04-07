@@ -130,7 +130,12 @@ def launch_setup(context):
             executable='reach',
             name='reach',
             parameters=[{'use_sim_time': True}],
-            output='screen'
+            output='screen',
+            remappings=[
+                ('/odom', '/orange/odom'),
+                ('/register_goals', '/orange/register_goals'),
+                ('/check_goals', '/orange/check_goals'),
+            ]            
         ),
     ])
 
@@ -211,9 +216,9 @@ def launch_setup(context):
             parameters=[{'use_sim_time': True}],
             output='screen',
             remappings=[
-                ('/orange/odom', '/husky/odom'),
-                ('/orange/check_goals', '/husky/check_goals'),
-                ('ackerman_check_goals', 'husky_check_goals'),
+                ('/odom', '/husky/odom'),
+                ('/register_goals', '/husky/register_goals'),
+                ('/check_goals', '/husky/check_goals'),
             ]
         ),
         spawn_husky,

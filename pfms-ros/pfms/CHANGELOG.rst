@@ -2,6 +2,15 @@
 Changelog for package pfms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.3 (2026-04-05)
+------------------
+* Signnificant improvementts to pose publishing and goal checking logic in reach node, including continuous updating of minimum distance to next goal
+* Improved tf (c++ version) updated 20 fold, allowing for smoother visualization and more accurate goal checking
+* Updated launch files for 2026 projects, including new remappings for reach node to work with both husky and audi robots
+* Provided a new script for downloading rosbag files from Google Drive, with improved argument parsing and default folder support
+* Contributors: Alen Alempijevic
+
+
 0.3.2 (2026-03-05)
 ------------------
 * Added Gazebo Fortress support for pfms package, including new launch files and models

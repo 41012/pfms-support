@@ -52,7 +52,7 @@ install(
 
 install(
   PROGRAMS
-    scripts/pose_to_tf.py
+    scripts/download_rosbags.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

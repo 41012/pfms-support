@@ -1,42 +1,76 @@
-- topic: /clock
-  type: rosgraph_msgs/msg/Clock
-  direction: both
-- topic: /tf
-  type: tf2_msgs/msg/TFMessage
-  direction: both
-- topic: /tf_static
-  type: tf2_msgs/msg/TFMessage
-  direction: both
-- topic: /sjtu_drone/cmd_vel
-  type: geometry_msgs/msg/Twist
-  direction: both
-- topic: /sjtu_drone/odom
-  type: nav_msgs/msg/Odometry
-  direction: both
-- topic: /sjtu_drone/imu
-  type: sensor_msgs/msg/Imu
-  direction: both
-- topic: /sjtu_drone/pose
-  type: geometry_msgs/msg/Pose
-  direction: both
-- topic: /sjtu_drone/camera_front
-  type: sensor_msgs/msg/Image
-  direction: both
-- topic: /sjtu_drone/camera_front_info
-  type: sensor_msgs/msg/CameraInfo
-  direction: both
-- topic: /sjtu_drone/camera_bottom
-  type: sensor_msgs/msg/Image
-  direction: both
-- topic: /sjtu_drone/camera_bottom_info
-  type: sensor_msgs/msg/CameraInfo
-  direction: both
-- topic: /sjtu_drone/sonar
-  type: sensor_msgs/msg/Range
-  direction: both
-- topic: /sjtu_drone/laserscan
-  type: sensor_msgs/msg/LaserScan
-  direction: both
-- topic: /sjtu_drone/gps/data
-  type: sensor_msgs/msg/NavSatFix
-  direction: both
+# Pose (used by pose_to_tf to publish world -> sjtu_drone/base_link)
+- ros_topic_name: '/sjtu_drone/pose'
+  gz_topic_name: '/model/sjtu_drone/pose'
+  ros_type_name: 'geometry_msgs/msg/PoseArray'
+  gz_type_name: 'gz.msgs.Pose_V'
+  direction: GZ_TO_ROS
+
+# Joint states
+- ros_topic_name: '/sjtu_drone/joint_states'
+  gz_topic_name: '/model/sjtu_drone/joint_states'
+  ros_type_name: 'sensor_msgs/msg/JointState'
+  gz_type_name: 'ignition.msgs.Model'
+  direction: GZ_TO_ROS
+
+# Odometry
+- ros_topic_name: '/sjtu_drone/odom'
+  gz_topic_name: '/model/sjtu_drone/odometry'
+  ros_type_name: 'nav_msgs/msg/Odometry'
+  gz_type_name: 'ignition.msgs.Odometry'
+  direction: GZ_TO_ROS
+
+# Inertial Measurement Unit
+- ros_topic_name: '/sjtu_drone/imu'
+  gz_topic_name: '/model/sjtu_drone/imu'
+  ros_type_name: 'sensor_msgs/msg/Imu'
+  gz_type_name: 'ignition.msgs.IMU'
+  direction: GZ_TO_ROS
+
+# Command velocity
+- ros_topic_name: '/sjtu_drone/cmd_vel'
+  gz_topic_name: '/model/sjtu_drone/cmd_vel'
+  ros_type_name: 'geometry_msgs/msg/Twist'
+  gz_type_name: 'ignition.msgs.Twist'
+  direction: ROS_TO_GZ
+
+# Laserscan
+- ros_topic_name: "/sjtu_drone/laserscan"
+  gz_topic_name: "/model/sjtu_drone/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+# Front Camera: RGB
+- ros_topic_name: "/sjtu_drone/camera_front"
+  gz_topic_name: "/model/sjtu_drone/camera_front/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+# Front Camera: Info
+- ros_topic_name: "/sjtu_drone/camera_front_info"
+  gz_topic_name: "/model/sjtu_drone/camera_front/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# Bottom Camera: RGB
+- ros_topic_name: "/sjtu_drone/camera_bottom"
+  gz_topic_name: "/model/sjtu_drone/camera_bottom/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "ignition.msgs.Image"
+  direction: GZ_TO_ROS
+
+# Bottom Camera: Info
+- ros_topic_name: "/sjtu_drone/camera_bottom_info"
+  gz_topic_name: "/model/sjtu_drone/camera_bottom/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "ignition.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# Sonar
+- ros_topic_name: "/sjtu_drone/sonar"
+  gz_topic_name: "/model/sjtu_drone/sonar"
+  ros_type_name: "sensor_msgs/msg/Range"
+  gz_type_name: "ignition.msgs.Double"
+  direction: GZ_TO_ROS

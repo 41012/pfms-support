@@ -4,6 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
                              OpaqueFunction, GroupAction)
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, PushRosNamespace
@@ -217,6 +218,7 @@ def launch_setup(context):
         name='rviz2',
         arguments=['-d', rviz_config],
         parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
         output='screen'
     )
 
@@ -241,5 +243,9 @@ def generate_launch_description():
             'start_paused',
             default_value='false',
             description='Start the simulation in a paused state'),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='true',
+            description='Launch RViz (true) or not (false)'),
         OpaqueFunction(function=launch_setup)
     ])

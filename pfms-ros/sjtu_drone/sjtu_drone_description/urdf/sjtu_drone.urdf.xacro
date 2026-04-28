@@ -56,9 +56,18 @@
   </joint>
   <link name="laser_link"/>
 
+  <!-- General Sensors plugin for cameras and lasers -->
   <gazebo>
-    <plugin name='simple_drone' filename='libplugin_drone.so'>
+    <plugin
+        filename="libignition-gazebo-sensors-system.so"
+        name="ignition::gazebo::systems::Sensors">
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename='plugin_drone' name='gz::sim::systems::DroneSimpleController'>
       <bodyName>base_link</bodyName>
+      <robot_name>${robot_namespace}</robot_name>
       <ros>
         <namespace>/${robot_namespace}</namespace>
       </ros>
@@ -95,39 +104,69 @@
   <!-- IMU sensor in 100fps -->
   <gazebo reference="base_link">
     <sensor name='sensor_imu' type='imu'>
-      <always_on> 1 </always_on>
-      <visualize>1</visualize>
-      <update_rate> 100 </update_rate>
-      <pose> 0 0 0 0 0 0 </pose>
-      <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
-        <ros>
-          <namespace>/${robot_namespace}</namespace>
-        </ros>
-        <initial_orientation_as_reference>false</initial_orientation_as_reference>
-      </plugin>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>100</update_rate>
+      <topic>model/sjtu_drone/imu</topic>
+      <gz_frame_id>sjtu_drone/base_link</gz_frame_id>
       <imu>
-        <noise>
-          <type>gaussian</type>
-          <rate>
-            <mean> 0 </mean>
-            <stddev> 0 </stddev>
-          </rate>
-          <accel>
-            <mean> 0 </mean>
-            <stddev> 0.00 </stddev>
-          </accel>
-        </noise>
+        <angular_velocity>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </z>
+        </linear_acceleration>
       </imu>
+      <plugin
+        filename="ignition-gazebo-imu-system"
+        name="ignition::gazebo::systems::Imu">
+      </plugin>
     </sensor>
   </gazebo>
 
 
   <!-- Sonar sensor in 5fps -->
   <gazebo reference="sonar_link">
-    <sensor name="sonar" type="ray">
+    <sensor name="sonar" type="gpu_lidar">
       <always_on>true</always_on>
       <visualize>true</visualize>
       <update_rate>5</update_rate>
+      <topic>model/sjtu_drone/sonar</topic>
+      <gz_frame_id>sjtu_drone/sonar_link</gz_frame_id>
       <ray>
         <scan>
           <horizontal>
@@ -154,20 +193,16 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="sonar" filename="libgazebo_ros_ray_sensor.so">
-        <ros>
-          <namespace>/${robot_namespace}</namespace>
-          <remapping>~/out:=sonar</remapping>
-        </ros>
-        <output_type>sensor_msgs/Range</output_type>
-        <radiation_type>ultrasound</radiation_type>
-        <frame_name>sonar_link</frame_name>
-      </plugin>
     </sensor>
   </gazebo>
 
   <gazebo reference="front_cam_link">
     <sensor name="front_camera" type="camera">
+      <always_on>true</always_on>
+      <update_rate>60</update_rate>
+      <visualize>true</visualize>
+      <topic>model/sjtu_drone/camera_front/image</topic>
+      <gz_frame_id>sjtu_drone/front_cam_link</gz_frame_id>
       <camera>
         <horizontal_fov>2.09</horizontal_fov>
         <image>
@@ -185,19 +220,6 @@
           <stddev>0.005</stddev>
         </noise>
       </camera>
-      <always_on>1</always_on>
-      <update_rate>60</update_rate>
-      <visualize>true</visualize>
-      <plugin name="camera_front" filename="libgazebo_ros_camera.so">
-        <ros>
-          <namespace>/${robot_namespace}</namespace>
-          <remapping>image_raw:=camera_front</remapping>
-          <remapping>camera_info:=camera_front_info</remapping>
-        </ros>
-        <camera_name>front</camera_name>
-        <frame_name>front_cam_link</frame_name>
-        <hack_baseline>0.07</hack_baseline>
-      </plugin>
     </sensor>
   </gazebo>
 
@@ -205,6 +227,11 @@
   <!-- downward looking camera -->
   <gazebo reference="bottom_cam_link">
     <sensor name="down_camera" type="camera">
+      <always_on>true</always_on>
+      <update_rate>15</update_rate>
+      <visualize>true</visualize>
+      <topic>model/sjtu_drone/camera_bottom/image</topic>
+      <gz_frame_id>sjtu_drone/bottom_cam_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
@@ -222,28 +249,17 @@
           <stddev>0.005</stddev>
         </noise>
       </camera>
-      <always_on>1</always_on>
-      <update_rate>15</update_rate>
-      <visualize>true</visualize>
-      <plugin name="camera_bottom" filename="libgazebo_ros_camera.so">
-        <ros>
-          <namespace>/${robot_namespace}</namespace>
-          <remapping>image_raw:=camera_bottom</remapping>
-          <remapping>camera_info:=camera_bottom_info</remapping>
-        </ros>
-        <camera_name>bottom</camera_name>
-        <frame_name>bottom_cam_link</frame_name>
-        <hack_baseline>0.07</hack_baseline>
-      </plugin>
     </sensor>
   </gazebo>
 
 
   <gazebo reference="base_link">
-    <sensor name="gps" type="gps">
+    <sensor name="gps" type="navsat">
       <always_on>true</always_on>
       <update_rate>30</update_rate>
-      <gps>
+      <topic>model/sjtu_drone/navsat</topic>
+      <gz_frame_id>sjtu_drone/base_link</gz_frame_id>
+      <navsat>
         <position_sensing>
           <horizontal>
             <noise type="gaussian">
@@ -258,52 +274,39 @@
             </noise>
           </vertical>
         </position_sensing>
-      </gps>
-      <plugin name="gps" filename="libgazebo_ros_gps_sensor.so">
-        <ros>
-          <namespace>/${robot_namespace}</namespace>
-          <remapping>~/out:=data</remapping>
-        </ros>
-      </plugin>
+      </navsat>
     </sensor>
   </gazebo>
 
   <gazebo reference="laser_link">
-      <sensor type="ray" name="laser">
-        <pose>0 0 0 0 0 0</pose>
-        <visualize>false</visualize>
-        <update_rate>30</update_rate>
-        <always_on>true</always_on>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>360</samples>
-              <resolution>1</resolution>
-              <min_angle>-3.14167</min_angle>
-              <max_angle>3.14167</max_angle>
-            </horizontal>
-          </scan>
-          <range>
-            <min>0.10</min>
-            <max>30.0</max>
-            <resolution>0.01</resolution>
-          </range>
-          <noise>
-            <type>gaussian</type>
-            <mean>0.0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-        </ray>
-          <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
-          <ros>
-            <namespace>/${robot_namespace}</namespace>
-            <remapping>~/out:=laserscan</remapping>
-          </ros>
-          <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>laser_link</frame_name>        
-        </plugin>
-      </sensor>
+    <sensor type="gpu_lidar" name="laser">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>30</update_rate>
+      <always_on>true</always_on>
+      <topic>model/sjtu_drone/scan</topic>
+      <gz_frame_id>sjtu_drone/laser_link</gz_frame_id>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14167</min_angle>
+            <max_angle>3.14167</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+    </sensor>
   </gazebo>
-
 
 </robot>

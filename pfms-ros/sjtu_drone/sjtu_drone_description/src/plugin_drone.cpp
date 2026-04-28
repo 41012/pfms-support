@@ -45,9 +45,10 @@ void DroneSimpleController::Configure(const Entity &_entity,
                  EntityComponentManager &_ecm,
                  EventManager &/*_eventMgr*/)
 {
+  // Initialize ROS if not already initialized
   if(!rclcpp::ok()){
-    RCLCPP_FATAL(rclcpp::get_logger("DroneSimpleController"), "A ROS node for Gazebo has not been initialized, unable to load plugin.");
-    return;
+    RCLCPP_WARN(rclcpp::get_logger("DroneSimpleController"), "ROS was not initialized, initializing now...");
+    rclcpp::init(0, nullptr);
   }
 
   this->model = gz::sim::Model(_entity);
@@ -67,9 +68,9 @@ void DroneSimpleController::Configure(const Entity &_entity,
   reset_topic_ = "reset";
   posctrl_topic_ = "posctrl";
   switch_mode_topic_ = "dronevel_mode";
-  gt_topic_ = "gt_odom";
-  gt_vel_topic_ = "gt_vel";
-  gt_acc_topic_ = "gt_acc";
+  gt_topic_ = "odom";
+  gt_vel_topic_ = "vel";
+  gt_acc_topic_ = "acc";
   
   
   if (!_sdf->HasElement("bodyName"))
@@ -362,6 +363,11 @@ void DroneSimpleController::PreUpdate(const UpdateInfo &_info,
   if (_info.paused)
     return;
 
+  // Skip if not properly initialized
+  if (!executor_ || !node_handle_) {
+    return;
+  }
+
   // Get time
   std::chrono::steady_clock::duration current_sim_time = _info.simTime;
   double dt = std::chrono::duration<double>(current_sim_time - last_sim_time).count();
@@ -372,7 +378,7 @@ void DroneSimpleController::PreUpdate(const UpdateInfo &_info,
     
   executor_->spin_some(std::chrono::milliseconds(10));
   UpdateState(dt);
-  UpdateDynamics(dt, _ecm);
+  UpdateDynamics(dt, _info, _ecm);
 
   if (tf_timer_count_++ >= tf_timer_thres_) {
     tf_timer_count_ = 0;
@@ -542,8 +548,9 @@ void DroneSimpleController::UpdateState(double dt){
 * truth pose, velocity, and acceleration of the drone to ROS topics.
 * 
 * @param dt The time step to use for the update.
+* @param _info The update info containing simulation time.
 */
-void DroneSimpleController::UpdateDynamics(double dt, EntityComponentManager &_ecm){
+void DroneSimpleController::UpdateDynamics(double dt, const UpdateInfo &_info, EntityComponentManager &_ecm){
   gz::math::Vector3d force, torque;
    
   // Get Pose/Orientation from Gazebo using ECS components
@@ -585,7 +592,10 @@ void DroneSimpleController::UpdateDynamics(double dt, EntityComponentManager &_e
       gt_pose.orientation.z = pose.Rot().Z();
 
       nav_msgs::msg::Odometry odom;
-      odom.header.stamp = node_handle_->now();
+      // Use simulation time instead of wall time
+      auto sim_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(_info.simTime).count();
+      odom.header.stamp.sec = static_cast<int32_t>(sim_time_ns / 1000000000);
+      odom.header.stamp.nanosec = static_cast<uint32_t>(sim_time_ns % 1000000000);
       odom.header.frame_id = "world"; 
       odom.pose.pose = gt_pose;
       odom.twist.twist.linear.x = velocity.X();
@@ -741,18 +751,22 @@ void DroneSimpleController::Reset()
 }
 
 void DroneSimpleController::tfTimerCallback() {
-  geometry_msgs::msg::TransformStamped t;
-  t.header.frame_id = "world";
-  t.child_frame_id = frame_id_;
-  t.header.stamp = node_handle_->now();
-  t.transform.translation.x = pose.Pos().X();
-  t.transform.translation.y = pose.Pos().Y();
-  t.transform.translation.z = pose.Pos().Z();
-  t.transform.rotation.w = pose.Rot().W();
-  t.transform.rotation.x = pose.Rot().X();
-  t.transform.rotation.y = pose.Rot().Y();
-  t.transform.rotation.z = pose.Rot().Z();
-  tf_broadcaster_->sendTransform(t);
+  // TF publishing disabled - using pose_to_tf node instead to ensure sim time sync
+  // if (!tf_broadcaster_ || !node_handle_) {
+  //   return;
+  // }
+  // geometry_msgs::msg::TransformStamped t;
+  // t.header.frame_id = "world";
+  // t.child_frame_id = frame_id_;
+  // t.header.stamp = node_handle_->now();
+  // t.transform.translation.x = pose.Pos().X();
+  // t.transform.translation.y = pose.Pos().Y();
+  // t.transform.translation.z = pose.Pos().Z();
+  // t.transform.rotation.w = pose.Rot().W();
+  // t.transform.rotation.x = pose.Rot().X();
+  // t.transform.rotation.y = pose.Rot().Y();
+  // t.transform.rotation.z = pose.Rot().Z();
+  // tf_broadcaster_->sendTransform(t);
 }
 
 

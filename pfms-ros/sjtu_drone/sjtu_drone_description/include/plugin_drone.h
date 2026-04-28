@@ -78,8 +78,7 @@ public:
 
 protected:
   virtual void LoadControllerSettings(const std::shared_ptr<const sdf::Element> &_sdf);
-  virtual void Update(const UpdateInfo &_info, EntityComponentManager &_ecm);
-  void UpdateDynamics(double dt, EntityComponentManager &_ecm);
+  void UpdateDynamics(double dt, const UpdateInfo &_info, EntityComponentManager &_ecm);
   void UpdateState(double dt);
   virtual void Reset();
 

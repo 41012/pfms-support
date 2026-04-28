@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>sjtu_drone_description</name>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <description>TODO: Package description</description>
   <maintainer email="georg.novtony@aon.at">Georg Novotny</maintainer>
   <license>TODO: License declaration</license>
@@ -10,8 +10,9 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>ignition_cmake_vendor</depend>
+  <!--depend>ignition_cmake_vendor</depend-->
   <depend>ros_ign</depend>
+  <depend>ros_ign_gazebo</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>

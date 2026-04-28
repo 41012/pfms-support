@@ -71,6 +71,6 @@
 # Sonar
 - ros_topic_name: "/sjtu_drone/sonar"
   gz_topic_name: "/model/sjtu_drone/sonar"
-  ros_type_name: "sensor_msgs/msg/Range"
-  gz_type_name: "ignition.msgs.Double"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS

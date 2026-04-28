@@ -8,15 +8,13 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
-        - /TF1/Frames1/sjtu_drone/laser_link1
         - /TF1/Tree1
         - /Quadcopter1
         - /Quadcopter1/Quad Sonar1
+        - /Quadcopter1/Quad Sonar1/Status1
         - /Quadcopter1/Quad LaserScan1
-        - /Quadcopter1/Quad LaserScan1/Status1
         - /Quadcopter1/Quad Odometry1
         - /Quadcopter1/Quad Platform1
-        - /Quadcopter1/Quad Platform1/Status1
         - /Image1
       Splitter Ratio: 0.5
     Tree Height: 669
@@ -37,7 +35,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Quad LaserScan
 Visualization Manager:
   Class: ""
   Displays:
@@ -60,40 +58,19 @@ Visualization Manager:
       Reference Frame: world
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        sjtu_drone/base_link:
-          Value: true
-        sjtu_drone/bottom_cam_link:
-          Value: true
-        sjtu_drone/front_cam_link:
-          Value: true
-        sjtu_drone/laser_link:
-          Value: true
-        sjtu_drone/sonar_link:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 2
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          sjtu_drone/base_link:
-            sjtu_drone/bottom_cam_link:
-              {}
-            sjtu_drone/front_cam_link:
-              {}
-            sjtu_drone/laser_link:
-              {}
-            sjtu_drone/sonar_link:
-              {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
@@ -132,7 +109,7 @@ Visualization Manager:
           Channel Name: intensity
           Class: rviz_default_plugins/LaserScan
           Color: 255; 255; 255
-          Color Transformer: ""
+          Color Transformer: Intensity
           Decay Time: 0
           Enabled: true
           Invert Rainbow: false
@@ -141,7 +118,7 @@ Visualization Manager:
           Min Color: 0; 0; 0
           Min Intensity: 0
           Name: Quad LaserScan
-          Position Transformer: ""
+          Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 3
           Size (m): 0.009999999776482582
@@ -176,7 +153,7 @@ Visualization Manager:
           Enabled: true
           Keep: 20
           Name: Quad Odometry
-          Position Tolerance: 1
+          Position Tolerance: 0.5
           Shape:
             Alpha: 1
             Axes Length: 1
@@ -193,7 +170,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /sjtu_drone/gt_odom
+            Value: /sjtu_drone/odom
           Value: true
         - Alpha: 1
           Class: rviz_default_plugins/RobotModel
@@ -304,7 +281,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 13.373930931091309
+      Distance: 16.296581268310547
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -319,10 +296,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5247958898544312
+      Pitch: 1.0647964477539062
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz_default_plugins)
-      Yaw: 3.138571262359619
+      Yaw: 3.2035698890686035
     Saved: ~
 Window Geometry:
   Displays:

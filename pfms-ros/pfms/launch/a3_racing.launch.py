@@ -1,118 +1,153 @@
 import os
 from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler, LogInfo, TimerAction)
-from launch.event_handlers import (OnExecutionComplete, OnProcessExit,
-                                OnProcessIO, OnProcessStart, OnShutdown)
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
-
-from launch_ros.substitutions import FindPackageShare
-from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable, AppendEnvironmentVariable
+from launch.actions import (DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription, GroupAction)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, PushRosNamespace
 from ament_index_python.packages import get_package_share_directory
 
-import xacro
 
+def launch_setup(context):
+    # Package directories
+    pfms_dir = get_package_share_directory('pfms')
+    audibot_gazebo_dir = get_package_share_directory('audibot_gazebo')
+    audibot_description_dir = get_package_share_directory('audibot_description')
 
-ARGUMENTS = [
-    DeclareLaunchArgument('world_path', default_value=PathJoinSubstitution(
-        [FindPackageShare("pfms"), "worlds", "race_track.world"]),
-        description='The world path, by default is race_track.world'),
-    DeclareLaunchArgument('gui', default_value='false',
-                          description='Whether to launch the GUI'),
-    AppendEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=os.path.join(get_package_share_directory('pfms'), 'models')),                          
-]
+    # -------------------------------------------------------
+    # Gazebo Simulation (Ignition)
+    # -------------------------------------------------------
+    world_file = os.path.join(pfms_dir, 'worlds', 'race_track.world')
 
-
-def generate_launch_description():
-
-    # Launch args
-    world_path = LaunchConfiguration('world_path')
-    # prefix = LaunchConfiguration('prefix')
-
+    gui_str = LaunchConfiguration('gui').perform(context)
     
-    
-    # Gazebo server
-    gzserver = ExecuteProcess(
-        cmd=['gzserver',
-             '-s', 'libgazebo_ros_init.so',
-             '-s', 'libgazebo_ros_factory.so',
-             world_path],
-        output='screen',
+    # Build Gazebo arguments: add -s flag for headless mode when gui=false
+    gz_args = world_file
+    if gui_str.lower() != 'true':
+        gz_args += ' -s'  # Server only (headless)
+    gz_args += ' -r'  # Run on start
+
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_ign_gazebo'),
+                         'launch', 'ign_gazebo.launch.py')),
+        launch_arguments={'ign_args': gz_args}.items()
     )
 
-    # Gazebo client
-    gzclient = ExecuteProcess(
-        cmd=['gzclient'],
-        output='screen',
-        condition=IfCondition(LaunchConfiguration('gui')),
+    # -------------------------------------------------------
+    # Clock Bridge (Global - single clock publisher)
+    # -------------------------------------------------------
+    clock_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='clock_bridge',
+        parameters=[{
+            'config_file': os.path.join(pfms_dir, 'config', 'clock_bridge.yaml'),
+        }],
+        output='screen'
     )
 
+    # -------------------------------------------------------
+    # Orange Audibot
+    # -------------------------------------------------------
+    orange_sdf_file = os.path.join(
+        audibot_description_dir, 'models', 'orange_audibot', 'model.sdf')
+    with open(orange_sdf_file, 'r') as f:
+        orange_robot_desc = f.read()
 
-    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
-   
-    rviz = Node(
+    bridge_config_orange = os.path.join(
+        audibot_gazebo_dir, 'config', 'ros_gz_bridge_orange.yaml')
+
+    # Spawn the orange audibot into the world at runtime
+    spawn_orange_audibot = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_orange_audibot',
+        arguments=['-file', orange_sdf_file, '-x', '24.2', '-y', '13.2', '-z', '0'],
+        output='screen'
+    )
+
+    orange_group = GroupAction([
+        PushRosNamespace('orange'),
+        Node(
+            package='ros_ign_bridge',
+            executable='parameter_bridge',
+            name='orange_bridge',
+            parameters=[{
+                'config_file': bridge_config_orange,
+                'use_sim_time': True,
+                'qos_overrides./tf_static.publisher.durability': 'transient_local',
+            }],
+            output='screen',
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='both',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': orange_robot_desc},
+                {'frame_prefix': 'orange/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'orange/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_footprint'},
+            ],
+            remappings=[
+                ('audibot/pose', '/orange/pose'),
+            ],
+            output='screen'
+        ),
+    ])
+
+    # -------------------------------------------------------
+    # RViz2
+    # -------------------------------------------------------
+    rviz_config = os.path.join(pfms_dir, 'rviz', 'a3_racing.rviz')
+    rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='a3_audi_rviz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_racing.rviz')]
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
+        output='screen'
     )
 
+    return [
+        gz_sim,
+        clock_bridge,
+        spawn_orange_audibot,
+        orange_group,
+        rviz_node,
+    ]
 
 
-    orange_audibot_options = dict(
-        robot_name = 'orange',
-        start_x = '24.2',
-        start_y = '13.2',
-        start_z = '0',
-        start_yaw = '0',
-        pub_tf = 'true',
-        tf_freq = '100.0',
-        blue = 'false'
-    )
-    
-    spawn_orange_audibot = GroupAction(
-        actions=[
-            PushRosNamespace('orange'),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
-                ]),
-                launch_arguments=orange_audibot_options.items()
-            )
-        ]
-    )
-
-    gazebo_connect = Node(
-        package='pfms',
-        executable='gazebo_connect',
-        name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
-    )
-
-    # Make sure spawn_husky_velocixxxxty_controller starts after spawn_joint_state_broadcaster
-    spawn_orange_robot_callback = RegisterEventHandler(
-        event_handler=OnProcessStart(
-            target_action=gzserver,
-            on_start=[
-                LogInfo(msg='gzserver has started!'),
-                TimerAction(
-                    period=5.0,
-                    actions=[spawn_orange_audibot],
-                )
-            ]
-        )
-    )    
-
-    ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(gzserver)
-    ld.add_action(gzclient)
-    ld.add_action(gazebo_connect)
-    ld.add_action(rviz)
-    ld.add_action(spawn_orange_robot_callback)
-
-    return ld
+def generate_launch_description():
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'gui',
+            default_value='false',
+            description='Launch Gazebo with GUI (true) or headless mode (false)'),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='true',
+            description='Launch RViz (true) or not (false)'),
+        OpaqueFunction(function=launch_setup)
+    ])

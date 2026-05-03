@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.8">
   <model name="terrain_1">
     <pose>0 0 0 0 0 0</pose>
     <static>true</static>
@@ -8,12 +8,10 @@
         <geometry>
           <mesh><uri>model://terrain_1/media/terrain_1.dae</uri></mesh>
         </geometry>
-      	<material>
-          <script>
-            <uri>model://terrain_1/media/scripts</uri>
-            <uri>model://terrain_1/media/Textures</uri>
-            <name>RepeatedGrass/Diffuse</name>
-          </script>
+        <material>
+          <ambient>0.3 0.6 0.3 1</ambient>
+          <diffuse>0.3 0.6 0.3 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
         </material>
       </visual>
       <collision name="collision">

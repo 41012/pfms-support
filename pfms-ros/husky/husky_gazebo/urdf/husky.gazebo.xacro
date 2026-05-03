@@ -105,12 +105,13 @@
   </gazebo>
 
   <!-- Lidar and cameras use the general Sensors plugin -->
-  <gazebo>
+  <!-- DISABLED: sensors-system plugin causes segfaults with scene-broadcaster -->
+  <!-- <gazebo>
     <plugin
         filename="libignition-gazebo-sensors-system.so"
         name="ignition::gazebo::systems::Sensors">
     </plugin>
-  </gazebo>
+  </gazebo> -->
 
   <gazebo reference="base_scan">
     <material>Gazebo/FlatBlack</material>

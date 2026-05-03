@@ -1,152 +1,199 @@
+#!/usr/bin/env python3
 import os
-import sys
+import subprocess
 
 import launch
 from launch.conditions import IfCondition
-from launch.substitutions import PythonExpression
-from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable
+from launch.substitutions import PythonExpression, LaunchConfiguration
+from launch.actions import (
+    IncludeLaunchDescription,
+    GroupAction,
+    SetEnvironmentVariable,
+    DeclareLaunchArgument,
+    OpaqueFunction
+)
 from launch_ros.actions import Node, PushRosNamespace
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
 
-import xacro
+def launch_setup(context):
+    # Package directories
+    pfms_dir = get_package_share_directory('pfms')
+    sjtu_drone_description_dir = get_package_share_directory('sjtu_drone_description')
+    sjtu_drone_bringup_dir = get_package_share_directory('sjtu_drone_bringup')
 
-def generate_launch_description():
+    # -------------------------------------------------------
+    # Gazebo Simulation (Ignition Fortress)
+    # -------------------------------------------------------
+    world_file = os.path.join(pfms_dir, 'worlds', 'tower_search_and_rescue.world')
 
-    mode = launch.substitutions.LaunchConfiguration('mode')
-    world = os.path.join(get_package_share_directory('pfms'), 'worlds')
-    pkg_pfms_models = get_package_share_directory('pfms')
-
-    if 'GAZEBO_MODEL_PATH' in os.environ:
-        model_path =  os.environ['GAZEBO_MODEL_PATH'] \
-            + ':' + pkg_pfms_models + '/models'
-    else:
-        model_path =  pkg_pfms_models + '/models'
-
-    gazebo_ros = get_package_share_directory('gazebo_ros')
-    gazebo_client = launch.actions.IncludeLaunchDescription(
-	launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzclient.launch.py')),
-        condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration('gui'))
-     )
+    start_paused_str = LaunchConfiguration('start_paused').perform(context)
+    gui_str = LaunchConfiguration('gui').perform(context)
     
-    gazebo_server = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
-    )
-    mode = launch.substitutions.LaunchConfiguration('mode')
+    # Build Gazebo arguments: add -s flag for headless mode when gui=false
+    gz_args = world_file
+    if gui_str.lower() != 'true':
+        gz_args += ' -s'  # Server only (headless)
+    if start_paused_str.lower() != 'true':
+        gz_args += ' -r'  # Run on start
 
-    # Gazebo server
-    # gazebo_server = ExecuteProcess(
-    #     cmd=['gzserver',
-    #          '-s', 'libgazebo_ros_init.so',
-    #          '-s', 'libgazebo_ros_factory.so',
-    #          world + '/a2.world',],
-    #     output='screen',
-    # )
-
-    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
-    xacro_file_name = "sjtu_drone.urdf.xacro"
-    xacro_file = os.path.join(
-        get_package_share_directory("sjtu_drone_description"),
-        "urdf", xacro_file_name
-    )
-    robot_description_config = xacro.process_file(xacro_file)
-    robot_desc = robot_description_config.toxml()
-    model_ns = "drone"
-
-    gazebo_connect = Node(
-        package='pfms',
-        executable='gazebo_connect',
-        name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_ign_gazebo'),
+                         'launch', 'ign_gazebo.launch.py')),
+        launch_arguments={'ign_args': gz_args}.items()
     )
 
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='two_vehicle_viz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'a3_search.rviz')]
+    # -------------------------------------------------------
+    # Clock Bridge (Global - single clock publisher)
+    # -------------------------------------------------------
+    clock_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='clock_bridge',
+        parameters=[{
+            'config_file': os.path.join(pfms_dir, 'config', 'clock_bridge.yaml'),
+        }],
+        output='screen'
     )
 
+    # -------------------------------------------------------
+    # SJTU Drone
+    # -------------------------------------------------------
+    # Process xacro to get robot description string
+    sjtu_drone_xacro_file = os.path.join(sjtu_drone_description_dir, 'urdf', 'sjtu_drone.urdf.xacro')
+    sjtu_drone_robot_desc = subprocess.check_output(
+        ['xacro', sjtu_drone_xacro_file]).decode('utf-8')
 
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher",
-        # namespace=model_ns,
-        output="screen",
-        parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
-        arguments=[robot_desc]
-    )
-
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        # namespace=model_ns,
+    # Spawn sjtu_drone into Gazebo from the /sjtu_drone/robot_description topic
+    spawn_sjtu_drone = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_sjtu_drone',
         output='screen',
+        arguments=['-topic', '/sjtu_drone/robot_description',
+                   '-name', 'sjtu_drone',
+                   '-x', '0', '-y', '0', '-z', '0.5']
     )
 
-    sjtu_drone_bringup= Node(
-        package="sjtu_drone_bringup",
-        executable="spawn_drone",
-        arguments=[robot_desc, model_ns],
-        output="screen"
+    # Bridge topics between Gazebo and ROS2 for the sjtu_drone
+    sjtu_drone_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='sjtu_drone_gz_bridge',
+        parameters=[{
+            'config_file': os.path.join(sjtu_drone_bringup_dir, 'config', 'ros_ign_bridge.yaml'),
+            'use_sim_time': True,
+        }],
+        output='screen',
+        remappings=[
+            ('tf', '/tf'),
+            ('tf_static', '/tf_static'),
+        ]
     )
 
+    sjtu_drone_group = GroupAction([
+        PushRosNamespace('sjtu_drone'),
+        # RSP publishes to /sjtu_drone/robot_description
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='screen',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': sjtu_drone_robot_desc},
+                {'frame_prefix': 'sjtu_drone/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'sjtu_drone/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_link'},
+                {'input_mode': 'odom'},
+                {'input_topic': 'odom'},
+                {'publish_rate_hz': 20.0},
+            ],
+            output='screen'
+        ),
+        spawn_sjtu_drone,
+        sjtu_drone_bridge,
+    ])
+
+    # -------------------------------------------------------
+    # Additional nodes
+    # -------------------------------------------------------
     drone_reach = Node(
         package='pfms',
         executable='reach',
         name='drone_reach',
         output='screen',
+        parameters=[{'use_sim_time': True}],
         remappings=[
-            ('/orange/odom', '/drone/gt_odom'),
-            ('/orange/check_goals', '/drone/check_goals'),
-            ('ackerman_check_goals', 'drone_check_goals'),
+            ('/orange/odom', '/sjtu_drone/odom'),
+            ('/register_goals', '/sjtu_drone/register_goals'),
+            ('/check_goals', '/sjtu_drone/check_goals'),
         ]
     )
 
+    # -------------------------------------------------------
+    # RViz2
+    # -------------------------------------------------------
+    rviz_config = os.path.join(pfms_dir, 'rviz', 'a3_search.rviz')
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
+        output='screen'
+    )
 
-    ld = launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-          'world',
-          default_value=[PythonExpression(['"',world,'" + "/tower_search_and_rescue.world"']),''],
-          description='SDF world file'),
+    return [
+        gz_sim,
+        clock_bridge,
+        sjtu_drone_group,
+        drone_reach,
+        rviz_node,
+    ]
 
-        launch.actions.DeclareLaunchArgument(
-            name='gui',
-            default_value='false'
-        ),
 
-        launch.actions.DeclareLaunchArgument(
-          name='mode',
-          default_value='night',
-          description='day or night modes are available'),
-
-        launch.actions.DeclareLaunchArgument(
-            name='extra_gazebo_args',
-            default_value='--verbose',
-            description='Extra plugins for (Gazebo)'),
-
-        SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
-          
-        gazebo_server,
-        gazebo_client,
-        gazebo_connect,
-        robot_state_publisher,
-        joint_state_publisher,
-        sjtu_drone_bringup,
-        rviz,
-        drone_reach
+def generate_launch_description():
+    # Set up model path for Ignition Gazebo
+    pfms_dir = get_package_share_directory('pfms')
+    models_path = os.path.join(pfms_dir, 'models')
+    
+    # Get existing IGN_GAZEBO_RESOURCE_PATH and append our models
+    ign_resource_path = os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')
+    if ign_resource_path:
+        models_path = models_path + ':' + ign_resource_path
+    
+    return launch.LaunchDescription([
+        SetEnvironmentVariable(name='IGN_GAZEBO_RESOURCE_PATH', value=models_path),
+        DeclareLaunchArgument(
+            'gui',
+            default_value='false',
+            description='Launch Gazebo with GUI (true) or headless mode (false)'),
+        DeclareLaunchArgument(
+            'start_paused',
+            default_value='false',
+            description='Start the simulation in a paused state'),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='true',
+            description='Launch RViz (true) or not (false)'),
+        OpaqueFunction(function=launch_setup)
     ])
-
-    return ld
 
 
 if __name__ == '__main__':

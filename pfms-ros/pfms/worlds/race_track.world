@@ -1,23 +1,33 @@
 <?xml version="1.0"?>
-
-<sdf version="1.6">
+<sdf version="1.9">
   <world name="default">
-    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
-      <ros>
-        <namespace>/demo</namespace>
-        <remapping>model_states:=model_states_demo</remapping>
-        <remapping>link_states:=link_states_demo</remapping>
-      </ros>
-      <update_rate>10.0</update_rate>
-    </plugin>
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
 
     <include>
-      <uri>model://ground_plane</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
     </include>
-    <include>
-      <uri>model://sun</uri>
-    </include>
-    <!--gravity>0 0 -9.8</gravity-->
+    
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
 
     <include>
       <uri>model://maze1</uri>
@@ -67,10 +77,9 @@
             </cylinder>
           </geometry>
           <material>
-            <script>
-              <name>Gazebo/Grey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.7 0.7 0.7 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
           </material>
         </visual>
         <self_collide>0</self_collide>

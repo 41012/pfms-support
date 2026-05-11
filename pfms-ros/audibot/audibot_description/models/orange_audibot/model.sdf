@@ -350,7 +350,7 @@
 
         <!-- Lidar: 360-degree laser scan, front of vehicle (matches original URDF laser_link position) -->
         <link name="base_scan">
-            <pose>3.728 0 0.36 0 0 0</pose>
+            <pose>3.725 0 0.36 0 0 0</pose>
             <sensor type="gpu_lidar" name="lidar">
                 <always_on>true</always_on>
                 <visualize>false</visualize>

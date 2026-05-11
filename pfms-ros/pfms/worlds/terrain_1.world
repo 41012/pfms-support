@@ -30,7 +30,7 @@
     </light>
 
     <!-- Ground plane -->
-    <model name="ground_plane">
+    <!-- model name="ground_plane">
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -55,7 +55,20 @@
           </material>
         </visual>
       </link>
-    </model>
+    </model-->
+
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
+    </include>
+
+    <!-- Terrain model -->
+    <include>
+      <uri>model://terrain_1</uri>
+      <name>terrain_1</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    
 
     <gui fullscreen='0'>
       <camera name='user_camera'>

@@ -250,7 +250,7 @@ def launch_setup(context):
         gz_sim,
         clock_bridge,
         husky_group,
-        sjtu_drone_group,
+        # sjtu_drone_group,
         rviz_node,
     ]
 

@@ -47,7 +47,7 @@
   gz_type_name: "ignition.msgs.Image"
   direction: GZ_TO_ROS
 
-# CSonar
+# Sonar
 - ros_topic_name: "/husky/sonar"
   gz_topic_name: "/model/husky/sonar"
   ros_type_name: "sensor_msgs/msg/LaserScan"

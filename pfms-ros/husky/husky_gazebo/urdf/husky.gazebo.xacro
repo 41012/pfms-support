@@ -106,12 +106,12 @@
 
   <!-- Lidar and cameras use the general Sensors plugin -->
   <!-- DISABLED: sensors-system plugin causes segfaults with scene-broadcaster -->
-  <!-- <gazebo>
+  <gazebo>
     <plugin
         filename="libignition-gazebo-sensors-system.so"
         name="ignition::gazebo::systems::Sensors">
     </plugin>
-  </gazebo> -->
+  </gazebo>
 
   <gazebo reference="base_scan">
     <material>Gazebo/FlatBlack</material>
@@ -157,14 +157,14 @@
           <horizontal>
             <samples>3</samples>
             <resolution>1</resolution>
-            <min_angle>-0.026</min_angle>
-            <max_angle>0.026</max_angle>
+            <min_angle>-0.245</min_angle>
+            <max_angle>0.245</max_angle>
           </horizontal>
           <vertical>
             <samples>3</samples>
             <resolution>1</resolution>
-            <min_angle>-0.026</min_angle>
-            <max_angle>0.026</max_angle>
+            <min_angle>-0.122</min_angle>
+            <max_angle>0.122</max_angle>
           </vertical>
         </scan>
         <range>

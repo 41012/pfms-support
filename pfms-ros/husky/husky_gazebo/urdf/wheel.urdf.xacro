@@ -15,10 +15,23 @@
 
       <collision>
         <origin xyz="0 0 0" rpy="1.5707963267948966 0 0"/> 
-        <contact_coefficients mu="0.5" kp="1+e07" kd="1"/> 
         <geometry>
           <cylinder length="0.1143" radius="${wheel_radius}"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <kp>1e+07</kp>
+              <kd>1.0</kd>
+            </ode>
+          </contact>
+        </surface>
       </collision>
       
       <inertial>

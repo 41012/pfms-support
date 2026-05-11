@@ -213,18 +213,18 @@ def launch_setup(context):
             ],
             output='screen'
         ),
-        # Node(
-        #     package='pfms',
-        #     executable='reach',
-        #     name='reach',
-        #     parameters=[{'use_sim_time': True}],
-        #     output='screen',
-        #     remappings=[
-        #         ('/odom', '/drone/odom'),
-        #         ('/register_goals', '/drone/register_goals'),
-        #         ('/check_goals', '/drone/check_goals'),
-        #     ]
-        # ),
+        Node(
+            package='pfms',
+            executable='reach',
+            name='reach',
+            parameters=[{'use_sim_time': True}],
+            output='screen',
+            remappings=[
+                ('/odom', '/drone/odom'),
+                ('/register_goals', '/drone/register_goals'),
+                ('/check_goals', '/drone/check_goals'),
+            ]
+        ),
         spawn_sjtu_drone,
         sjtu_drone_bridge,
     ])
@@ -277,7 +277,7 @@ def generate_launch_description():
             description='Start the simulation in a paused state'),
         DeclareLaunchArgument(
             'rviz',
-            default_value='false',
+            default_value='true',
             description='Launch RViz (true) or not (false). Note: For best results, launch RViz separately to avoid TF time jump warnings'),
         OpaqueFunction(function=launch_setup)
     ])

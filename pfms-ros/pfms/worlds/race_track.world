@@ -10,6 +10,9 @@
     <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"></plugin>
     <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"></plugin>
     <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"></plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
 
     <include>
       <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
@@ -33,7 +36,7 @@
       <uri>model://maze1</uri>
     </include>
 
-<model name='crash_dummy'>
+    <model name='crash_dummy'>
       <pose>50.0 50.0 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>

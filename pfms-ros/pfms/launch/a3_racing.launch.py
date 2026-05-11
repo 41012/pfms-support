@@ -63,7 +63,7 @@ def launch_setup(context):
         package='ros_ign_gazebo',
         executable='create',
         name='spawn_orange_audibot',
-        arguments=['-file', orange_sdf_file, '-x', '24.2', '-y', '13.2', '-z', '0'],
+        arguments=['-file', orange_sdf_file, '-x', '19.0', '-y', '14.8', '-z', '0'],
         output='screen'
     )
 

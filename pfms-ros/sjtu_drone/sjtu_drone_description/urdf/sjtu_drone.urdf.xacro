@@ -78,12 +78,12 @@
       <yawProportionalGain>2.0</yawProportionalGain>
       <yawDifferentialGain>1.0</yawDifferentialGain>
       <yawLimit>1.5</yawLimit>
-      <velocityXYProportionalGain>5.0</velocityXYProportionalGain>
-      <velocityXYDifferentialGain>2.3</velocityXYDifferentialGain>
+      <velocityXYProportionalGain>10.0</velocityXYProportionalGain>
+      <velocityXYDifferentialGain>5.0</velocityXYDifferentialGain>
       <velocityXYLimit>2</velocityXYLimit>
-      <velocityZProportionalGain>5.0</velocityZProportionalGain>
-      <velocityZIntegralGain>0.0</velocityZIntegralGain>
-      <velocityZDifferentialGain>1.0</velocityZDifferentialGain>
+      <velocityZProportionalGain>10.0</velocityZProportionalGain>
+      <velocityZIntegralGain>0.5</velocityZIntegralGain>
+      <velocityZDifferentialGain>2.0</velocityZDifferentialGain>
       <velocityZLimit>-1</velocityZLimit>
       <positionXYProportionalGain>1.1</positionXYProportionalGain>
       <positionXYDifferentialGain>0.0</positionXYDifferentialGain>
@@ -93,7 +93,7 @@
       <positionZDifferentialGain>0.2</positionZDifferentialGain>
       <positionZIntegralGain>0.0</positionZIntegralGain>
       <positionZLimit>-1</positionZLimit>
-      <maxForce>30</maxForce>
+      <maxForce>80</maxForce>
       <motionSmallNoise>0.05</motionSmallNoise>
       <motionDriftNoise>0.03</motionDriftNoise>
       <motionDriftNoiseTime>5.0</motionDriftNoiseTime>

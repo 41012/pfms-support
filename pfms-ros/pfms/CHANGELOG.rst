@@ -2,6 +2,12 @@
 Changelog for package pfms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.4 (2026-05-10)
+------------------
+* Updated launch files for 2026 projects A3, including new remappings for reach node to work with both husky and audi robots
+* Updated world files for 2026 projects
+* Contributors: Alen Alempijevic
+
 0.3.3 (2026-04-05)
 ------------------
 * Signnificant improvementts to pose publishing and goal checking logic in reach node, including continuous updating of minimum distance to next goal

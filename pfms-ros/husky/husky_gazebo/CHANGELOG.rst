@@ -2,12 +2,18 @@
 Changelog for package husky_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.2 (2026-05-10)
+------------------
+* Needed to adjust gravity and friction parameters.
+* The location of virtual sonar (laser) was adjusted for A3 project.
+* Contributors: Alen Alempijevic
+
+
 1.0.1 (2026-03-05)
 ------------------
 * Now Gazebo Fortress compatible.
 * Configs for the new Gazebo Fortress realsense plugin.
 * Contributors: Alen Alempijevic
-
 
 1.0.0 (2021-11-07)
 ------------------

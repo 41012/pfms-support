@@ -105,8 +105,8 @@
   <gazebo reference="base_link">
     <sensor name='sensor_imu' type='imu'>
       <always_on>true</always_on>
-      <visualize>true</visualize>
-      <update_rate>100</update_rate>
+      <visualize>false</visualize>
+      <update_rate>50</update_rate>
       <topic>model/sjtu_drone/imu</topic>
       <gz_frame_id>sjtu_drone/base_link</gz_frame_id>
       <imu>
@@ -163,7 +163,7 @@
   <gazebo reference="sonar_link">
     <sensor name="sonar" type="gpu_lidar">
       <always_on>true</always_on>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>5</update_rate>
       <topic>model/sjtu_drone/sonar</topic>
       <gz_frame_id>sjtu_drone/sonar_link</gz_frame_id>
@@ -200,7 +200,7 @@
     <sensor name="front_camera" type="camera">
       <always_on>true</always_on>
       <update_rate>5</update_rate>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <topic>model/sjtu_drone/camera_front/image</topic>
       <gz_frame_id>sjtu_drone/front_cam_link</gz_frame_id>
       <camera>
@@ -256,7 +256,7 @@
   <gazebo reference="base_link">
     <sensor name="gps" type="navsat">
       <always_on>true</always_on>
-      <update_rate>30</update_rate>
+      <update_rate>10</update_rate>
       <topic>model/sjtu_drone/navsat</topic>
       <gz_frame_id>sjtu_drone/base_link</gz_frame_id>
       <navsat>
@@ -282,7 +282,7 @@
     <sensor type="gpu_lidar" name="laser">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
-      <update_rate>30</update_rate>
+      <update_rate>20</update_rate>
       <always_on>true</always_on>
       <topic>model/sjtu_drone/scan</topic>
       <gz_frame_id>sjtu_drone/laser_link</gz_frame_id>

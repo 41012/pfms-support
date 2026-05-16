@@ -148,8 +148,8 @@ def launch_setup(context):
     # -------------------------------------------------------
     # RViz2
     # -------------------------------------------------------
-    # rviz_config = os.path.join(pfms_dir, 'rviz', 'a3_search.rviz')
-    rviz_config = os.path.join(sjtu_drone_bringup_dir, 'rviz', 'sjtu_drone.rviz')
+    rviz_config = os.path.join(pfms_dir, 'rviz', 'a3_search.rviz')
+    #rviz_config = os.path.join(sjtu_drone_bringup_dir, 'rviz', 'sjtu_drone.rviz')
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',

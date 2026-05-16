@@ -2,6 +2,11 @@
 Changelog for package pfms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2026-05-16)
+------------------
+* Simplifications to make the world file work faster for the drone (human now much simpler)
+* Contributors: Alen Alempijevic
+
 0.3.4 (2026-05-10)
 ------------------
 * Updated launch files for 2026 projects A3, including new remappings for reach node to work with both husky and audi robots

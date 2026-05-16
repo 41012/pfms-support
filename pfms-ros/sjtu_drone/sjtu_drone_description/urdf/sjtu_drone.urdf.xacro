@@ -199,7 +199,7 @@
   <gazebo reference="front_cam_link">
     <sensor name="front_camera" type="camera">
       <always_on>true</always_on>
-      <update_rate>60</update_rate>
+      <update_rate>5</update_rate>
       <visualize>true</visualize>
       <topic>model/sjtu_drone/camera_front/image</topic>
       <gz_frame_id>sjtu_drone/front_cam_link</gz_frame_id>
@@ -225,7 +225,7 @@
 
 
   <!-- downward looking camera -->
-  <gazebo reference="bottom_cam_link">
+  <!-- <gazebo reference="bottom_cam_link">
     <sensor name="down_camera" type="camera">
       <always_on>true</always_on>
       <update_rate>15</update_rate>
@@ -250,7 +250,7 @@
         </noise>
       </camera>
     </sensor>
-  </gazebo>
+  </gazebo> -->
 
 
   <gazebo reference="base_link">

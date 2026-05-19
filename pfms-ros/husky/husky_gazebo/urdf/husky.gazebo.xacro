@@ -157,15 +157,15 @@
           <horizontal>
             <samples>3</samples>
             <resolution>1</resolution>
-            <min_angle>-0.245</min_angle>
-            <max_angle>0.245</max_angle>
+            <min_angle>-0.026</min_angle>
+            <max_angle>0.026</max_angle>
           </horizontal>
-          <!--vertical>
+          <vertical>
             <samples>3</samples>
             <resolution>1</resolution>
-            <min_angle>-0.122</min_angle>
-            <max_angle>0.122</max_angle>
-          </vertical-->
+            <min_angle>-0.026</min_angle>
+            <max_angle>0.026</max_angle>
+          </vertical>
         </scan>
         <range>
           <min>0.02</min>

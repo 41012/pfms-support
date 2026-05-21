@@ -37,3 +37,7 @@ debian
 *.deb
 *.ddeb
 meshes/
+
+# python packages
+.pybuild
+*.egg-info

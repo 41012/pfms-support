@@ -37,7 +37,8 @@ Reach() :
         "/odom", 1000, std::bind(&Reach::odoCallback,this,_1));
 
     sub2_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/register_goals", 1000, std::bind(&Reach::goalsCallback,this,_1));
+        "/register_goals", rclcpp::QoS(1).transient_local().reliable(), 
+        std::bind(&Reach::goalsCallback,this,_1));
 
     serviceCheckGoals_ = this->create_service<std_srvs::srv::Trigger>("/check_goals", 
                                 std::bind(&Reach::checkGoals,this, std::placeholders::_1, std::placeholders::_2));

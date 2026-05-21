@@ -1,183 +1,257 @@
 import os
-import sys
-
-import launch
+import subprocess
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
+                             OpaqueFunction, GroupAction)
 from launch.conditions import IfCondition
-from launch.substitutions import PythonExpression
-from launch.actions import IncludeLaunchDescription, GroupAction, SetEnvironmentVariable
-from launch_ros.actions import Node, PushRosNamespace
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch.actions import ExecuteProcess
-from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node, PushRosNamespace
 
-import xacro
 
-def generate_launch_description():
+def launch_setup(context):
+    # Package directories
+    pfms_dir = get_package_share_directory('pfms')
+    audibot_gazebo_dir = get_package_share_directory('audibot_gazebo')
+    audibot_description_dir = get_package_share_directory('audibot_description')
 
-    mode = launch.substitutions.LaunchConfiguration('mode')
-    world = os.path.join(get_package_share_directory('pfms'), 'worlds')
-    pkg_pfms_models = get_package_share_directory('pfms')
+    # -------------------------------------------------------
+    # Gazebo Simulation (Ignition Harmonic)
+    # -------------------------------------------------------
+    world_file = os.path.join(pfms_dir, 'worlds', 'a1.world')
 
-    if 'GAZEBO_MODEL_PATH' in os.environ:
-        model_path =  os.environ['GAZEBO_MODEL_PATH'] \
-            + ':' + pkg_pfms_models + '/models'
-    else:
-        model_path =  pkg_pfms_models + '/models'
-
-    gazebo_ros = get_package_share_directory('gazebo_ros')
-    gazebo_client = launch.actions.IncludeLaunchDescription(
-	launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzclient.launch.py')),
-        condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration('gui'))
-     )
+    start_paused_str = LaunchConfiguration('start_paused').perform(context)
+    gui_str = LaunchConfiguration('gui').perform(context)
     
-    gazebo_server = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros, 'launch', 'gzserver.launch.py'))
-    )
-    mode = launch.substitutions.LaunchConfiguration('mode')
+    # Build Gazebo arguments: add -s flag for headless mode when gui=false
+    gz_args = world_file
+    if gui_str.lower() != 'true':
+        gz_args += ' -s'  # Server only (headless)
+    if start_paused_str.lower() != 'true':
+        gz_args += ' -r'  # Run on start
 
-    gazebo_connect = Node(
-        package='pfms',
-        executable='gazebo_connect',
-        name='gazebo_connect',
-        parameters=[{'use_sim_time': False}]
-        # arguments=['-d', os.path.join(get_package_share_directory('audibot_gazebo'), 'rviz', 'two_vehicle_example.rviz')]
-    )
-
-    orange_audibot_options = dict(
-        robot_name = 'orange',
-        start_x = '0',
-        start_y = '2',
-        start_z = '0',
-        start_yaw = '0',
-        pub_tf = 'true',
-        tf_freq = '100.0',
-        blue = 'false'
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_ign_gazebo'),
+                         'launch', 'ign_gazebo.launch.py')),
+        launch_arguments={'ign_args': gz_args}.items()
     )
 
-    blue_audibot_options = dict(
-        robot_name = 'blue',
-        start_x = '0',
-        start_y = '-2',
-        start_z = '0',
-        start_yaw = '0',
-        pub_tf = 'true',
-        tf_freq = '100.0',
-        blue = 'true'
-    )
-
-    spawn_orange_audibot = GroupAction(
-        actions=[
-            PushRosNamespace('orange'),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
-                ]),
-                launch_arguments=orange_audibot_options.items()
-            )
-        ]
-    )
-
-    spawn_blue_audibot = GroupAction(
-        actions=[
-            PushRosNamespace('blue'),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    os.path.join(get_package_share_directory('audibot_gazebo'), 'launch', 'audibot_robot.launch.py')
-                ]),
-                launch_arguments=blue_audibot_options.items()
-            )
-        ]
-    )
-
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='two_audi_viz',
-        # output='screen',
-        output={'both': 'log'},
-        arguments=['-d', os.path.join(get_package_share_directory('pfms'), 'rviz', 'two_cars.rviz')]
-    )
-
-
-    # robot_state_publisher = Node(
-    #     package="robot_state_publisher",
-    #     executable="robot_state_publisher",
-    #     name="robot_state_publisher",
-    #     # namespace=model_ns,
-    #     output="screen",
-    #     parameters=[{"use_sim_time": use_sim_time, "robot_description": robot_desc}],
-    #     arguments=[robot_desc]
-    # )
-
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        # namespace=model_ns,
-        output='screen',
-    )
-
-    audi_orange_reach = Node(
-        package='pfms',
-        executable='reach',
-        name='audi_orange_reach',
+    # -------------------------------------------------------
+    # Clock Bridge (Global - single clock publisher)
+    # -------------------------------------------------------
+    clock_bridge = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='clock_bridge',
+        parameters=[{
+            'config_file': os.path.join(pfms_dir, 'config', 'clock_bridge.yaml'),
+        }],
         output='screen'
-        # output={'both': 'log'},
     )
 
-    audi_blue_reach = Node(
-        package='pfms',
-        executable='reach',
-        name='audi_blue_reach',
-        output='screen',
-        # output={'both': 'log'},
-        remappings=[
-            ('/orange/odom', '/blue/odom'),
-            ('/orange/check_goals', '/blue/check_goals'),
-            ('ackerman_check_goals', 'ackerman_blue_check_goals'),
-        ]        
+    # -------------------------------------------------------
+    # Orange Audibot
+    # -------------------------------------------------------
+    orange_sdf_file = os.path.join(
+        audibot_description_dir, 'models', 'orange_audibot', 'model.sdf')
+    with open(orange_sdf_file, 'r') as f:
+        orange_robot_desc = f.read()
+
+    bridge_config_orange = os.path.join(
+        audibot_gazebo_dir, 'config', 'ros_gz_bridge_orange.yaml')
+
+    # Spawn the orange audibot into the world at runtime
+    spawn_orange_audibot = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_orange_audibot',
+        arguments=['-file', orange_sdf_file, '-x', '0', '-y', '3', '-z', '0'],
+        output='screen'
     )
 
-
-    ld = launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-          'world',
-          default_value=[PythonExpression(['"',world,'" + "/a1.world"']),''],
-          description='SDF world file'),
-
-        launch.actions.DeclareLaunchArgument(
-            name='gui',
-            default_value='false'
+    orange_group = GroupAction([
+        PushRosNamespace('orange'),
+        Node(
+            package='ros_ign_bridge',
+            executable='parameter_bridge',
+            name='orange_bridge',
+            parameters=[{
+                'config_file': bridge_config_orange,
+                'qos_overrides./tf_static.publisher.durability': 'transient_local',
+            }],
+            output='screen',
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
         ),
-
-        # launch.actions.DeclareLaunchArgument(
-        #   name='mode',
-        #   default_value='night',
-        #   description='day or night modes are available'),
-
-        launch.actions.DeclareLaunchArgument(
-            name='extra_gazebo_args',
-            default_value='--verbose',
-            description='Extra plugins for (Gazebo)'),
-
-        SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=model_path),
-          
-        gazebo_server,
-        gazebo_client,
-        gazebo_connect,
-        spawn_orange_audibot,
-        spawn_blue_audibot,
-        # robot_state_publisher,
-        joint_state_publisher,
-        rviz,
-        audi_blue_reach,
-        audi_orange_reach,
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='both',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': orange_robot_desc},
+                {'frame_prefix': 'orange/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'orange/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_footprint'},
+            ],
+            remappings=[
+                ('audibot/pose', '/orange/pose'),
+            ],
+            output='screen'
+        ),
+        Node(
+            package='pfms',
+            executable='reach',
+            name='reach',
+            parameters=[{'use_sim_time': True}],
+            output='screen',
+            remappings=[
+                ('/odom', '/orange/odom'),
+                ('/register_goals', '/orange/register_goals'),
+                ('/check_goals', '/orange/check_goals'),
+            ]                
+        ),
     ])
 
-    return ld
+    # -------------------------------------------------------
+    # Blue Audibot
+    # -------------------------------------------------------
+    blue_sdf_file = os.path.join(
+        audibot_description_dir, 'models', 'blue_audibot', 'model.sdf')
+    with open(blue_sdf_file, 'r') as f:
+        blue_robot_desc = f.read()
+
+    bridge_config_blue = os.path.join(
+        audibot_gazebo_dir, 'config', 'ros_gz_bridge_blue.yaml')
+
+    # Spawn the blue audibot into the world at runtime
+    spawn_blue_audibot = Node(
+        package='ros_ign_gazebo',
+        executable='create',
+        name='spawn_blue_audibot',
+        arguments=['-file', blue_sdf_file, '-x', '0', '-y', '-3', '-z', '0'],
+        output='screen'
+    )
+
+    blue_group = GroupAction([
+        PushRosNamespace('blue'),
+        Node(
+            package='ros_ign_bridge',
+            executable='parameter_bridge',
+            name='blue_bridge',
+            parameters=[{
+                'config_file': bridge_config_blue,
+                'qos_overrides./tf_static.publisher.durability': 'transient_local',
+            }],
+            output='screen',
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='both',
+            parameters=[
+                {'use_sim_time': True},
+                {'robot_description': blue_robot_desc},
+                {'frame_prefix': 'blue/'},
+            ],
+            remappings=[
+                ('tf', '/tf'),
+                ('tf_static', '/tf_static'),
+            ]
+        ),
+        Node(
+            package='pfms',
+            executable='pose_to_tf',
+            name='pose_to_tf',
+            parameters=[
+                {'use_sim_time': True},
+                {'frame_prefix': 'blue/'},
+                {'parent_frame': 'world'},
+                {'child_frame': 'base_footprint'},
+            ],
+            remappings=[
+                ('audibot/pose', '/blue/pose'),
+            ],
+            output='screen'
+        ),
+        Node(
+            package='pfms',
+            executable='reach',
+            name='reach',
+            parameters=[{'use_sim_time': True}],
+            output='screen',
+            remappings=[
+                ('/odom', '/blue/odom'),
+                ('/register_goals', '/blue/register_goals'),
+                ('/check_goals', '/blue/check_goals'),
+            ]                
+        ),
+    ])
+
+    # -------------------------------------------------------
+    # RViz2
+    # -------------------------------------------------------
+    rviz_config = os.path.join(pfms_dir, 'rviz', 'two_cars.rviz')
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
+        output='screen'
+    )
+
+    return [
+        gz_sim,
+        clock_bridge,
+        spawn_orange_audibot,
+        spawn_blue_audibot,
+        orange_group,
+        blue_group,
+        rviz_node,
+    ]
+
+
+def generate_launch_description():
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'gui',
+            default_value='false',
+            description='Launch Gazebo with GUI (true) or headless mode (false)'),
+        DeclareLaunchArgument(
+            'start_paused',
+            default_value='false',
+            description='Start the simulation in a paused state'),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='true',
+            description='Launch RViz (true) or not (false)'),
+        OpaqueFunction(function=launch_setup)
+    ])
 
 
 if __name__ == '__main__':
